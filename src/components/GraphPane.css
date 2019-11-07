@@ -1,0 +1,7 @@
+#nodeedit {
+    position:absolute;
+    display: none;
+    overflow: auto;
+    resize: none;
+}
+
