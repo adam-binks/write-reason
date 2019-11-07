@@ -1,26 +1,19 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import DocPane from './components/DocPane.js';
+import GraphPane from './components/GraphPane.js';
+// import Divider from './components/Divider';
+import SplitPane from 'react-split-pane';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    return (
+        <div className="App">
+            <SplitPane split="vertical" defaultSize="50%">
+                <DocPane />
+                <GraphPane />
+            </SplitPane>
+        </div>
+    );
 }
 
 export default App;

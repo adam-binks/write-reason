@@ -3,9 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "immutable": "^4.0.0-rc.12",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
-    "react-scripts": "3.2.0"
+    "react-scripts": "3.2.0",
+    "react-split-pane": "^0.1.87",
+    "slate": "^0.47.8",
+    "slate-react": "^0.22.9",
+    "svg.connectable.js": "^2.0.1",
+    "svg.draggy.js": "^1.1.1",
+    "svg.js": "^2.7.1"
   },
   "scripts": {
     "start": "react-scripts start",
