@@ -2,7 +2,8 @@ import React from 'react';
 import './GraphPane.css';
 import SVG from 'svg.js';
 import 'svg.draggy.js';
-import 'svg.connectable.js'
+import 'svg.connectable.js';
+import MouseFollower from './mouse_follower.js'
 
 class GraphPane extends React.Component {
     componentDidMount() {
@@ -13,8 +14,18 @@ class GraphPane extends React.Component {
         var markers = svg.group();
         var nodes = svg.group();
 
-        var g1 = nodes.group().translate(300, 100).draggy();
-        var rect = g1.rect(100, 80).radius(10).fill("#C2185B");
+        var mouse_follower = new MouseFollower(this.$el, svg, links, markers);
+
+        var g1 = nodes.group().translate(300, 100);
+
+        var arrow_hitbox_margin = 20;
+        var arrow_hitbox = g1.rect(100 + 2 * arrow_hitbox_margin, 80 + 2 * arrow_hitbox_margin)
+                .translate(-arrow_hitbox_margin, -arrow_hitbox_margin).opacity(0);
+        var rect = g1.rect(100, 80).radius(10).fill("#C2185B").draggy();
+        rect.on('dragmove', (event) => {
+            g1.translate(event.detail.delta.movedX, event.detail.delta.movedY);
+            // rect.move(0, 0);
+        })
         var text = g1.text("Node 1");
         rect.click(function () {
             document.activeElement.blur(); // remove focus from everything
@@ -39,6 +50,14 @@ class GraphPane extends React.Component {
                     save_and_hide();
                 }
             }
+        });
+
+        arrow_hitbox.on('mouseenter', function() {
+            mouse_follower.update_source(g1);
+        });
+
+        arrow_hitbox.on('mouseleave', function() {
+            mouse_follower.hide();
         });
 
         var g2 = nodes.group().translate(100, 100).draggy();
