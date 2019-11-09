@@ -5,3 +5,15 @@
     resize: none;
 }
 
+.node-text {
+    -moz-user-select: -moz-none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    fill: white; /* text colour (it's SVG text) */
+}
+
+.node {
+    fill: #FF5252 !important;
+}
