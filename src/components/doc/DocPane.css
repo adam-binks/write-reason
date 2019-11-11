@@ -1,0 +1,9 @@
+.node-link {
+    display: inline;
+    background: papayawhip;
+    padding: 0.1em 0;
+}
+
+.node-link:hover {
+    background: yellow;
+}

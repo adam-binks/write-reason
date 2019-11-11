@@ -12,7 +12,8 @@ class MouseFollower {
 
         this.mouse_rect = svg.group();
         window.addEventListener('mousemove', e => {
-            this.mouse_rect.move(e.clientX - parent_element.getBoundingClientRect().left, e.clientY - parent_element.getBoundingClientRect().top);
+            var point = svg.point(e.clientX, e.clientY);
+            this.mouse_rect.move(point.x, point.y); //e.clientX - parent_element.getBoundingClientRect().left, e.clientY - parent_element.getBoundingClientRect().top);
             
             if (typeof(this.connector) !== 'undefined') {
                 this.connector.update();

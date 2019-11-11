@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import './DocPane.css';
 import DocEditor from './DocEditor.js'
 
 class DocPane extends Component {
