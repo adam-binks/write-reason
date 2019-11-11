@@ -1,8 +1,7 @@
 import React from 'react';
 import './App.css';
-import DocPane from './components/DocPane.js';
-import GraphPane from './components/GraphPane.js';
-// import Divider from './components/Divider';
+import DocPane from './components/doc/DocPane.js';
+import GraphPane from './components/graph/GraphPane.js';
 import SplitPane from 'react-split-pane';
 
 function App() {
