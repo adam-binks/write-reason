@@ -2,8 +2,10 @@ import React from 'react';
 import { Editor } from 'slate-react';
 import { Value } from 'slate';
 import NodePlugin from './NodePlugin.js';
+import GraphPlugin from './GraphPlugin.js';
 
 const plugins = [
+    GraphPlugin(),
     NodePlugin()
 ];
 
@@ -35,8 +37,20 @@ const initialValue = Value.fromJSON({
 });
 
 class DocEditor extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.props.sharedState.editor_ref = React.createRef();
+    }
+
     state = {
         value: initialValue,
+    }
+    
+    queries = {
+        getSharedState: () => {
+            return this.props.sharedState;
+        }
     }
 
     onChange = ({ value }) => {
@@ -44,8 +58,9 @@ class DocEditor extends React.Component {
     }
 
     render() {
-        return <Editor
-            plugins = {plugins}
+        return <Editor ref={this.props.sharedState.editor_ref}
+            plugins={plugins}
+            queries={this.queries}
             value={this.state.value}
             onChange={this.onChange}
         />
