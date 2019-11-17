@@ -1,9 +1,13 @@
-import React from 'react';
+import React, { Component } from 'react';
 
-export default function LinkNode(props) {
-    return (
-        <p className="node-link" {...props.attributes}>
-            {props.children}
-        </p>
-    );
+class LinkNode extends Component {    
+    render() {
+        return (
+            <p className="node-link" {...this.props.attributes}>
+                {this.props.children}
+            </p>
+        );
+    }
 }
+
+export default LinkNode;

@@ -1,7 +1,9 @@
 var ARROW_HITBOX_MARGIN = 20;
 
 class GraphNode {
-    constructor(nodes, mouse_follower, text, x, y, width, height) {
+    constructor(nodes, mouse_follower, shared_state, text, x, y, width, height, focus_text_area) {
+        this.id = shared_state.getNodeId();
+
         this.nodes = nodes;
         this.group = nodes.group().translate(x, y);
 
@@ -9,8 +11,8 @@ class GraphNode {
             .translate(-ARROW_HITBOX_MARGIN, -ARROW_HITBOX_MARGIN).opacity(0);
         var rect = this.group.rect(width, height).radius(10).addClass('node');
         this.text = this.group.text(text).addClass('node-text');
-        
-        this.setupRectDragging(rect);
+
+        this.setupRectDragging(rect, shared_state);
         this.setupArrowHitbox(arrow_hitbox, rect, mouse_follower);
         rect.on('mouseup', (e) => {
             if (mouse_follower.drawing_arrow_from) {
@@ -18,13 +20,15 @@ class GraphNode {
             }
         });
 
-        this.editText(true);
+        if (focus_text_area) {
+            this.editText(true);
+        }
     }
 
     // the hitbox for arrows is an invisible rect a bit bigger than the visible node rect
     // but we only want to make the node itself draggable
     // so we need to intercept drag events on the rect, and move the entire group instead!
-    setupRectDragging(rect) {
+    setupRectDragging(rect, shared_state) {
         rect.draggy(); // setup dragging on the rect
         rect.on('mousedown', (e) => {
             e.stopPropagation(); // don't pan when moving a node
@@ -34,6 +38,13 @@ class GraphNode {
             var start_x = this.group.x();
             var start_y = this.group.y();
             document.activeElement.blur();
+
+            shared_state.draggedNode = {
+                text: this.text.text(),
+                resetPos: () => {
+                    this.group.move(start_x, start_y);
+                }
+            };
 
             rect.off('dragmove');
             rect.on('dragmove', (e) => {
@@ -52,24 +63,26 @@ class GraphNode {
                 var nudge = 10;
                 if (x_diff > nudge || x_diff < -nudge || y_diff > nudge || y_diff < -nudge) {
                     rect.just_dropped = true;
-                    setTimeout(() => {rect.just_dropped = false}, 0.05);
+                    setTimeout(() => { rect.just_dropped = false }, 0.05);
                 }
+
+                shared_state.draggedNode = false;
             });
         });
         this.text.click((e) => e.preventDefault());
-        var edit_text_if_not_just_dropped = () => {if (!rect.just_dropped) this.editText()};
+        var edit_text_if_not_just_dropped = () => { if (!rect.just_dropped) this.editText() };
         rect.click(edit_text_if_not_just_dropped);
         this.text.click(edit_text_if_not_just_dropped);
     }
 
     // click/drag events on the arrow hitbox should start the arrow creation process
     setupArrowHitbox(arrow_hitbox, rect, mouse_follower) {
-        arrow_hitbox.on('mousemove', ()  => {
+        arrow_hitbox.on('mousemove', () => {
             if (!mouse_follower.drawing_arrow_from) {
                 mouse_follower.update_source(this.group);
             }
         });
-        arrow_hitbox.on('mouseleave', ()  => {
+        arrow_hitbox.on('mouseleave', () => {
             if (!mouse_follower.drawing_arrow_from) {
                 mouse_follower.hide();
             }
@@ -80,7 +93,7 @@ class GraphNode {
         });
     }
 
-    editText(delete_if_empty_text=false) {
+    editText(delete_if_empty_text = false) {
         document.activeElement.blur(); // remove focus from everything
 
         var textarea = document.querySelector('#nodeedit');
@@ -92,11 +105,11 @@ class GraphNode {
         textarea.style.display = "inline-block";
         textarea.focus();
 
-        var save_changes = ()  => {
+        var save_changes = () => {
             this.text.text(this.text.text().replace(/[\r\n\v]+/g, ''));
             this.text.text(textarea.value);
         };
-        var save_and_hide = ()  => {
+        var save_and_hide = () => {
             save_changes();
             textarea.style.display = "none";
             if (delete_if_empty_text && (!this.text.text() || this.text.text() === "")) {

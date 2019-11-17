@@ -6,7 +6,7 @@ class DocPane extends Component {
     render() {
         return (
             <div className="pane">
-                <DocEditor />
+                <DocEditor sharedState={this.props.sharedState} />
             </div>
         );
     }

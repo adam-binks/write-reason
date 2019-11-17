@@ -9,6 +9,8 @@ import GraphNode from './GraphNode.js'
 
 class GraphPane extends React.Component {
     componentDidMount() {
+        this.props.sharedState.graphPane = this;
+
         this.$el = document.querySelector("#graph")
 
         var svg = new SVG(this.$el).size("100%", "100%").panZoom({ zoomMin: 1, zoomMax: 1 }); // just pan, no zoom
@@ -37,27 +39,35 @@ class GraphPane extends React.Component {
                 return;
             }
 
-            this.addNodeAtScreenLocation(svg, nodes, mouse_follower, "", e.clientX, e.clientY);
+            this.addNodeAtScreenLocation(svg, nodes, mouse_follower, "", e.clientX, e.clientY, true);
         });
 
-        // todo FIX
-        // svg.on('drop', this.onDrop);
-        document.addEventListener("drop", function (event) {
-            event.preventDefault();
-            // if (event.target.id === "graph") {
-                var data = event.dataTransfer.getData("Text");
-                console.log(data);
-            // }
-        });
+        this.setupTextDropping(svg, nodes, mouse_follower);
 
         svg.on('panStart', (e) => {
             document.activeElement.blur();
         });
+
+        // temp
+        this.addNodeAtScreenLocation(svg, nodes, mouse_follower, "Radical", 1200, 300, false);
     }
 
-    addNodeAtScreenLocation(svg, nodes, mouse_follower, text, x, y) {
+    setupTextDropping(svg, nodes, mouse_follower) {
+        this.$el.addEventListener("dragover", (e) => {
+            e.preventDefault();
+        });
+
+        this.$el.addEventListener("drop", (e) => {
+            e.preventDefault();
+            var data = e.dataTransfer.getData("Text");
+            var node = this.addNodeAtScreenLocation(svg, nodes, mouse_follower, data, e.clientX, e.clientY, false);
+            this.props.sharedState.addLinkAtSelection(node.id, node);
+        });
+    }
+
+    addNodeAtScreenLocation(svg, nodes, mouse_follower, text, x, y, focus_text_area) {
         var point = svg.point(x, y);
-        new GraphNode(nodes, mouse_follower, text, point.x, point.y, 100, 80);
+        return new GraphNode(nodes, mouse_follower, this.props.sharedState, text, point.x, point.y, 100, 80, focus_text_area);
     }
 
     componentWillUnmount() {
