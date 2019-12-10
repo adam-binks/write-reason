@@ -20,16 +20,17 @@ const initialValue = Value.fromJSON({
                         object: 'text',
                         text: 'A line of text in a paragraph.',
                     },
-                    {
-                        object: 'inline',
-                        type: 'link',
-                        nodes: [
-                            {
-                                object: 'text',
-                                text: 'This is a link.'
-                            }
-                        ]
-                    }
+                    // {
+                    //     object: 'inline',
+                    //     type: 'link',
+                    //     data: {node_id: 'sometghing'},
+                    //     nodes: [
+                    //         {
+                    //             object: 'text',
+                    //             text: 'This is a link.'
+                    //         }
+                    //     ]
+                    // }
                 ],
             },
         ],

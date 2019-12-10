@@ -13,8 +13,12 @@ export default function LinkPlugin(options) {
         },
 
         renderInline(props, editor, next) {
-            if (props.node.type === 'link') {                
-                return <LinkNode {...props} sharedState={editor.getSharedState()} />
+            if (props.node.type === 'link') {
+                var id = props.node.data.get("node_id");
+                var ref = React.createRef();
+                editor.getSharedState().registerLinkNode(id, ref);
+
+                return <LinkNode ref={ref} {...props} sharedState={editor.getSharedState()} nodeId={id}/>
             }
 
             return next();

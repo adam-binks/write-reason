@@ -17,3 +17,7 @@
 .node {
     fill: #FF5252 !important;
 }
+
+.node.hovered {
+    fill: #d4c04b !important;
+}
