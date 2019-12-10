@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function GraphPlugin(options) {
     return {
         onMouseUp(event, editor, next) {

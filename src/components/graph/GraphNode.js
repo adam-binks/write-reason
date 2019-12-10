@@ -10,7 +10,8 @@ class GraphNode {
         var arrow_hitbox = this.group.rect(width + 2 * ARROW_HITBOX_MARGIN, height + 2 * ARROW_HITBOX_MARGIN)
             .translate(-ARROW_HITBOX_MARGIN, -ARROW_HITBOX_MARGIN).opacity(0);
         this.rect = this.group.rect(width, height).radius(10).addClass('node');
-        this.text = this.group.text(text).addClass('node-text');
+        this.text = this.group.text("").addClass('node-text');
+        this.updateShortText(text);
 
         this.setupRectDragging(this.rect, shared_state);
         this.setupArrowHitbox(arrow_hitbox, mouse_follower);
@@ -64,7 +65,7 @@ class GraphNode {
 
             shared_state.draggedNode = {
                 id: this.id,
-                text: this.text.text(),
+                text: this.getShortText(),
                 resetPos: () => {
                     this.group.move(start_x, start_y);
                 },
@@ -118,11 +119,20 @@ class GraphNode {
         });
     }
 
+    updateShortText(newShortText) {
+        this.shortText = newShortText.replace(/[\r\n\v]+/g, '');
+        this.text.text(this.shortText);
+    }
+
+    getShortText() {
+        return this.shortText;
+    }
+
     editText(shared_state, delete_if_empty_text = false) {
         document.activeElement.blur(); // remove focus from everything
 
         var textarea = document.querySelector('#nodeedit');
-        textarea.value = this.text.text();
+        textarea.value = this.getShortText();
 
         var screen_coords = this.group.getScreenCoords();
         textarea.style.left = screen_coords.x + "px";
@@ -131,10 +141,8 @@ class GraphNode {
         textarea.focus();
 
         var save_changes = () => {
-            this.text.text(this.text.text().replace(/[\r\n\v]+/g, ''));
-            this.text.text(textarea.value);
-            
-            shared_state.updateDocShortText(this.id, this.text.text());
+            this.updateShortText(textarea.value);
+            shared_state.updateDocShortText(this.id, this.getShortText());
         };
         var save_and_hide = () => {
             save_changes();
@@ -144,16 +152,18 @@ class GraphNode {
             }
         };
         textarea.onblur = save_and_hide;
-        textarea.onkeydown = (e) => {
-            save_changes();
+        textarea.onkeyup = (e) => {
             if (e.key === "Escape" || e.key === "Esc" || e.key === "Enter") {
-                save_and_hide();
                 e.preventDefault();
+                document.activeElement.blur();
+            } else {
+                save_changes();
             }
         };
     }
 
     delete() {
+        // TODO remove from sharedstate
         this.group.remove();
     }
 }

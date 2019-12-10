@@ -1,3 +1,4 @@
+import { Text } from 'slate';
 
 export default class SharedState {
     node_id_counter = 0;
@@ -59,8 +60,25 @@ export default class SharedState {
 
     updateDocShortText(id, newText) {
         var docNode = this.getDocNode(id);
+        console.log(docNode);
+        
         if (docNode) {
-            //todo
+            var editor = this.getEditor();
+
+            docNode.nodes.forEach(child => {
+                editor.removeNodeByKey(child.key);
+            });
+
+            editor.insertNodeByKey(docNode.key, 0, Text.create({text: newText}));
+            console.log("insert " + newText);
+        }
+    }
+
+    updateGraphShortText(id, newText) {
+        var graphNode = this.getGraphNode(id);
+        
+        if (graphNode) {
+            graphNode.text.text(newText);            
         }
     }
 }
