@@ -9,19 +9,42 @@ class GraphNode {
 
         var arrow_hitbox = this.group.rect(width + 2 * ARROW_HITBOX_MARGIN, height + 2 * ARROW_HITBOX_MARGIN)
             .translate(-ARROW_HITBOX_MARGIN, -ARROW_HITBOX_MARGIN).opacity(0);
-        var rect = this.group.rect(width, height).radius(10).addClass('node');
+        this.rect = this.group.rect(width, height).radius(10).addClass('node');
         this.text = this.group.text(text).addClass('node-text');
 
-        this.setupRectDragging(rect, shared_state);
-        this.setupArrowHitbox(arrow_hitbox, rect, mouse_follower);
-        rect.on('mouseup', (e) => {
+        this.setupRectDragging(this.rect, shared_state);
+        this.setupArrowHitbox(arrow_hitbox, mouse_follower);
+        this.rect.on('mouseup', (e) => {
             if (mouse_follower.drawing_arrow_from) {
                 mouse_follower.complete_arrow(this);
             }
         });
 
+        this.rect.on('mouseenter', (e) => {
+            this.setHovered(true);
+            var ref = shared_state.getDocNodeRef(this.id);
+            if (ref) {
+                ref.setExternalHover(true);
+            }
+        });
+        this.rect.on('mouseleave', (e) => {
+            this.setHovered(false);
+            var ref = shared_state.getDocNodeRef(this.id);
+            if (ref) {
+                ref.setExternalHover(false);
+            }
+        });
+
         if (focus_text_area) {
-            this.editText(true);
+            this.editText(shared_state, true);
+        }
+    }
+
+    setHovered(isHovered) {
+        if (isHovered) {
+            this.rect.addClass("hovered");
+        } else {
+            this.rect.removeClass("hovered");
         }
     }
 
@@ -40,10 +63,12 @@ class GraphNode {
             document.activeElement.blur();
 
             shared_state.draggedNode = {
+                id: this.id,
                 text: this.text.text(),
                 resetPos: () => {
                     this.group.move(start_x, start_y);
-                }
+                },
+                node: this
             };
 
             rect.off('dragmove');
@@ -70,13 +95,13 @@ class GraphNode {
             });
         });
         this.text.click((e) => e.preventDefault());
-        var edit_text_if_not_just_dropped = () => { if (!rect.just_dropped) this.editText() };
+        var edit_text_if_not_just_dropped = () => { if (!rect.just_dropped) this.editText(shared_state) };
         rect.click(edit_text_if_not_just_dropped);
         this.text.click(edit_text_if_not_just_dropped);
     }
 
     // click/drag events on the arrow hitbox should start the arrow creation process
-    setupArrowHitbox(arrow_hitbox, rect, mouse_follower) {
+    setupArrowHitbox(arrow_hitbox, mouse_follower) {
         arrow_hitbox.on('mousemove', () => {
             if (!mouse_follower.drawing_arrow_from) {
                 mouse_follower.update_source(this.group);
@@ -93,7 +118,7 @@ class GraphNode {
         });
     }
 
-    editText(delete_if_empty_text = false) {
+    editText(shared_state, delete_if_empty_text = false) {
         document.activeElement.blur(); // remove focus from everything
 
         var textarea = document.querySelector('#nodeedit');
@@ -108,6 +133,8 @@ class GraphNode {
         var save_changes = () => {
             this.text.text(this.text.text().replace(/[\r\n\v]+/g, ''));
             this.text.text(textarea.value);
+            
+            shared_state.updateDocShortText(this.id, this.text.text());
         };
         var save_and_hide = () => {
             save_changes();

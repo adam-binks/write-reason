@@ -8,39 +8,41 @@ export default function GraphPlugin(options) {
             if (draggedNode) {
                 draggedNode.resetPos();
 
-                const { value } = editor
-                const { document, selection } = value
+                if (editor.getSharedState().getGraphNode(draggedNode.id)) {
+                    // todo possibly display a message to the user?
+                    console.log("Duplicate!");
+                } else {
+                    const { value } = editor
+                    const { document, selection } = value
+                    const target = editor.findEventRange(event)
+                    editor.select(target)
 
-                const target = editor.findEventRange(event)
-                editor.select(target)
-
-                const { anchor } = target
-                let hasVoidParent = document.hasVoidParent(anchor.path, editor)
-
-                // this bit seems necessary, taken from slate.js onDrop
-                if (hasVoidParent) {
-                    let p = anchor.path
-                    let n = document.getNode(anchor.path)
-
-                    while (hasVoidParent) {
-                        const [nxt] = document.texts({ path: p })
-
-                        if (!nxt) {
-                            break
+                    // this bit seems necessary, taken from slate.js onDrop
+                    const { anchor } = target
+                    let hasVoidParent = document.hasVoidParent(anchor.path, editor)
+                    if (hasVoidParent) {
+                        let p = anchor.path
+                        let n = document.getNode(anchor.path)
+                        while (hasVoidParent) {
+                            const [nxt] = document.texts({ path: p })
+                            if (!nxt) {
+                                break
+                            }
+                            ;[n, p] = nxt
+                            hasVoidParent = document.hasVoidParent(p, editor)
                         }
-
-                        ;[n, p] = nxt
-                        hasVoidParent = document.hasVoidParent(p, editor)
+                        if (n) editor.moveToStartOfNode(n)
                     }
 
-                    if (n) editor.moveToStartOfNode(n)
-                }
+                    // insert the link
+                    editor.insertInline({
+                        type: 'link',
+                        data: {node_id: draggedNode.id}
+                    })
+                    editor.insertText(draggedNode.text)
 
-                // insert the link
-                editor.insertInline({
-                    type: 'link'
-                })
-                editor.insertText(draggedNode.text)
+                    editor.getSharedState().addGraphMapping(draggedNode.id, draggedNode.node)
+                }
             }
             next();
         },
