@@ -21,3 +21,18 @@
 .node.hovered {
     fill: #d4c04b !important;
 }
+
+table { border-collapse:collapse }
+
+.option-popup-div {
+    position: absolute;
+    background-color: white;
+    border-width: 5px;
+    border-color: grey;
+    border-style: solid;
+    border-radius: 5px;
+}
+
+.option-row:hover {
+    background-color: lightgrey;
+}

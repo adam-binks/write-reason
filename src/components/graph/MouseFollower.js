@@ -1,6 +1,14 @@
+import OptionPopup from './OptionPopup.js'
+
 const COMPLETED_ARROW_COLOUR = "#5D4037";
 const POTENTIAL_ARROW_COLOUR = "#d4b8b0";
 const DRAWING_ARROW_COLOUR = "#719deb";
+
+const ARROW_OPTIONS = [
+    {'colour': 'green', 'name': 'Supports'},
+    {'colour': 'red', 'name': 'Opposes'},
+    {'colour': 'blue', 'name': 'Expands'}
+];
 
 class MouseFollower {
     constructor(parent_element, svg, connectables_container, markers, links) {
@@ -55,11 +63,21 @@ class MouseFollower {
     }
 
     complete_arrow(end_node) {
-        this.drawing_arrow_from.group.connectable({
+        var connector = this.drawing_arrow_from.group.connectable({
             container: this.links,
             markers: this.markers
-        }, end_node.group).setLineColor(COMPLETED_ARROW_COLOUR);
-        this.stop_drawing_arrow()
+        }, end_node.group);
+        connector.setLineColor(COMPLETED_ARROW_COLOUR);
+
+        var c1 = this.drawing_arrow_from.group.getScreenCoords();
+        var c2 = end_node.group.getScreenCoords();
+        var midpoint = [(c1.x + c2.x) / 2, (c1.y + c2.y) / 2]
+
+        new OptionPopup(ARROW_OPTIONS, midpoint[0], midpoint[1], (selected_option) => {
+            connector.setLineColor(selected_option.colour);
+        });
+
+        this.stop_drawing_arrow();
     }
 
     stop_drawing_arrow() {
