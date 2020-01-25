@@ -60,17 +60,15 @@ export default class SharedState {
 
     updateDocShortText(id, newText) {
         var docNode = this.getDocNode(id);
-        console.log(docNode);
         
         if (docNode) {
             var editor = this.getEditor();
 
+            // replace any text with newText
             docNode.nodes.forEach(child => {
                 editor.removeNodeByKey(child.key);
             });
-
             editor.insertNodeByKey(docNode.key, 0, Text.create({text: newText}));
-            console.log("insert " + newText);
         }
     }
 
@@ -78,7 +76,7 @@ export default class SharedState {
         var graphNode = this.getGraphNode(id);
         
         if (graphNode) {
-            graphNode.text.text(newText);            
+            graphNode.updateShortText(newText);            
         }
     }
 }

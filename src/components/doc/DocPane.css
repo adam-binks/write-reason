@@ -1,3 +1,8 @@
+.slate-editor {
+    font-family: 'Crimson Text', serif;
+    font-size: 120%;
+}
+
 .node-link {
     display: inline;
     background: papayawhip;
