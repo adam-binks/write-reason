@@ -3,6 +3,19 @@
     display: none;
     overflow: auto;
     resize: none;
+
+    margin: 15px;
+
+    background: rgba(0, 0, 0, 0);
+    border: none;
+    outline: 0;
+    cursor: text;
+    color: white;
+
+    font-family: 'Varela Round', sans-serif;
+    font-size: 1em;
+
+    line-height: 131%;
 }
 
 .node-text {
@@ -11,7 +24,10 @@
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    fill: white; /* text colour (it's SVG text) */
+    fill: lightgrey; /* text colour (it's SVG text) */
+    
+    font-family: 'Varela Round', sans-serif;
+    font-size: 1em;
 }
 
 .node {
@@ -19,5 +35,5 @@
 }
 
 .node.hovered {
-    fill: #d4c04b !important;
+    fill: rgb(255, 46, 46) !important;
 }

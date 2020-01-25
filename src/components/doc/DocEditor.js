@@ -59,7 +59,9 @@ class DocEditor extends React.Component {
     }
 
     render() {
-        return <Editor ref={this.props.sharedState.editor_ref}
+        return <Editor
+            className="slate-editor"
+            ref={this.props.sharedState.editor_ref}
             plugins={plugins}
             queries={this.queries}
             value={this.state.value}

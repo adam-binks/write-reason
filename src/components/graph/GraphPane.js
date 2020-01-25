@@ -48,6 +48,13 @@ class GraphPane extends React.Component {
             document.activeElement.blur();
         });
 
+        var textarea = document.querySelector('#nodeedit');
+        textarea.setAttribute('style', 'height:' + (textarea.scrollHeight) + 'px;overflow-y:hidden;');
+        textarea.addEventListener("input", (e) => {
+            textarea.style.height = 'auto';
+            textarea.style.height = (textarea.scrollHeight) + 'px';
+        });
+
         // temp
         this.addNodeAtScreenLocation(svg, nodes, mouse_follower, "Radical", 1200, 300, false);
     }
