@@ -21,7 +21,7 @@ class MouseFollower {
         this.mouse_rect = svg.group();
         window.addEventListener('mousemove', e => {
             var point = svg.point(e.clientX, e.clientY);
-            this.mouse_rect.move(point.x, point.y); //e.clientX - parent_element.getBoundingClientRect().left, e.clientY - parent_element.getBoundingClientRect().top);
+            this.mouse_rect.move(point.x, point.y);
             
             if (typeof(this.connector) !== 'undefined') {
                 this.connector.update();
@@ -44,6 +44,9 @@ class MouseFollower {
                 markers: this.markers
             }, this.mouse_rect);
         } else {
+            this.connector.marker.show();
+            this.connector.line.show();
+
             this.connector.target = this.mouse_rect;
             this.connector.source = new_source;
             this.connector.update();
@@ -54,6 +57,8 @@ class MouseFollower {
     hide() {
         if (typeof(this.connector) !== 'undefined') {
             this.connector.target = this.connector.source;
+            this.connector.marker.hide();
+            this.connector.line.hide();
         }
     }
 
@@ -65,7 +70,8 @@ class MouseFollower {
     complete_arrow(end_node) {
         var connector = this.drawing_arrow_from.group.connectable({
             container: this.links,
-            markers: this.markers
+            markers: this.markers,
+            specialCoords: true
         }, end_node.group);
         connector.setLineColor(COMPLETED_ARROW_COLOUR);
 
