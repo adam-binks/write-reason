@@ -3,10 +3,9 @@ import './GraphPane.css';
 import SVG from 'svg.js';
 import 'svg.panzoom.js';
 import 'svg.draggy.js';
-import 'svg.connectable.js';
-import MouseFollower from './MouseFollower.js'
-import GraphNode from './GraphNode.js'
-import OptionPopup from './OptionPopup.js'
+import './svg.connectable.js';
+import MouseFollower from './MouseFollower.js';
+import GraphNode from './GraphNode.js';
 
 class GraphPane extends React.Component {
     componentDidMount() {

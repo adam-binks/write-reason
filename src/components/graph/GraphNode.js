@@ -87,6 +87,7 @@ class GraphNode {
                 text: this.getShortText(),
                 resetPos: () => {
                     this.group.move(start_x, start_y);
+                    this.group.node.dispatchEvent(new CustomEvent("dragmove")); // update any connectables looking for drag events
                 },
                 node: this
             };
@@ -183,6 +184,8 @@ class GraphNode {
         this.text.center(0.5 * this.rect.width(), 0.5 * this.rect.height());
 
         this.arrow_hitbox.size(this.rect.width() + ARROW_HITBOX_MARGIN * 2, this.rect.height() + ARROW_HITBOX_MARGIN * 2);
+
+        this.group.node.dispatchEvent(new CustomEvent("dragmove")); // update any connectables looking for drag events
     }
 
     getShortText() {
