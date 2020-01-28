@@ -109,6 +109,7 @@ class GraphNode {
             shared_state.draggedNode = {
                 id: this.id,
                 text: this.getShortText(),
+                longText: this.getLongText(),
                 resetPos: () => {
                     this.group.move(start_x, start_y);
                     this.group.node.dispatchEvent(new CustomEvent("dragmove")); // update any connectables looking for drag events
@@ -214,6 +215,10 @@ class GraphNode {
 
     getShortText() {
         return this.shortText;
+    }
+
+    getLongText() {
+        return "long text (todo)";
     }
 
     editText(shared_state, delete_if_empty_text = false) {

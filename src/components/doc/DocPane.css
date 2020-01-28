@@ -9,6 +9,10 @@
     padding: 0.1em 0;
 }
 
-.node-link.hovered, .node-link:hover {
+.node-body {
+    background: papayawhip;
+}
+
+.node-body.hovered .node-body:hover .node-link.hovered, .node-link:hover {
     background: yellow;
 }

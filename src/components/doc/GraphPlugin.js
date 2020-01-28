@@ -33,11 +33,18 @@ export default function GraphPlugin(options) {
                     }
 
                     // insert the link
-                    editor.insertInline({
+                    editor.insertBlock({
                         type: 'link',
                         data: {node_id: draggedNode.id}
                     })
                     editor.insertText(draggedNode.text)
+
+                    // add the body of the node
+                    editor.insertBlock({
+                        type: 'body',
+                        data: {node_id: draggedNode.id}
+                    })
+                    editor.insertText(draggedNode.longText)
 
                     editor.getSharedState().addGraphMapping(draggedNode.id, draggedNode.node)
                 }
