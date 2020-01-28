@@ -52,3 +52,11 @@ table { border-collapse:collapse }
 .option-row:hover {
     background-color: lightgrey;
 }
+
+.connector-line:hover {
+    fill: black !important;
+}
+
+.connector-marker:hover {
+    fill: black !important;
+}
