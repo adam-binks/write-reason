@@ -1,13 +1,15 @@
 import OptionPopup from './OptionPopup.js'
+import colorString from 'color-string';
 
 const COMPLETED_ARROW_COLOUR = "#5D4037";
 const POTENTIAL_ARROW_COLOUR = "#d4b8b0";
 const DRAWING_ARROW_COLOUR = "#719deb";
 
 const ARROW_OPTIONS = [
-    {'colour': 'green', 'name': 'Supports'},
-    {'colour': 'red', 'name': 'Opposes'},
-    {'colour': 'blue', 'name': 'Expands'}
+    {'colour': 'green', 'name': 'Supports', 'symbol': "→"},
+    {'colour': 'red', 'name': 'Opposes', 'symbol': "→"},
+    {'colour': 'blue', 'name': 'Expands', 'symbol': "→"},
+    {'colour': 'black', 'name': 'Delete', 'symbol': "🗙"}
 ];
 
 class MouseFollower {
@@ -68,6 +70,11 @@ class MouseFollower {
     }
 
     complete_arrow(end_node) {
+        if (end_node === this.drawing_arrow_from) {
+            this.stop_drawing_arrow();
+            return;
+        }
+
         var connector = this.drawing_arrow_from.group.connectable({
             container: this.links,
             markers: this.markers,
@@ -77,24 +84,38 @@ class MouseFollower {
 
         connector.line.on("click", e => {
             var graph_pos = document.getElementById("graph").getBoundingClientRect();
-            this.edit_connector_type(connector, e.clientX - graph_pos.left, e.clientY - graph_pos.top);
+            this.edit_connector_type(connector, e.clientX - graph_pos.left, e.clientY - graph_pos.top, true);
         });
 
         var c1 = this.drawing_arrow_from.group.getScreenCoords();
         var c2 = end_node.group.getScreenCoords();
         var midpoint = [(c1.x + c2.x) / 2, (c1.y + c2.y) / 2]
 
-        this.edit_connector_type(connector, midpoint[0], midpoint[1]);
+        this.edit_connector_type(connector, midpoint[0], midpoint[1], false);
 
         this.stop_drawing_arrow();
     }
 
-    edit_connector_type(connector, popup_x, popup_y) {
-        console.log('x' + popup_x + "y" + popup_y);
+    edit_connector_type(connector, popup_x, popup_y, hideOnClickOutside) {
+        var prev_selected = undefined;
         
-        new OptionPopup(ARROW_OPTIONS, popup_x, popup_y, (selected_option) => {
-            connector.setLineColor(selected_option.colour);
-        });
+        ARROW_OPTIONS.forEach(entry => {
+            if (entry.colour === connector.line.attr('stroke')) {
+                prev_selected = entry.name;
+            }
+        })
+
+        new OptionPopup(ARROW_OPTIONS, popup_x, popup_y, hideOnClickOutside, (selected_option) => {
+            if (selected_option.name === "Delete") {
+                this.remove_arrow(connector);
+            } else {
+                connector.setLineColor(selected_option.colour);
+            }
+        }, prev_selected);
+    }
+
+    remove_arrow(connector) {
+        connector.line.node.instance.delete_connectable(connector);
     }
 
     stop_drawing_arrow() {

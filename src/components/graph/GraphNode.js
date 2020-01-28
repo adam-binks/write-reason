@@ -1,3 +1,5 @@
+import OptionPopup from "./OptionPopup";
+
 var ARROW_HITBOX_MARGIN = 20;
 
 class GraphNode {
@@ -24,10 +26,32 @@ class GraphNode {
         this.text.on('mouseup', complete_arrow);
 
         this.setupHover(shared_state);
+        this.setupContextMenu(shared_state);
 
         if (focus_text_area) {
             this.editText(shared_state, true);
         }
+    }
+
+    setupContextMenu(shared_state) {
+        var showOptionMenu = e => {
+            e.preventDefault();
+            
+            var entries = [
+                {'colour': 'black', 'name': 'Delete', 'symbol': "🗙"}
+            ]
+            var graph_pos = document.getElementById("graph").getBoundingClientRect();
+            new OptionPopup(entries, e.clientX - graph_pos.left, e.clientY - graph_pos.top, true, (selected_option) => {
+                if (selected_option.name === "Delete") {
+                    this.delete();
+                }
+            });
+            
+
+            return false;
+        };
+        this.rect.on('contextmenu', showOptionMenu);
+        this.text.on('contextmenu', showOptionMenu);
     }
 
     setupHover(shared_state) {
@@ -236,8 +260,10 @@ class GraphNode {
 
     delete() {
         // TODO remove from sharedstate
-        // TODO delete arrows
         this.group.remove();
+
+        // delete arrows
+        this.group.node.dispatchEvent(new CustomEvent("deletenode"));
     }
 }
 

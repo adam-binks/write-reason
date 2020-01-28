@@ -27,6 +27,33 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             container = null,
             markers = null;
 
+        function delete_connectable(con) {
+            con.line.remove();
+            con.marker.remove();
+
+            _connections[con.source.id()] = _connections[con.source.id()].filter(e => e !== con);
+            _connections[con.target.id()] = _connections[con.target.id()].filter(e => e !== con);
+
+            var toString = function() {
+                var ids = [con.source.id(), con.target.id()],
+                    id1 = ids.join("->"),
+                    id2 = ids.reverse().join("->");
+
+                con._ = con.id = id1;
+
+                if (_betweenTwoBubbles[id2]) {
+                    con._ = id2;
+                    return id2;
+                }
+
+                con.id = id1;
+                return id1;
+            }
+
+            _betweenTwoBubbles[toString()] = _betweenTwoBubbles[toString()].filter(e => e !== con);
+            con.source.node.dispatchEvent(new CustomEvent("dragmove")); // update any other connectables looking for drag events
+        }
+
         /**
          * connectable
          * Connects two elements.
@@ -68,7 +95,11 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
             var marker = markers.marker(10, 10).addClass('connector-marker'),
                 markerId = "triangle-" + Id(),
-                line = container.path().attr("marker-end", "url(#" + markerId + ")").fill("none").stroke({width: 3}).addClass('connector-line');
+                line = container.path().attr("marker-end", "url(#" + markerId + ")").fill("none").stroke({width: 3});
+            
+            if (options.specialCoords) {
+                line.addClass('connector-line');
+            }
 
             marker.attr({
                 id: markerId,
@@ -94,6 +125,13 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             con.line = line;
             con.marker = marker;
 
+
+            if (options.specialCoords) {
+                // remove this when node is deleted
+                con.source.on("deletenode", () => con.source.node.instance.delete_connectable(con));
+                con.target.on("deletenode", () => con.target.node.instance.delete_connectable(con));
+            }
+
             SetOrGet(_connections, con.source.id(), []).push(con);
             SetOrGet(_connections, con.target.id(), []).push(con);
 
@@ -114,6 +152,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                     return id1;
                 }
             }, []).push(con);
+            
 
             /**
              * computeLineCoordinates
@@ -406,7 +445,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
         if (typeof SVG === "function") {
             SVG.extend(SVG.Element, {
-                connectable: connectable
+                connectable: connectable,
+                delete_connectable: delete_connectable
             });
         } else if ((typeof window === "undefined" ? "undefined" : _typeof(window)) === "object") {
             throw new Error("SVG.js is not loaded but it is required.");
