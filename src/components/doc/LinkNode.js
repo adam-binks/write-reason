@@ -5,7 +5,8 @@ class LinkNode extends Component {
         super(props)
         this.state = {
             hover: false,
-            externalHover: false
+            externalHover: false,
+            style: props.style
         }
         this.toggleHover = this.toggleHover.bind(this);
     }
@@ -26,11 +27,21 @@ class LinkNode extends Component {
     render() {
         var hoverClass = this.state.externalHover ? " hovered" : "";
         var classes = "node-link" + hoverClass;
-        return (
-            <p className={classes} {...this.props.attributes} onMouseEnter={this.toggleHover} onMouseLeave={this.toggleHover}>
-                {this.props.children}
-            </p>
-        );
+
+        if (this.state.style === "heading") {
+            return (
+                <p className={classes} {...this.props.attributes} onMouseEnter={this.toggleHover} onMouseLeave={this.toggleHover}>
+                    <u><b>{this.props.children}</b></u>
+                </p>
+            );
+
+        } else if (this.state.style === "inline") {
+            return (
+                <p className={classes} {...this.props.attributes} onMouseEnter={this.toggleHover} onMouseLeave={this.toggleHover}>
+                    {this.props.children}
+                </p>
+            );
+        }
     }
 }
 
