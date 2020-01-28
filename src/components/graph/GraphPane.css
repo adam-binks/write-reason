@@ -31,6 +31,18 @@
     font-size: 1em;
 }
 
+.indicator-text {
+    -moz-user-select: -moz-none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    fill: grey; /* text colour (it's SVG text) */
+    
+    font-family: 'Varela Round', sans-serif;
+    font-size: 1em;
+}
+
 .node {
     fill: #FF5252 !important;
 }

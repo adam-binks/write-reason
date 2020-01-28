@@ -9,6 +9,8 @@ import GraphNode from './GraphNode.js';
 
 class GraphPane extends React.Component {
     componentDidMount() {
+        this.nodes = [];
+
         this.props.sharedState.graphPane = this;
 
         this.$el = document.querySelector("#graph")
@@ -55,8 +57,17 @@ class GraphPane extends React.Component {
             textarea.style.height = (textarea.scrollHeight) + 'px';
         });
 
+        this.addNoNodesIndicator(svg, nodes, mouse_follower);
+
         // temp
-        this.addNodeAtScreenLocation(svg, nodes, mouse_follower, "Radical", 1200, 300, false);
+        // this.addNodeAtScreenLocation(svg, nodes, mouse_follower, "Radical", 1200, 300, false);
+    }
+
+    addNoNodesIndicator(svg, nodes, mouse_follower) {
+        this.noNodesIndicator = svg.text("Double click to add a node").addClass("indicator-text").attr({x: "40%", y: "45%"});
+        this.noNodesIndicator.on('dblclick', (e) => {
+            this.addNodeAtScreenLocation(svg, nodes, mouse_follower, "", e.clientX, e.clientY, true);
+        });
     }
 
     setupTextDropping(svg, nodes, mouse_follower) {
@@ -74,7 +85,12 @@ class GraphPane extends React.Component {
 
     addNodeAtScreenLocation(svg, nodes, mouse_follower, text, x, y, focus_text_area) {
         var point = svg.point(x, y);
-        return new GraphNode(nodes, mouse_follower, this.props.sharedState, text, point.x, point.y, 100, 80, focus_text_area);
+        var node = new GraphNode(nodes, mouse_follower, this.props.sharedState, text, point.x, point.y, 100, 80, focus_text_area);
+        this.nodes.push(node);
+
+        this.noNodesIndicator.hide();
+
+        return node;
     }
 
     componentWillUnmount() {
