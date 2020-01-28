@@ -16,6 +16,7 @@
     font-size: 1em;
 
     line-height: 131%;
+    text-align: center;
 }
 
 .node-text {
@@ -24,7 +25,7 @@
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    fill: lightgrey; /* text colour (it's SVG text) */
+    fill: white; /* text colour (it's SVG text) */
     
     font-family: 'Varela Round', sans-serif;
     font-size: 1em;
@@ -49,12 +50,17 @@ table { border-collapse:collapse }
     border-radius: 5px;
 }
 
+.option-row-selected {
+    background-color: lightgrey;
+}
+
 .option-row:hover {
     background-color: lightgrey;
 }
 
+/* is only for completed lines, not potential ones */
 .connector-line:hover {
-    fill: black !important;
+    stroke: black !important;
 }
 
 .connector-marker:hover {
