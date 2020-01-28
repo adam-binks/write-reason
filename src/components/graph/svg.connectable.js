@@ -66,9 +66,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             options.k = options.k || 100;
             options.kk = options.kk || 10;
 
-            var marker = markers.marker(10, 10),
+            var marker = markers.marker(10, 10).addClass('connector-marker'),
                 markerId = "triangle-" + Id(),
-                line = container.path().attr("marker-end", "url(#" + markerId + ")").fill("none").stroke({width: 1});
+                line = container.path().attr("marker-end", "url(#" + markerId + ")").fill("none").stroke({width: 3}).addClass('connector-line');
 
             marker.attr({
                 id: markerId,
@@ -76,8 +76,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                 refX: "0",
                 refY: "5",
                 markerUnits: "strokeWidth",
-                markerWidth: "12",
-                markerHeight: "14"
+                markerWidth: "4",
+                markerHeight: "5"
             });
 
             marker.path().attr({

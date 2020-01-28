@@ -75,15 +75,26 @@ class MouseFollower {
         }, end_node.group);
         connector.setLineColor(COMPLETED_ARROW_COLOUR);
 
+        connector.line.on("click", e => {
+            var graph_pos = document.getElementById("graph").getBoundingClientRect();
+            this.edit_connector_type(connector, e.clientX - graph_pos.left, e.clientY - graph_pos.top);
+        });
+
         var c1 = this.drawing_arrow_from.group.getScreenCoords();
         var c2 = end_node.group.getScreenCoords();
         var midpoint = [(c1.x + c2.x) / 2, (c1.y + c2.y) / 2]
 
-        new OptionPopup(ARROW_OPTIONS, midpoint[0], midpoint[1], (selected_option) => {
-            connector.setLineColor(selected_option.colour);
-        });
+        this.edit_connector_type(connector, midpoint[0], midpoint[1]);
 
         this.stop_drawing_arrow();
+    }
+
+    edit_connector_type(connector, popup_x, popup_y) {
+        console.log('x' + popup_x + "y" + popup_y);
+        
+        new OptionPopup(ARROW_OPTIONS, popup_x, popup_y, (selected_option) => {
+            connector.setLineColor(selected_option.colour);
+        });
     }
 
     stop_drawing_arrow() {
