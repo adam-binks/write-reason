@@ -53,7 +53,7 @@ class GraphNode {
             var graph_pos = document.getElementById("graph").getBoundingClientRect();
             new OptionPopup(entries, e.clientX - graph_pos.left, e.clientY - graph_pos.top, true, (selected_option) => {
                 if (selected_option.name === "Delete") {
-                    this.delete();
+                    this.delete(shared_state);
                 }
             });
             
@@ -226,7 +226,7 @@ class GraphNode {
     }
 
     getLongText() {
-        return "long text (todo)";
+        return "";
     }
 
     editText(shared_state, delete_if_empty_text = false) {
@@ -255,7 +255,7 @@ class GraphNode {
             save_changes();
             textarea.style.display = "none";
             if (delete_if_empty_text && (!this.text.text() || this.text.text() === "")) {
-                this.delete();
+                this.delete(shared_state);
             }
             this.text.show();
             this.updateShortText(this.shortText);
@@ -271,8 +271,10 @@ class GraphNode {
         };
     }
 
-    delete() {
-        // TODO remove from sharedstate
+    delete(shared_state) {
+        shared_state.removeGraphNode(this.id);
+
+
         this.group.remove();
 
         // delete arrows

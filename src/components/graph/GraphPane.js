@@ -60,7 +60,7 @@ class GraphPane extends React.Component {
         this.addNoNodesIndicator(svg, nodes, mouse_follower);
 
         // temp
-        // this.addNodeAtScreenLocation(svg, nodes, mouse_follower, "Radical", 1200, 300, false);
+        this.addNodeAtScreenLocation(svg, nodes, mouse_follower, "Radical", 1200, 300, false);
     }
 
     addNoNodesIndicator(svg, nodes, mouse_follower) {
@@ -80,6 +80,7 @@ class GraphPane extends React.Component {
             var data = e.dataTransfer.getData("Text");
             var node = this.addNodeAtScreenLocation(svg, nodes, mouse_follower, data, e.clientX, e.clientY, false);
             this.props.sharedState.addLinkAtSelection(node.id, node);
+            document.activeElement.blur();
         });
     }
 
@@ -95,12 +96,6 @@ class GraphPane extends React.Component {
 
     componentWillUnmount() {
         // this.$el.somePlugin('destroy');
-    }
-
-    onDrop(e) {
-        e.preventDefault();
-        var data = e.dataTransfer.getData("Text");
-        console.log(data);
     }
 
     render() {
