@@ -5,19 +5,21 @@ class LinkNode extends Component {
         super(props)
         this.state = {
             hover: false,
-            externalHover: false,
-            style: props.linkStyle
+            externalHover: false
         }
-        this.toggleHover = this.toggleHover.bind(this);
+        
+        this.setHover = this.setHover.bind(this);
     }
 
-    toggleHover() {
-        var node = this.props.sharedState.getGraphNode(this.props.nodeId);
-        if (node) {
-            node.setHovered(!this.state.hover);
+    setHover(newHover) {
+        if (this.props.linkStyle === "inline") {
+            var node = this.props.sharedState.getGraphNode(this.props.nodeId);
+            if (node) {
+                node.setHovered(newHover);
+            }
         }
 
-        this.setState({hover: !this.state.hover});
+        this.setState({hover: newHover});
     }
     
     setExternalHover(isHovered) {
@@ -25,19 +27,27 @@ class LinkNode extends Component {
     }
 
     render() {
-        var hoverClass = this.state.externalHover ? " hovered" : "";
+        const { value } = this.props.editor;
+        const { document, selection } = value;
+        var cursorInside = document.getDescendantsAtRange(selection).contains(this.props.node)
+        var node = this.props.sharedState.getGraphNode(this.props.nodeId);
+        if (node && !this.state.hover) {
+            node.setHovered(cursorInside);
+        }
+        
+        var hoverClass = (this.state.externalHover || cursorInside) ? " hovered" : "";
         var classes = "node-link" + hoverClass;
 
-        if (this.state.style === "heading") {
+        if (this.props.linkStyle === "heading") {
             return (
-                <p className={classes} {...this.props.attributes} onMouseEnter={this.toggleHover} onMouseLeave={this.toggleHover}>
+                <p className={classes} {...this.props.attributes} onMouseEnter={() => this.setHover(true)} onMouseLeave={() => this.setHover(false)}>
                     <u><b>{this.props.children}</b></u>
                 </p>
             );
 
-        } else if (this.state.style === "inline") {
+        } else if (this.props.linkStyle === "inline") {
             return (
-                <p className={classes} {...this.props.attributes} onMouseEnter={this.toggleHover} onMouseLeave={this.toggleHover}>
+                <p className={classes} {...this.props.attributes} onMouseEnter={() => this.setHover(true)} onMouseLeave={() => this.setHover(false)}>
                     {this.props.children}
                 </p>
             );
