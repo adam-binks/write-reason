@@ -27,6 +27,10 @@ export default class SharedState {
     }
 
     setLinkMapping(id, doc_node, long_or_short) {
+        if (this.map[id] === undefined) {
+            console.log(this.map + " id " + id);
+        }
+        
         if (this.map[id].doc_nodes === undefined) {
             this.map[id].doc_nodes = {};
         }

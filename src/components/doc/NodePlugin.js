@@ -31,9 +31,8 @@ export default function LinkPlugin(options) {
 
                 // set up the placeholder text to only appear when the body is empty and no text is selected
                 const { value } = editor;
-                const { document, selection } = value;                
-                var blockIsSelected = document.getDescendantsAtRange(selection).contains(props.node);
-                var isEmpty = (!props.node.text || props.node.text === "") && !blockIsSelected;
+                const { document, selection } = value;
+                var isEmpty = (!props.node.text || props.node.text === "");
 
                 var selectNode = () => {
                     setTimeout(() => {editor.focus(); editor.moveToStartOfNode(props.node);}, 0)
@@ -107,35 +106,28 @@ export default function LinkPlugin(options) {
                     }
                 }
 
-                // when enter is pressed inside a body block, insert a void block
+                // when enter is pressed inside a body block, insert a block
                 if (startBlock && startBlock.type === "body" && start.key === end.key) {
                     const nextBlock = document.getNextBlock(start.key)
+                    
                     const prevBlock = document.getPreviousBlock(start.key)
                     const blockToInsert = Block.create({object: 'block', type: ''})
+                    const section = document.getParent(startBlock.key);
+                    const sectionParent = document.getParent(section.key);
+                    console.log(startBlock);
+                    
+                    const sectionIndex = sectionParent.nodes.indexOf(section);
 
-                    // Void block at the end of the document
-                    if (!nextBlock) {
-                        return editor
-                        .moveToEndOfNode(startBlock)
-                        .insertBlock(blockToInsert)
-                        .moveToEnd()
+                    var insert = () => {
+                        editor.insertNodeByKey(sectionParent.key, sectionIndex + 1, blockToInsert)
                     }
-                    // Void block between two blocks
-                    if (nextBlock && prevBlock) {
-                        return editor
-                        .moveToEndOfNode(startBlock)
-                        .insertBlock(blockToInsert)
-                    }
-                    // Void block in the beginning of the document
-                    if (nextBlock && !prevBlock) {
-                        return editor
-                        .moveToStartOfNode(startBlock)
-                        .insertNodeByKey(document.key, 0, blockToInsert)
-                    }
+
+                    insert();
+                    return editor.moveToEndOfNode(startBlock).moveForward(1)
                 }
             }
             return next()
-          }
+        }
     }
 
     function getRefAndId(props, editor, long_or_short) {

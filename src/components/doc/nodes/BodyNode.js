@@ -7,17 +7,12 @@ export default class BodyNode extends Component {
             hover: false,
             externalHover: false
         }
-        this.toggleHover = this.toggleHover.bind(this);
+        this.setHover = this.setHover.bind(this);
         this.selectNode = props.selectNode;
     }
 
-    toggleHover() {
-        var node = this.props.sharedState.getGraphNode(this.props.nodeId);
-        if (node) {
-            node.setHovered(!this.state.hover);
-        }
-
-        this.setState({hover: !this.state.hover});
+    setHover(newHover) {
+        this.setState({hover: newHover});
     }
     
     setExternalHover(isHovered) {
@@ -25,18 +20,26 @@ export default class BodyNode extends Component {
     }
 
     render() {
-        var hoverClass = this.state.externalHover ? " hovered" : "";
+        var hoverClass = (this.state.externalHover || this.state.hover) ? " hovered" : "";
         var classes = "node-body" + hoverClass + (this.props.isEmpty ? " placeholder" : "");
+
+        const { value } = this.props.editor;
+        const { document, selection } = value;
+        var cursorInside = document.getDescendantsAtRange(selection).contains(this.props.node)
+        var node = this.props.sharedState.getGraphNode(this.props.nodeId);
+        if (node && !this.state.hover) {
+            node.setHovered(cursorInside);
+        }
 
         if (this.props.isEmpty) {
                 return (
-                    <p className={classes} {...this.props.attributes} onMouseEnter={this.toggleHover} onMouseLeave={this.toggleHover} onMouseDown={this.selectNode}>
+                    <p className={classes} {...this.props.attributes} onMouseEnter={() => this.setHover(true)} onMouseLeave={() => this.setHover(false)} onMouseDown={this.selectNode}>
                         Type some text...{this.props.children}
                     </p>
                 );
         } else {
             return (
-                <p className={classes} {...this.props.attributes} onMouseEnter={this.toggleHover} onMouseLeave={this.toggleHover}>
+                <p className={classes} {...this.props.attributes} onMouseEnter={() => this.setHover(true)} onMouseLeave={() => this.setHover(false)}>
                     {this.props.children}
                 </p>
             );

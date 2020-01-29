@@ -37,7 +37,8 @@ export default function GraphPlugin(options) {
                     editor.getSharedState().addGraphMapping(draggedNode.id, draggedNode.node)
 
                     var section = Block.create({
-                        type: 'section'
+                        type: 'section',
+                        data: {node_id: draggedNode.id}
                     })
                     editor.insertBlock(section);
                     editor.moveTo(section.key)

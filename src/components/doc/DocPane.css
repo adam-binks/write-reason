@@ -5,26 +5,33 @@
     min-height: 100%;
 }
 
+.slate-editor div {
+    margin-bottom: 20px;
+}
+
+.section {
+    background-color: papayawhip;
+}
+
 .node-link {
     display: inline;
     background: papayawhip;
     padding: 0.1em 0;
 }
 
-.node-body {
-    margin-top: 0px;
-    background: papayawhip;
+.section .node-link {
+    background: none;
 }
 
-.node-body.hovered, .node-body:hover, .node-link.hovered, .node-link:hover {
+.node-body {
+    margin-top: 0px;
+}
+
+.section.hovered, .section:hover, .node-link.hovered, .node-link:hover, .node-body:hover .node-body.hovered {
     background: yellow;
 }
 
 .placeholder {
     font-style: oblique;
     color: grey;
-}
-
-.section {
-    background-color: red;
 }
