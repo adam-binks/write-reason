@@ -27,10 +27,10 @@ export default class SharedState {
     }
 
     setLinkMapping(id, doc_node, long_or_short) {
-        if (this.map[id].doc_node === undefined) {
-            this.map[id].doc_node = {};
+        if (this.map[id].doc_nodes === undefined) {
+            this.map[id].doc_nodes = {};
         }
-        this.map[id].doc_node[long_or_short] = doc_node;
+        this.map[id].doc_nodes[long_or_short] = doc_node;
     }
 
     getGraphNodeAndDocNode(id) {
@@ -44,10 +44,19 @@ export default class SharedState {
         }
     }
 
+    removeGraphNode(id) {
+        if (this.getDocNodes(id)) {
+            Object.values(this.getDocNodes(id)).forEach(node => {
+                this.getEditor().removeGraphLink(node);
+            })
+            this.map[id] = undefined;
+        }
+    }
+
     getDocNodes(id) {
         const map = this.getGraphNodeAndDocNode(id);
         if (map) {
-            return map.doc_node;
+            return map.doc_nodes;
         }
     }
 
@@ -72,11 +81,11 @@ export default class SharedState {
         }
     }
 
-    getAllDocNodeRefs(id, long_or_short) {
+    getAllDocNodeRefs(id) {
         var docNodes = [];
         const map = this.getGraphNodeAndDocNode(id);
         if (map) {
-            ["long", "short"].forEach(long_or_short => {
+            ["long", "short", "section"].forEach(long_or_short => {
                 if (map.doc_link_node[long_or_short]) {
                     docNodes.push(map.doc_link_node[long_or_short].current)
                 }

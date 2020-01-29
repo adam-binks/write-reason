@@ -51,12 +51,20 @@
     fill: #4fabca !important;
 }
 
+.node.hovered {
+    fill: #4bbce2 !important;
+}
+
 .node.node-on-graph {
     fill: #FF5252 !important;
 }
 
-.node.hovered {
-    fill: #d4c04b !important;
+.node.hovered.node-on-graph {
+    fill: yellow !important;
+}
+
+.hovered.node-on-graph ~ .node-text {
+    fill:black
 }
 
 table { border-collapse:collapse }

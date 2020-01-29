@@ -19,3 +19,12 @@
 .node-body.hovered, .node-body:hover, .node-link.hovered, .node-link:hover {
     background: yellow;
 }
+
+.placeholder {
+    font-style: oblique;
+    color: grey;
+}
+
+.section {
+    background-color: red;
+}

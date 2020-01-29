@@ -9,6 +9,17 @@ const plugins = [
     NodePlugin()
 ];
 
+const schema = {
+    blocks: {
+        section: {
+            // isVoid: true,
+            // nodes: [
+
+            // ]
+        }
+    }
+}
+
 const initialValue = Value.fromJSON({
     document: {
         nodes: [
@@ -62,6 +73,7 @@ class DocEditor extends React.Component {
         return <Editor
             className="slate-editor"
             ref={this.props.sharedState.editor_ref}
+            schema={schema}
             plugins={plugins}
             queries={this.queries}
             value={this.state.value}

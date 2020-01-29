@@ -1,6 +1,7 @@
 import React from 'react';
-import LinkNode from './LinkNode.js'
-import BodyNode from './BodyNode.js'
+import LinkNode from './nodes/LinkNode.js'
+import BodyNode from './nodes/BodyNode.js'
+import SectionNode from './nodes/SectionNode.js'
 import {Block} from 'slate'
 
 export default function LinkPlugin(options) {
@@ -28,12 +29,27 @@ export default function LinkPlugin(options) {
             if (props.node.type === 'body') {
                 var { ref, id } = getRefAndId(props, editor, "long");
 
-                return <BodyNode ref={ref} {...props} sharedState={editor.getSharedState()} nodeId={id}/>
+                // set up the placeholder text to only appear when the body is empty and no text is selected
+                const { value } = editor;
+                const { document, selection } = value;                
+                var blockIsSelected = document.getDescendantsAtRange(selection).contains(props.node);
+                var isEmpty = (!props.node.text || props.node.text === "") && !blockIsSelected;
+
+                var selectNode = () => {
+                    setTimeout(() => {editor.focus(); editor.moveToStartOfNode(props.node);}, 0)
+                }
+
+                return <BodyNode ref={ref} {...props} sharedState={editor.getSharedState()} nodeId={id} isEmpty={isEmpty} selectNode={selectNode}/>
 
             } else if (props.node.type === 'link') {
                 var { ref, id } = getRefAndId(props, editor, "short");
 
                 return <LinkNode ref={ref} {...props} linkStyle="heading" sharedState={editor.getSharedState()} nodeId={id}/>
+
+            } else if (props.node.type === 'section') {
+                var { ref, id } = getRefAndId(props, editor, "section");
+
+                return <SectionNode ref={ref} {...props} sharedState={editor.getSharedState()} nodeId={id}/>
             }
 
             return next();

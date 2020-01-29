@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-export default class BodyNode extends Component {
+export default class SectionNode extends Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -25,12 +25,12 @@ export default class BodyNode extends Component {
 
     render() {
         var hoverClass = this.state.externalHover ? " hovered" : "";
-        var classes = "node-body" + hoverClass;
+        var classes = "section" + hoverClass;
 
         return (
-            <p className={classes} {...this.props.attributes} onMouseEnter={this.toggleHover} onMouseLeave={this.toggleHover}>
+            <div className={classes} {...this.props.attributes} onMouseEnter={this.toggleHover} onMouseLeave={this.toggleHover}>
                 {this.props.children}
-            </p>
+            </div>
         );
     }
 }

@@ -1,3 +1,5 @@
+import { Block } from 'slate';
+
 export default function GraphPlugin(options) {
     return {
         onMouseUp(event, editor, next) {
@@ -32,11 +34,20 @@ export default function GraphPlugin(options) {
                         if (n) editor.moveToStartOfNode(n)
                     }
 
+                    editor.getSharedState().addGraphMapping(draggedNode.id, draggedNode.node)
+
+                    var section = Block.create({
+                        type: 'section'
+                    })
+                    editor.insertBlock(section);
+                    editor.moveTo(section.key)
+
                     // insert the link
-                    editor.insertBlock({
+                    var link = Block.create({
                         type: 'link',
                         data: {node_id: draggedNode.id}
                     })
+                    editor.insertNodeByKey(section.key, 0, link); // just doing this once seems to make everything else insert into the section too:)
                     editor.insertText(draggedNode.text)
 
                     // add the body of the node
@@ -45,8 +56,6 @@ export default function GraphPlugin(options) {
                         data: {node_id: draggedNode.id}
                     })
                     editor.insertText(draggedNode.longText)
-
-                    editor.getSharedState().addGraphMapping(draggedNode.id, draggedNode.node)
                 }
             }
             next();
@@ -55,6 +64,12 @@ export default function GraphPlugin(options) {
         onBlur(event, editor, next) {
             editor.deselect();
             next();
+        },
+
+        commands: {
+            removeGraphLink(editor, node) {
+                editor.setNodeByKey(node.key, {"type": ""})
+            }
         }
     }
 }
