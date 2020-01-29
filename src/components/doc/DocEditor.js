@@ -66,6 +66,7 @@ class DocEditor extends React.Component {
             queries={this.queries}
             value={this.state.value}
             onChange={this.onChange}
+            placeholder="Write your document here..."
         />
     }
 }

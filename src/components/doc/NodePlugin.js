@@ -16,9 +16,9 @@ export default function LinkPlugin(options) {
 
         renderInline(props, editor, next) {
             if (props.node.type === 'link') {
-                var { ref, id } = getRefAndId(props, editor);
+                var { ref, id } = getRefAndId(props, editor, "short");
 
-                return <LinkNode ref={ref} {...props} style="inline" sharedState={editor.getSharedState()} nodeId={id}/>
+                return <LinkNode ref={ref} {...props} linkStyle="inline" sharedState={editor.getSharedState()} nodeId={id}/>
             }
 
             return next();
@@ -26,14 +26,14 @@ export default function LinkPlugin(options) {
 
         renderBlock(props, editor, next) {
             if (props.node.type === 'body') {
-                var { ref, id } = getRefAndId(props, editor);
+                var { ref, id } = getRefAndId(props, editor, "long");
 
                 return <BodyNode ref={ref} {...props} sharedState={editor.getSharedState()} nodeId={id}/>
 
             } else if (props.node.type === 'link') {
-                var { ref, id } = getRefAndId(props, editor);
+                var { ref, id } = getRefAndId(props, editor, "short");
 
-                return <LinkNode ref={ref} {...props} style="heading" sharedState={editor.getSharedState()} nodeId={id}/>
+                return <LinkNode ref={ref} {...props} linkStyle="heading" sharedState={editor.getSharedState()} nodeId={id}/>
             }
 
             return next();
@@ -66,11 +66,15 @@ export default function LinkPlugin(options) {
         onKeyDown(e, editor, next) {
             const {value} = editor
 
-            // TODO need to prevent backspace from merging the block with previous
+            // prevent backspace from merging body and link blocks with previous
             if (e.key === 'Backspace') {
                 const { document, selection, startBlock} = value
                 const {start, end} = selection
 
+                if (startBlock && (startBlock.type === "body" || startBlock.type === "link") && start.offset === 0) {
+                    const prevBlock = document.getPreviousBlock(start.key)
+                    return editor.moveToEndOfNode(prevBlock);
+                }
             }
 
             if (e.key === 'Enter') {
@@ -78,7 +82,7 @@ export default function LinkPlugin(options) {
                 const {start, end} = selection
 
                 // when enter is pressed inside a link *block* (not inline), do nothing
-                if (startBlock && startBlock.type == "link" && start.key === end.key) {
+                if (startBlock && startBlock.type === "link" && start.key === end.key) {
                     const nextBlock = document.getNextBlock(start.key)
                     if (nextBlock) {
                         return editor.moveToStartOfNode(nextBlock);
@@ -88,7 +92,7 @@ export default function LinkPlugin(options) {
                 }
 
                 // when enter is pressed inside a body block, insert a void block
-                if (startBlock && startBlock.type == "body" && start.key === end.key) {
+                if (startBlock && startBlock.type === "body" && start.key === end.key) {
                     const nextBlock = document.getNextBlock(start.key)
                     const prevBlock = document.getPreviousBlock(start.key)
                     const blockToInsert = Block.create({object: 'block', type: ''})
@@ -118,11 +122,11 @@ export default function LinkPlugin(options) {
           }
     }
 
-    function getRefAndId(props, editor) {
+    function getRefAndId(props, editor, long_or_short) {
         var id = props.node.data.get("node_id");
-        editor.getSharedState().setLinkMapping(id, props.node);
+        editor.getSharedState().setLinkMapping(id, props.node, long_or_short);
         var ref = React.createRef();
-        editor.getSharedState().registerLinkNode(id, ref);
+        editor.getSharedState().registerLinkNode(id, ref, long_or_short);
         return { ref, id };
     }
 }

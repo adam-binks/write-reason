@@ -5,6 +5,7 @@ var ARROW_HITBOX_MARGIN = 20;
 class GraphNode {
     constructor(nodes, mouse_follower, shared_state, text, x, y, width, height, focus_text_area) {
         this.id = shared_state.getNodeId();
+        this.isOnGraph = false;
 
         this.nodes = nodes;
         this.group = nodes.group().translate(x, y);
@@ -33,6 +34,15 @@ class GraphNode {
         }
     }
 
+    setIsOnGraph(newVal) {
+        this.isOnGraph = newVal;
+        if (this.isOnGraph) {
+            this.rect.addClass("node-on-graph");
+        } else {
+            this.rect.removeClass("node-on-graph");
+        }
+    }
+
     setupContextMenu(shared_state) {
         var showOptionMenu = e => {
             e.preventDefault();
@@ -57,17 +67,15 @@ class GraphNode {
     setupHover(shared_state) {
         const startHover = (e) => {
             this.setHovered(true);
-            var ref = shared_state.getDocNodeRef(this.id);
-            if (ref) {
+            shared_state.getAllDocNodeRefs(this.id).forEach(ref => {
                 ref.setExternalHover(true);
-            }
+            });
         };
         const endHover = (e) => {
             this.setHovered(false);
-            var ref = shared_state.getDocNodeRef(this.id);
-            if (ref) {
+            shared_state.getAllDocNodeRefs(this.id).forEach(ref => {
                 ref.setExternalHover(false);
-            }
+            });
         };
         this.rect.on('mouseenter', startHover);
         this.text.on('mouseenter', startHover);

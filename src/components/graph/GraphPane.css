@@ -1,3 +1,7 @@
+#graph {
+    background-color: rgb(241, 241, 241);
+}
+
 #nodeedit {
     position:absolute;
     display: none;
@@ -44,6 +48,10 @@
 }
 
 .node {
+    fill: #4fabca !important;
+}
+
+.node.node-on-graph {
     fill: #FF5252 !important;
 }
 
