@@ -1,5 +1,4 @@
 import OptionPopup from './OptionPopup.js'
-import colorString from 'color-string';
 
 const COMPLETED_ARROW_COLOUR = "#5D4037";
 const POTENTIAL_ARROW_COLOUR = "#d4b8b0";

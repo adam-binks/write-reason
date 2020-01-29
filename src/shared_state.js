@@ -22,11 +22,15 @@ export default class SharedState {
     }
 
     addGraphMapping(id, graph_node) {
+        graph_node.setIsOnGraph(true);
         this.map[id] = { graph_node: graph_node };
     }
 
-    setLinkMapping(id, doc_node) {
-        this.map[id].doc_node = doc_node;
+    setLinkMapping(id, doc_node, long_or_short) {
+        if (this.map[id].doc_node === undefined) {
+            this.map[id].doc_node = {};
+        }
+        this.map[id].doc_node[long_or_short] = doc_node;
     }
 
     getGraphNodeAndDocNode(id) {
@@ -40,26 +44,56 @@ export default class SharedState {
         }
     }
 
-    getDocNode(id) {
+    getDocNodes(id) {
         const map = this.getGraphNodeAndDocNode(id);
         if (map) {
             return map.doc_node;
         }
     }
 
-    getDocNodeRef(id) {
-        const map = this.getGraphNodeAndDocNode(id);
-        if (map) {
-            return map.doc_link_node.current;
+    getDocNodeShortText(id) {
+        const docNode = this.getDocNodes(id);
+        if (docNode) {
+            return docNode.short;
         }
     }
 
-    registerLinkNode(id, ref) {
-        this.map[id].doc_link_node = ref;
+    getDocNodeLongText(id) {
+        const docNode = this.getDocNodes(id);
+        if (docNode) {
+            return docNode.long;
+        }
+    }
+
+    getDocNodeRef(id, long_or_short) {
+        const map = this.getGraphNodeAndDocNode(id);
+        if (map) {
+            return map.doc_link_node[long_or_short].current;
+        }
+    }
+
+    getAllDocNodeRefs(id, long_or_short) {
+        var docNodes = [];
+        const map = this.getGraphNodeAndDocNode(id);
+        if (map) {
+            ["long", "short"].forEach(long_or_short => {
+                if (map.doc_link_node[long_or_short]) {
+                    docNodes.push(map.doc_link_node[long_or_short].current)
+                }
+            })
+        }
+        return docNodes;
+    }
+
+    registerLinkNode(id, ref, long_or_short) {
+        if (this.map[id].doc_link_node === undefined) {
+            this.map[id].doc_link_node = {};
+        }
+        this.map[id].doc_link_node[long_or_short] = ref;
     }
 
     updateDocShortText(id, newText) {
-        var docNode = this.getDocNode(id);
+        var docNode = this.getDocNodeShortText(id);
         
         if (docNode) {
             var editor = this.getEditor();

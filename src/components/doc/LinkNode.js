@@ -6,7 +6,7 @@ class LinkNode extends Component {
         this.state = {
             hover: false,
             externalHover: false,
-            style: props.style
+            style: props.linkStyle
         }
         this.toggleHover = this.toggleHover.bind(this);
     }

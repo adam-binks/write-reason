@@ -1,6 +1,8 @@
 .slate-editor {
     font-family: 'Crimson Text', serif;
     font-size: 120%;
+    padding: 50px;
+    min-height: 100%;
 }
 
 .node-link {
@@ -10,9 +12,10 @@
 }
 
 .node-body {
+    margin-top: 0px;
     background: papayawhip;
 }
 
-.node-body.hovered .node-body:hover .node-link.hovered, .node-link:hover {
+.node-body.hovered, .node-body:hover, .node-link.hovered, .node-link:hover {
     background: yellow;
 }
