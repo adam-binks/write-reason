@@ -12,7 +12,8 @@ const ARROW_OPTIONS = [
 ];
 
 class MouseFollower {
-    constructor(parent_element, svg, connectables_container, markers, links) {
+    constructor(shared_state, svg, connectables_container, markers, links) {
+        this.shared_state = shared_state;
         this.drawing_arrow_from = false;
         this.connector = undefined;
         this.connectables_container = connectables_container;
@@ -69,6 +70,7 @@ class MouseFollower {
     }
 
     complete_arrow(end_node) {
+        // no arrows to self
         if (end_node === this.drawing_arrow_from) {
             this.stop_drawing_arrow();
             return;
@@ -92,6 +94,7 @@ class MouseFollower {
 
         this.edit_connector_type(connector, midpoint[0], midpoint[1], false);
 
+        this.shared_state.logger.logEvent({'type': 'arrow_create', 'id': connector.id, 'source': this.drawing_arrow_from.id, 'target': end_node.id});
         this.stop_drawing_arrow();
     }
 
@@ -106,9 +109,11 @@ class MouseFollower {
 
         new OptionPopup(ARROW_OPTIONS, popup_x, popup_y, hideOnClickOutside, (selected_option) => {
             if (selected_option.name === "Delete") {
+                this.shared_state.logger.logEvent({'type': 'arrow_delete', 'id': connector.id});
                 this.remove_arrow(connector);
             } else {
                 connector.setLineColor(selected_option.colour);
+                this.shared_state.logger.logEvent({'type': 'arrow_set_type', 'id': connector.id, 'new_type': selected_option.name});
             }
         }, prev_selected);
     }

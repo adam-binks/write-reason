@@ -32,7 +32,7 @@ class GraphPane extends React.Component {
         var markers = svg.group();
         var nodes = svg.group();
 
-        var mouse_follower = new MouseFollower(this.$el, svg, links, markers, links);
+        var mouse_follower = new MouseFollower(this.props.sharedState, svg, links, markers, links);
 
         // add new nodes on mouse click
         svg.on('dblclick', (e) => {
@@ -81,6 +81,8 @@ class GraphPane extends React.Component {
             var node = this.addNodeAtScreenLocation(svg, nodes, mouse_follower, data, e.clientX, e.clientY, false);
             this.props.sharedState.addLinkAtSelection(node.id, node);
             document.activeElement.blur();
+
+            this.props.sharedState.logger.logEvent({'type': 'node_create_from_doc', 'node_id': node.id, 'text': data});
         });
     }
 

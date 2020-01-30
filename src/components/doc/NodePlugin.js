@@ -30,8 +30,6 @@ export default function LinkPlugin(options) {
                 var { ref, id } = getRefAndId(props, editor, "long");
 
                 // set up the placeholder text to only appear when the body is empty and no text is selected
-                const { value } = editor;
-                const { document, selection } = value;
                 var isEmpty = (!props.node.text || props.node.text === "");
 
                 var selectNode = () => {
@@ -96,7 +94,7 @@ export default function LinkPlugin(options) {
                 const { document, selection, startBlock} = value
                 const {start, end} = selection
 
-                // when enter is pressed inside a link *block* (not inline), do nothing
+                // when enter is pressed inside a link *block* (not inline), just go to body
                 if (startBlock && startBlock.type === "link" && start.key === end.key) {
                     const nextBlock = document.getNextBlock(start.key)
                     if (nextBlock) {
@@ -106,23 +104,14 @@ export default function LinkPlugin(options) {
                     }
                 }
 
-                // when enter is pressed inside a body block, insert a block
+                // when enter is pressed inside a body block, insert a block after the section
                 if (startBlock && startBlock.type === "body" && start.key === end.key) {
-                    const nextBlock = document.getNextBlock(start.key)
-                    
-                    const prevBlock = document.getPreviousBlock(start.key)
                     const blockToInsert = Block.create({object: 'block', type: ''})
                     const section = document.getParent(startBlock.key);
-                    const sectionParent = document.getParent(section.key);
-                    console.log(startBlock);
-                    
+                    const sectionParent = document.getParent(section.key);                    
                     const sectionIndex = sectionParent.nodes.indexOf(section);
 
-                    var insert = () => {
-                        editor.insertNodeByKey(sectionParent.key, sectionIndex + 1, blockToInsert)
-                    }
-
-                    insert();
+                    editor.insertNodeByKey(sectionParent.key, sectionIndex + 1, blockToInsert);
                     return editor.moveToEndOfNode(startBlock).moveForward(1)
                 }
             }
