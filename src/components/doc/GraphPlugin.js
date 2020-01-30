@@ -57,6 +57,8 @@ export default function GraphPlugin(options) {
                         data: {node_id: draggedNode.id}
                     })
                     editor.insertText(draggedNode.longText)
+
+                    editor.getSharedState().logger.logEvent({'type': 'doc_create_from_node', 'node_id': draggedNode.id, 'short_text': draggedNode.text, 'long_text': draggedNode.longText});
                 }
             }
             next();

@@ -32,6 +32,8 @@ class GraphNode {
         if (focus_text_area) {
             this.editText(shared_state, true);
         }
+
+        shared_state.logger.logEvent({'type': 'node_create', 'id': this.id});
     }
 
     setIsOnGraph(newVal) {
@@ -57,7 +59,6 @@ class GraphNode {
                 }
             });
             
-
             return false;
         };
         this.rect.on('contextmenu', showOptionMenu);
@@ -86,7 +87,7 @@ class GraphNode {
     setHovered(isHovered) {
         if (isHovered) {
             this.rect.addClass("hovered");
-        } else if (!isHovered) {
+        } else {
             this.rect.removeClass("hovered");
         }
     }
@@ -259,6 +260,8 @@ class GraphNode {
             }
             this.text.show();
             this.updateShortText(this.shortText);
+
+            shared_state.logger.logEvent({'type': 'node_edit_short_text', 'id': this.id, 'text': this.shortText});
         };
         textarea.onblur = save_and_hide;
         textarea.onkeyup = (e) => {
@@ -274,11 +277,12 @@ class GraphNode {
     delete(shared_state) {
         shared_state.removeGraphNode(this.id);
 
-
         this.group.remove();
 
         // delete arrows
         this.group.node.dispatchEvent(new CustomEvent("deletenode"));
+
+        shared_state.logger.logEvent({'type': 'node_delete', 'id': this.id});
     }
 }
 

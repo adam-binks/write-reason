@@ -62,6 +62,9 @@ class DocEditor extends React.Component {
     queries = {
         getSharedState: () => {
             return this.props.sharedState;
+        },
+        getValue: () => {
+            return this.state.value;
         }
     }
 

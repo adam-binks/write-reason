@@ -1,11 +1,19 @@
 import { Text } from 'slate';
+import Logger from './logging'
 
 export default class SharedState {
-    node_id_counter = 0;
-    map = {};
-    // this.editor_ref and this.graphPane set in the editor and graphpane
-    editor_ref = undefined;
-    graphPane = undefined;
+    constructor() {
+        this.logger = new Logger(Logger.getNewId())
+        
+        this.node_id_counter = 0;
+        this.map = {};
+
+        // this.editor_ref and this.graphPane set in the editor and graphpane
+        this.editor_ref = undefined;
+        this.graphPane = undefined;
+
+        window.setInterval((() => this.logger.logEvent({'type': 'document_content', 'content': this.getEditor().getValue()})), 30000) // log entire document content every 30 seconds
+    }
 
     getEditor() {
         return this.editor_ref.current;
