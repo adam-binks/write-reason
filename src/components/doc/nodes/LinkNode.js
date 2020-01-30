@@ -11,12 +11,10 @@ class LinkNode extends Component {
         this.setHover = this.setHover.bind(this);
     }
 
-    setHover(newHover) {
-        if (this.props.linkStyle === "inline") {
-            var node = this.props.sharedState.getGraphNode(this.props.nodeId);
-            if (node) {
-                node.setHovered(newHover);
-            }
+    setHover(newHover) {     
+        var node = this.props.sharedState.getGraphNode(this.props.nodeId);
+        if (node) {
+            node.setHovered(newHover);
         }
 
         this.setState({hover: newHover});
@@ -31,7 +29,7 @@ class LinkNode extends Component {
         const { document, selection } = value;
         var cursorInside = document.getDescendantsAtRange(selection).contains(this.props.node)
         var node = this.props.sharedState.getGraphNode(this.props.nodeId);
-        if (node && !this.state.hover) {
+        if (node && !this.state.hover && !this.state.externalHover) {
             node.setHovered(cursorInside);
         }
         
@@ -40,7 +38,7 @@ class LinkNode extends Component {
 
         if (this.props.linkStyle === "heading") {
             return (
-                <p className={classes} {...this.props.attributes} onMouseEnter={() => this.setHover(true)} onMouseLeave={() => this.setHover(false)}>
+                <p className={classes} {...this.props.attributes}>
                     <u><b>{this.props.children}</b></u>
                 </p>
             );

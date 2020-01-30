@@ -65,16 +65,14 @@ class GraphNode {
     }
 
     setupHover(shared_state) {
-        this.internalHovered = false;
-        this.externalHovered = false;
         const startHover = (e) => {
-            this.setHoveredInternal(true);
+            this.setHovered(true);
             shared_state.getAllDocNodeRefs(this.id).forEach(ref => {
                 ref.setExternalHover(true);
             });
         };
         const endHover = (e) => {
-            this.setHoveredInternal(false);
+            this.setHovered(false);
             shared_state.getAllDocNodeRefs(this.id).forEach(ref => {
                 ref.setExternalHover(false);
             });
@@ -85,20 +83,10 @@ class GraphNode {
         this.text.on('mouseleave', endHover);
     }
 
-    setHoveredInternal(isHovered) {
-        this.internalHovered = isHovered;
-        if (isHovered) {
-            this.rect.addClass("hovered");
-        } else if (!isHovered && !this.externalHovered) {
-            this.rect.removeClass("hovered");
-        }
-    }
-
     setHovered(isHovered) {
-        this.externalHovered = isHovered;
         if (isHovered) {
             this.rect.addClass("hovered");
-        } else if (!isHovered && !this.internalHovered) {
+        } else if (!isHovered) {
             this.rect.removeClass("hovered");
         }
     }

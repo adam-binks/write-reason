@@ -33,13 +33,13 @@ export default class BodyNode extends Component {
 
         if (this.props.isEmpty) {
                 return (
-                    <p className={classes} {...this.props.attributes} onMouseEnter={() => this.setHover(true)} onMouseLeave={() => this.setHover(false)} onMouseDown={this.selectNode}>
+                    <p className={classes} {...this.props.attributes} onMouseDown={this.selectNode}>
                         Type some text...{this.props.children}
                     </p>
                 );
         } else {
             return (
-                <p className={classes} {...this.props.attributes} onMouseEnter={() => this.setHover(true)} onMouseLeave={() => this.setHover(false)}>
+                <p className={classes} {...this.props.attributes}>
                     {this.props.children}
                 </p>
             );
