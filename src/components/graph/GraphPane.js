@@ -1,5 +1,6 @@
 import React from 'react';
 import './GraphPane.css';
+import ExperimentControls from '../experiment/ExperimentControls.js'
 import SVG from 'svg.js';
 import 'svg.panzoom.js';
 import 'svg.draggy.js';
@@ -60,7 +61,7 @@ class GraphPane extends React.Component {
         this.addNoNodesIndicator(svg, nodes, mouse_follower);
 
         // temp
-        this.addNodeAtScreenLocation(svg, nodes, mouse_follower, "Radical", 1200, 300, false);
+        // this.addNodeAtScreenLocation(svg, nodes, mouse_follower, "Radical", 1200, 300, false);
     }
 
     addNoNodesIndicator(svg, nodes, mouse_follower) {
@@ -104,6 +105,7 @@ class GraphPane extends React.Component {
         return (
             <div id="graph" className="pane" ref={el => this.el = el}>
                 <textarea id='nodeedit'></textarea>
+                <ExperimentControls sharedState={this.props.sharedState} />
             </div>
         );
     }

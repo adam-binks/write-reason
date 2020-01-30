@@ -2,6 +2,12 @@
     background-color: rgb(241, 241, 241);
 }
 
+.experiment-controls {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+}
+
 #nodeedit {
     position:absolute;
     display: none;
