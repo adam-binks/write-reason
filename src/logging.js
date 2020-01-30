@@ -1,9 +1,18 @@
 export default class Logger {
     shouldLogToConsole = true;
 
-    constructor(id) {
+    constructor(id, params) {
         this.id = id;
-        this.logToConsole("Logging begin, id " + id);
+        this.conditions = params;
+        this.logToConsole("Logging begin, id " + id + ", conditions " + JSON.stringify(params));
+    }
+
+    getExperimentData() {
+        return JSON.stringify(this.getLog(), null, 2);
+    }
+
+    getExperimentId() {
+        return this.id
     }
 
     // Generate an ID from the current time to avoid collision

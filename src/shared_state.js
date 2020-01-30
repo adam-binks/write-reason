@@ -2,8 +2,8 @@ import { Text } from 'slate';
 import Logger from './logging'
 
 export default class SharedState {
-    constructor() {
-        this.logger = new Logger(Logger.getNewId())
+    constructor(params) {      
+        this.logger = new Logger(Logger.getNewId(), params)
         
         this.node_id_counter = 0;
         this.map = {};
