@@ -1,6 +1,5 @@
 import React from 'react';
 import './GraphPane.css';
-import ExperimentControls from '../experiment/ExperimentControls.js'
 import SVG from 'svg.js';
 import 'svg.panzoom.js';
 import 'svg.draggy.js';
@@ -105,7 +104,6 @@ class GraphPane extends React.Component {
         return (
             <div id="graph" className="pane" ref={el => this.el = el}>
                 <textarea id='nodeedit'></textarea>
-                <ExperimentControls sharedState={this.props.sharedState} />
             </div>
         );
     }

@@ -4,6 +4,8 @@ import Logger from './logging'
 export default class SharedState {
     constructor(params) {      
         this.logger = new Logger(Logger.getNewId(), params)
+        this.condition = params.condition;
+        this.params = params;
         
         this.node_id_counter = 0;
         this.map = {};
@@ -12,7 +14,27 @@ export default class SharedState {
         this.editor_ref = undefined;
         this.graphPane = undefined;
 
-        window.setInterval((() => this.logger.logEvent({'type': 'document_content', 'content': this.getEditor().getValue()})), 30000) // log entire document content every 30 seconds
+        // log entire document content every 30 seconds
+        this.intervalLogger = window.setInterval((() => this.logger.logEvent({'type': 'document_content', 'content': this.getEditor().getValue()})), 30000)
+        
+        this.downloadExperimentData = this.downloadExperimentData.bind(this);
+    }
+
+    downloadExperimentData() {
+        const element = document.createElement("a");
+        const file = new Blob([this.logger.getExperimentData()], {type: 'text/plain'});
+
+        element.href = URL.createObjectURL(file);
+        element.download = this.logger.getExperimentId() + ".json";
+        document.body.appendChild(element); // Required for this to work in FireFox
+        element.click();
+    }
+
+    finishCondition() {
+        // temporarily commented
+        // this.downloadExperimentData();
+
+        window.clearInterval(this.intervalLogger)
     }
 
     getEditor() {

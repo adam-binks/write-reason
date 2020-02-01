@@ -6,7 +6,8 @@ export default class ConditionForm extends Component {
         super(props);
         this.state = {
             experimentId: "",
-            novelToolFirst: false
+            novelToolFirst: false,
+            duration: 1.1 * 1000 * 60 // calculates seconds, and then into minutes
         };
     
         this.handleChange = this.handleChange.bind(this);
@@ -25,7 +26,10 @@ export default class ConditionForm extends Component {
     
     handleSubmit(event) {
         event.preventDefault();
-        this.props.submitFunc(this.state);
+
+        this.setState({'condition': this.state.novelToolFirst ? 'graph' : 'plain'}, () => {
+            this.props.submitFunc(this.state);
+        });
     }
     
     render() {
@@ -35,11 +39,11 @@ export default class ConditionForm extends Component {
                     <fieldset>
                         <input type="number" name="experimentId" value={this.state.experimentId} onChange={this.handleChange} placeholder="Experiment ID" />
                         
-                        <label for="novelToolFirst">
+                        <label htmlFor="novelToolFirst">
                             Novel tool first <input type="checkbox" id="novelToolFirst" name="novelToolFirst" value={this.state.novelToolFirst} onChange={this.handleChange} />
                         </label>
 
-                        <input type="submit" class="pure-button pure-button-primary" value="Begin experiment" />
+                        <input type="submit" className="pure-button pure-button-primary" value="Begin experiment" />
                     </fieldset>
                 </form>
             </div>

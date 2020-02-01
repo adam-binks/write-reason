@@ -1,0 +1,7 @@
+.countdown {
+    color: grey;
+}
+
+.countdown.low-time {
+    color: red;
+}
