@@ -3,11 +3,18 @@ import { Editor } from 'slate-react';
 import { Value } from 'slate';
 import NodePlugin from './NodePlugin.js';
 import GraphPlugin from './GraphPlugin.js';
+import LoggingPlugin from './LoggingPlugin.js';
 
-const plugins = [
-    GraphPlugin(),
-    NodePlugin()
-];
+const plugins = {
+    'graph': [
+        GraphPlugin(),
+        NodePlugin(),
+        LoggingPlugin(),
+    ],
+    'plain': [
+        LoggingPlugin(),
+    ]
+};
 
 const schema = {
     blocks: {
@@ -77,7 +84,7 @@ class DocEditor extends React.Component {
             className="slate-editor"
             ref={this.props.sharedState.editor_ref}
             schema={schema}
-            plugins={plugins}
+            plugins={plugins[this.props.sharedState.condition]}
             queries={this.queries}
             value={this.state.value}
             onChange={this.onChange}

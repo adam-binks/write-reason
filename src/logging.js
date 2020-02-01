@@ -4,7 +4,7 @@ export default class Logger {
     constructor(id, params) {
         this.id = id;
         this.conditions = params;
-        this.logToConsole("Logging begin, id " + id + ", conditions " + JSON.stringify(params));
+        this.logToConsole("Logging begin, id " + id + "\nParams " + JSON.stringify(params, null, 1));
     }
 
     getExperimentData() {
