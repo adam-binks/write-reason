@@ -4,15 +4,15 @@ import DropifyBlock from '../DropifyBlock';
 
 class PlainBlockNode extends Component {
     render() {
-        const { isOverCurrent, connectDropTarget, connectDragSource } = this.props
+        const { isOverCurrent, connectDropTarget, connectDragSource, dragPreview } = this.props
 
-        return connectDragSource(connectDropTarget(
-            <div {...this.props.attributes}>
+        return connectDropTarget(
+            <div {...this.props.attributes} ref={dragPreview}>
                 {isOverCurrent && <div className="drop-indicator" />}
-                <div className="drag-handle" />
+                <div ref={connectDragSource} className="drag-handle" />
                 {this.props.children}
             </div>
-        ));
+        );
     }
 }
 

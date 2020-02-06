@@ -34,6 +34,7 @@ function collect(connect, monitor) {
         // Call this function inside render()
         // to let React DnD handle the drag events:
         connectDragSource: connect.dragSource(),
+        dragPreview: connect.dragPreview(),
         isDragging: monitor.isDragging(),
     }
 }
