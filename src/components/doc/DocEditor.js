@@ -4,11 +4,13 @@ import { Value } from 'slate';
 import NodePlugin from './NodePlugin.js';
 import GraphPlugin from './GraphPlugin.js';
 import LoggingPlugin from './LoggingPlugin.js';
+import ReorderPlugin from './ReorderPlugin.js';
 
 const plugins = {
     'graph': [
         GraphPlugin(),
         NodePlugin(),
+        ReorderPlugin(),
         LoggingPlugin(),
     ],
     'plain': [

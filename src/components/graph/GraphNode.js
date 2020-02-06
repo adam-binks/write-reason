@@ -69,13 +69,13 @@ class GraphNode {
         const startHover = (e) => {
             this.setHovered(true);
             shared_state.getAllDocNodeRefs(this.id).forEach(ref => {
-                ref.setExternalHover(true);
+                ref.decoratedRef ? ref.decoratedRef.current.decoratedRef.current.setExternalHover(true) : ref.setExternalHover(true);
             });
         };
         const endHover = (e) => {
             this.setHovered(false);
             shared_state.getAllDocNodeRefs(this.id).forEach(ref => {
-                ref.setExternalHover(false);
+                ref.decoratedRef ? ref.decoratedRef.current.decoratedRef.current.setExternalHover(false) : ref.setExternalHover(false);
             });
         };
         this.rect.on('mouseenter', startHover);

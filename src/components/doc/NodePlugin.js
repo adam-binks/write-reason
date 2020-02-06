@@ -53,8 +53,8 @@ export default function LinkPlugin(options) {
         },
 
         onDrop(event, editor, next) {
-            console.log('drop');
-            next();
+            // suppress drop events
+            // next();
         },
 
         onChange(editor, next) {

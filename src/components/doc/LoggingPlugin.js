@@ -1,8 +1,4 @@
-import React from 'react';
-import LinkNode from './nodes/LinkNode.js'
-import BodyNode from './nodes/BodyNode.js'
-import SectionNode from './nodes/SectionNode.js'
-import {Block} from 'slate'
+
 import { getEventTransfer } from 'slate-react';
 
 export default function LinkPlugin(options) {

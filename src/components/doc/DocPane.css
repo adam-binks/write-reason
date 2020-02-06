@@ -27,7 +27,7 @@
     margin-top: 0px;
 }
 
-.section.hovered, .section:hover, .node-link.hovered, .node-link:hover, .node-body:hover .node-body.hovered {
+.hovered, .section:hover, .node-link:hover, .node-body:hover {
     background: yellow;
 }
 
@@ -44,3 +44,22 @@
     margin-right: 0.75rem;
     cursor: move;
 }
+
+.drop-indicator {
+    width: 100%;
+    height: 1rem;
+    background-color: yellowgreen;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        background-color: yellowgreen;
+    }
+    50% {
+        background-color: green;
+    }
+    100% {
+        background-color: yellowgreen;
+    }
+  }
