@@ -1,3 +1,5 @@
+/* eslint-disable no-fallthrough */
+/* eslint-disable default-case */
 import React, { Component } from 'react';
 import './App.css';
 import DocPane from './components/doc/DocPane.js';
@@ -7,14 +9,17 @@ import SharedState from './shared_state.js';
 import ConditionForm from './components/experiment/ConditionForm.js';
 import TeardownScreen from './components/experiment/TeardownScreen.js';
 import ExperimentControls from './components/experiment/ExperimentControls.js'
+import { DndProvider } from 'react-dnd'
+import Backend from 'react-dnd-html5-backend'
+
 
 export default class App extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            phase: "setup",
-            sharedState: undefined,
+            phase: "editor", // "setup",
+            sharedState: new SharedState({"condition": "graph"}), // undefined,
             params: undefined,
             completedConditions: []
         }
@@ -28,7 +33,7 @@ export default class App extends Component {
         this.setState({ 
             completedConditions: this.state.completedConditions.concat([this.state.params.condition])
         }, () => {
-            var other_condition = this.state.params.condition == "graph" ? "plain" : "graph";
+            var other_condition = this.state.params.condition === "graph" ? "plain" : "graph";
             
             if (this.state.completedConditions.includes(other_condition)) {
                 // both conditions have been tested
@@ -62,11 +67,13 @@ export default class App extends Component {
                     case "graph":
                         return (
                             <div className="App">
-                                <SplitPane split="vertical" defaultSize="50%">
-                                    <DocPane key="graph" sharedState={this.state.sharedState} />
-                                    <GraphPane sharedState={this.state.sharedState} />
-                                </SplitPane>
-                                <ExperimentControls sharedState={this.state.sharedState} completeFunc={this.finishCondition} />
+                                <DndProvider backend={Backend}>
+                                    <SplitPane split="vertical" defaultSize="50%">
+                                        <DocPane key="graph" sharedState={this.state.sharedState} />
+                                        <GraphPane sharedState={this.state.sharedState} />
+                                    </SplitPane>
+                                    <ExperimentControls sharedState={this.state.sharedState} completeFunc={this.finishCondition} />
+                                </DndProvider>
                             </div>
                         );
 
