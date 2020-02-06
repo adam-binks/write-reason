@@ -29,15 +29,15 @@ class SectionNode extends Component {
         var hoverClass = this.state.externalHover ? " hovered" : "";
         var classes = "section" + hoverClass;
 
-        const { isOverCurrent, connectDropTarget, connectDragSource } = this.props;
+        const { isOverCurrent, connectDropTarget, connectDragSource, dragPreview } = this.props;
 
-        return connectDragSource(connectDropTarget(
-            <div className={classes} {...this.props.attributes} onMouseEnter={this.toggleHover} onMouseLeave={this.toggleHover}>
+        return connectDropTarget(
+            <div className={classes} {...this.props.attributes} onMouseEnter={this.toggleHover} onMouseLeave={this.toggleHover} ref={dragPreview}>
                 {isOverCurrent && <div className="drop-indicator" />}
-                <div className="drag-handle" />
+                <div ref={connectDragSource} className="drag-handle" />
                 {this.props.children}
             </div>
-        ));
+        );
     }
 }
 
