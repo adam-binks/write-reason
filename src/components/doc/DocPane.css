@@ -1,12 +1,18 @@
 .slate-editor {
     font-family: 'Crimson Text', serif;
     font-size: 120%;
-    padding: 50px;
+    padding-right: 50px;
+    padding-top: 50px;
+    padding-bottom: 50px;
     min-height: 100%;
 }
 
 .slate-editor div {
     /* margin-bottom: 20px; */
+}
+
+.plain-block {
+    padding-left: 50px;
 }
 
 .section {
@@ -38,17 +44,13 @@
 }
 
 .drag-handle {
-    background-color: green;
+    background-color: lightgrey;
     width: 1rem;
     height: 1rem;
     display: inline-block;
     position: relative;
     left: -30px;
     cursor: ns-resize;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
 }
 
 .drop-indicator {
