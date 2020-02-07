@@ -2,6 +2,12 @@ import { DropTarget } from "react-dnd";
 import { ItemTypes } from "../../dragtypes";
 
 const blockTarget = {
+    hover(props, monitor, component) {
+        console.log("mouseOffset: " + JSON.stringify(monitor.getClientOffset()));
+        console.log("ref " + JSON.stringify(component.getDecoratedComponentInstance().selfRef));
+        
+    },
+
     drop(props, monitor, component) {
         const document = props.editor.value.document;
         const blockParent = document.getParent(props.node.key);
