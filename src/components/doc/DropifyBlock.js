@@ -4,7 +4,7 @@ import { ItemTypes } from "../../dragtypes";
 const blockTarget = {
     hover(props, monitor, component) {
         console.log("mouseOffset: " + JSON.stringify(monitor.getClientOffset()));
-        console.log("ref " + JSON.stringify(component.getDecoratedComponentInstance().selfRef));
+        // console.log("ref " + JSON.stringify(component.getDecoratedComponentInstance().selfRef));
         
     },
 
