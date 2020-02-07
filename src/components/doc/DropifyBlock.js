@@ -1,18 +1,24 @@
+import ReactDOM from 'react-dom';
 import { DropTarget } from "react-dnd";
 import { ItemTypes } from "../../dragtypes";
 
 const blockTarget = {
     hover(props, monitor, component) {
-        console.log("mouseOffset: " + JSON.stringify(monitor.getClientOffset()));
-        // console.log("ref " + JSON.stringify(component.getDecoratedComponentInstance().selfRef));
+        const mouse = monitor.getClientOffset();
+        const rect = ReactDOM.findDOMNode(component).getBoundingClientRect();
         
+        if (mouse.y > (rect.y + rect.height / 2)) {
+            component.setState({overHalf: true});
+        } else {
+            component.setState({overHalf: false});
+        }
     },
 
     drop(props, monitor, component) {
         const document = props.editor.value.document;
         const blockParent = document.getParent(props.node.key);
         const blockIndex = blockParent.nodes.indexOf(props.node);
-        return { parentKey: blockParent.key, indexDroppedOn: blockIndex }
+        return { parentKey: blockParent.key, indexDroppedOn: blockIndex, insertBefore: component.state.overHalf }
     },
 }
 

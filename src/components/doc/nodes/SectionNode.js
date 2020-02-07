@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import DragifyBlock from '../DragifyBlock';
 import DropifyBlock from '../DropifyBlock';
+import { handleMouseUp } from '../GraphPlugin';
 
 class SectionNode extends Component {
     constructor(props) {
@@ -26,16 +27,21 @@ class SectionNode extends Component {
     }
 
     render() {
-        var hoverClass = this.state.externalHover ? " hovered" : "";
-        var classes = "section plain-block " + hoverClass;
+        const { isOverCurrent, connectDropTarget, connectDragSource, dragPreview, isDragging } = this.props;
 
-        const { isOverCurrent, connectDropTarget, connectDragSource, dragPreview } = this.props;
+        var hoverClass = this.state.externalHover ? " hovered" : "";
+        var classes = "section plain-block " + hoverClass  + (isDragging ? " display-none" : "");
 
         return connectDropTarget(
-            <div className={classes} {...this.props.attributes} onMouseEnter={this.toggleHover} onMouseLeave={this.toggleHover} ref={dragPreview}>
-                {isOverCurrent && <div className="drop-indicator" />}
+            <div className={classes} {...this.props.attributes} 
+                    onMouseEnter={this.toggleHover} onMouseLeave={this.toggleHover} 
+                    onMouseUp={() => {handleMouseUp(this.props.editor, this.props.node) && this.setState({hover: false})}}
+                    ref={dragPreview}>
+                {(isOverCurrent && !this.state.overHalf && <div className="drop-indicator" />)}
                 <div ref={connectDragSource} className="drag-handle" />
                 {this.props.children}
+                {(isOverCurrent && this.state.overHalf && <div className="drop-indicator" />)}
+                {(this.state.hover && this.props.editor.getSharedState().draggedNode) && <div className="drop-indicator" />}
             </div>
         );
     }
