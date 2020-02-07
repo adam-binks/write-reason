@@ -89,6 +89,23 @@ export default function LinkPlugin(options) {
                     return editor.moveToEndOfNode(prevBlock);
                 }
             }
+            
+            // if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+            //     const start = value.selection.start
+            //     const adjacentBlock = e.key === 'ArrowDown' ? value.document.getNextBlock(start.key) : value.document.getPreviousBlock(start.key)
+            //     const closestFunc = e.key === 'ArrowDown' ? editor.moveToStartOfNode : editor.moveToEndOfNode
+            //     const furthestFunc = e.key === 'ArrowDown' ?  editor.moveToEndOfNode : editor.moveToStartOfNode
+                
+            //     console.log("x");
+
+            //     if (adjacentBlock) {
+            //         console.log("adj");
+                    
+            //         return editor.moveToStartOfNode(adjacentBlock);
+            //     } else if (value.startBlock) {
+            //         return editor.moveToStartOfNode(value.startBlock);
+            //     }
+            // }
 
             if (e.key === 'Enter') {
                 const { document, selection, startBlock} = value
