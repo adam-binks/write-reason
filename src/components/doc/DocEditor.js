@@ -82,8 +82,10 @@ class DocEditor extends React.Component {
     }
 
     render() {
+        const plainClass = this.props.sharedState.condition === "plain" ? " slate-editor-no-graph" : "";
+
         return <Editor
-            className="slate-editor"
+            className={"slate-editor" + plainClass}
             ref={this.props.sharedState.editor_ref}
             schema={schema}
             plugins={plugins[this.props.sharedState.condition]}

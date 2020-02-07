@@ -27,7 +27,7 @@ class SectionNode extends Component {
 
     render() {
         var hoverClass = this.state.externalHover ? " hovered" : "";
-        var classes = "section" + hoverClass;
+        var classes = "section plain-block " + hoverClass;
 
         const { isOverCurrent, connectDropTarget, connectDragSource, dragPreview } = this.props;
 
