@@ -82,6 +82,7 @@ table { border-collapse:collapse }
     border-color: grey;
     border-style: solid;
     border-radius: 5px;
+    z-index: 100;
 }
 
 .option-row-selected {

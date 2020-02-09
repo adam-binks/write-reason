@@ -57,27 +57,7 @@ function addSection(value, document, selection, draggedNode, editor, target) {
 
     editor.getSharedState().addGraphMapping(draggedNode.id, draggedNode.node)
 
-    var section = Block.create({
-        type: 'section',
-        data: {node_id: draggedNode.id}
-    })
-    editor.insertBlock(section);
-    editor.moveTo(section.key)
-
-    // insert the link
-    var link = Block.create({
-        type: 'link',
-        data: {node_id: draggedNode.id}
-    })
-    editor.insertNodeByKey(section.key, 0, link); // just doing this once seems to make everything else insert into the section too:)
-    editor.insertText(draggedNode.text)
-
-    // add the body of the node
-    editor.insertBlock({
-        type: 'body',
-        data: {node_id: draggedNode.id}
-    })
-    editor.insertText(draggedNode.longText)
+    insertSectionBlock(editor, draggedNode.id, draggedNode.text, draggedNode.longText)
 
     editor.getSharedState().logger.logEvent({
         'type': 'doc_create_from_node', 
@@ -85,6 +65,32 @@ function addSection(value, document, selection, draggedNode, editor, target) {
         'short_text': draggedNode.text, 
         'long_text': draggedNode.longText
     });
+}
+
+export function insertSectionBlock(editor, id, text, longText) {
+    var section = Block.create({
+        type: 'section',
+        data: {node_id: id}
+    })
+    editor.insertBlock(section);
+    editor.moveTo(section.key)
+
+    // insert the link
+    var link = Block.create({
+        type: 'link',
+        data: {node_id: id}
+    })
+    editor.insertNodeByKey(section.key, 0, link); // just doing this once seems to make everything else insert into the section too:)
+    editor.insertText(text)
+
+    // add the body of the node
+    editor.insertBlock({
+        type: 'body',
+        data: {node_id: id}
+    })
+    editor.insertText(longText)
+
+    return section
 }
 
 export function handleMouseUp(editor, clickedNode) {

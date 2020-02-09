@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
+import { showNodeSwitchMenu } from '../NodeSwitch';
 
 class LinkNode extends Component {
     constructor(props) {
         super(props)
         this.state = {
             hover: false,
-            externalHover: false
+            externalHover: false,
+            nodeStyle: "Inline"
         }
         
         this.setHover = this.setHover.bind(this);
@@ -45,7 +47,10 @@ class LinkNode extends Component {
 
         } else if (this.props.linkStyle === "inline") {
             return (
-                <p className={classes} {...this.props.attributes} onMouseEnter={() => this.setHover(true)} onMouseLeave={() => this.setHover(false)}>
+                <p className={classes} {...this.props.attributes}
+                        onMouseEnter={() => this.setHover(true)} 
+                        onMouseLeave={() => this.setHover(false)}
+                        onContextMenu={(e) => showNodeSwitchMenu(e, this.state, this.setState.bind(this), this.props.node, this.props.editor)}>
                     {this.props.children}
                 </p>
             );
