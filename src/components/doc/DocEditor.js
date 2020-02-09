@@ -21,10 +21,7 @@ const plugins = {
 const schema = {
     blocks: {
         section: {
-            // isVoid: true,
-            // nodes: [
-
-            // ]
+            // parent: { object: 'document'}
         }
     }
 }
