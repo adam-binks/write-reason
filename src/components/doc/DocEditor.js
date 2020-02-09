@@ -19,11 +19,11 @@ const plugins = {
 };
 
 const schema = {
-    blocks: {
-        section: {
-            // parent: { object: 'document'}
-        }
-    }
+    // blocks: {
+    //     section: {
+    //         // parent: { object: 'document'}
+    //     }
+    // }
 }
 
 const initialValue = Value.fromJSON({

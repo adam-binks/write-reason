@@ -24,6 +24,10 @@
     background-color: rgba(255, 255, 255, 0.5);
 }
 
+.plain-block:hover {
+    background-color: rgba(245, 245, 245, 0.5);
+}
+
 .section {
     background-color: papayawhip;
 }
@@ -36,11 +40,19 @@
 
 .section .node-link {
     background: none;
+    padding: 0;
+}
+
+.section.hide-body .node-body {
+    display: none;
+}
+
+.section.hide-heading .node-link {
+    display: none;
 }
 
 .node-body {
     margin-top: 0px;
-    margin-left: 15px;
 }
 
 .hovered, .section:hover, .node-link:hover, .node-body:hover {
@@ -61,7 +73,11 @@
     left: -30px;
     top: 22px;
     cursor: ns-resize;
-    user-select: none;
+    /* user-select: none; */
+}
+
+.drag-handle:hover {
+    background-color: grey;
 }
 
 .drop-indicator {

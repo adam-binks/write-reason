@@ -1,12 +1,15 @@
 export default class OptionPopup {
-    constructor(entries, x, y, shouldHideOnClickOutside, callback, selected=undefined) {
+    constructor(entries, x, y, shouldHideOnClickOutside, callback, selected=undefined, parent=undefined) {
         var div = document.createElement("div");
         div.classList.add("option-popup-div");
         div.appendChild(this.generateTable(entries, div, callback, selected));
         div.style.left = x + "px";
         div.style.top = y + "px";
 
-        document.getElementById("graph").appendChild(div);
+        if (parent === undefined) {
+            parent = document.getElementById("graph");
+        }
+        parent.appendChild(div);
 
         if (shouldHideOnClickOutside) {
             setTimeout(() => this.hideOnClickOutside(div), 0.01);
