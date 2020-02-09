@@ -83,10 +83,13 @@ class MouseFollower {
         }, end_node.group);
         connector.setLineColor(COMPLETED_ARROW_COLOUR);
 
-        connector.line.on("click", e => {
+        const show_context_menu = e => {
             var graph_pos = document.getElementById("graph").getBoundingClientRect();
             this.edit_connector_type(connector, e.clientX - graph_pos.left, e.clientY - graph_pos.top, true);
-        });
+            e.preventDefault();
+        };
+        connector.line.on("click", show_context_menu);
+        connector.line.on("contextmenu", show_context_menu);
 
         var c1 = this.drawing_arrow_from.group.getScreenCoords();
         var c2 = end_node.group.getScreenCoords();

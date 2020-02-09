@@ -20,12 +20,7 @@ const blockSource = {
         const blockIndex = blockParent.nodes.indexOf(props.node);
         const indexShift = (dropResult.insertBefore ? 1 : 0) - (dropResult.indexDroppedOn > blockIndex ? 1 : 0)
 
-        console.log("index shift " + indexShift + " before " + dropResult.insertBefore);
-        
-
         props.editor.moveNodeByKey(props.node.key, dropResult.parentKey, dropResult.indexDroppedOn + indexShift)
-
-
     },
   }
 

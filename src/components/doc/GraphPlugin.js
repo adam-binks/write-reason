@@ -15,9 +15,10 @@ export default function GraphPlugin(options) {
                     const { value } = editor
                     const { document, selection } = value
                     const target = editor.findEventRange(event)
-                    editor.select(target)
-
-                    addSection(value, document, selection, draggedNode, editor, target)
+                    if (target) {
+                        editor.select(target)
+                        addSection(value, document, selection, draggedNode, editor, target)
+                    }
                 }
             }
             next();
@@ -89,20 +90,25 @@ function addSection(value, document, selection, draggedNode, editor, target) {
 export function handleMouseUp(editor, clickedNode) {
     var draggedNode = editor.getSharedState().draggedNode;
 
-        if (draggedNode) {
-            draggedNode.resetPos();
+    if (draggedNode) {
+        draggedNode.resetPos();
 
-            if (editor.getSharedState().getGraphNode(draggedNode.id)) {
-                // todo possibly display a message to the user?
-                console.log("Duplicate!");
-            } else {
-                const { value } = editor
-                const { document, selection } = value
-                editor.focus()
-                editor.moveToEndOfNode(clickedNode);
+        if (editor.getSharedState().getGraphNode(draggedNode.id)) {
+            // todo possibly display a message to the user?
+            console.log("Duplicate! 2");
+        } else {
+            const { value } = editor
+            const { document, selection } = value
+            editor.focus()
 
-                addSection(value, document, selection, draggedNode, editor, editor.value.selection);
-                return true;
+            if (clickedNode.type === "body" || clickedNode.type === "link") {
+                clickedNode = document.getParent(clickedNode);
             }
+
+            editor.moveToEndOfNode(clickedNode);
+
+            addSection(value, document, selection, draggedNode, editor, editor.value.selection);
+            return true;
         }
+    }
 }
