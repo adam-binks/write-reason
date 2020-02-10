@@ -4,10 +4,10 @@ import { insertSectionBlock } from './GraphPlugin.js';
 
 export const showNodeSwitchMenu = (event, state, setState, node, editor) => {
     const entries = [
-        {'colour': 'black', 'name': 'Heading only', 'symbol': "🗙"},
-        {'colour': 'black', 'name': 'Body only', 'symbol': "🗙"},
-        {'colour': 'black', 'name': 'Heading and body', 'symbol': "🗙"},
-        {'colour': 'black', 'name': 'Inline', 'symbol': "🗙"}
+        {'colour': 'black', 'name': 'Heading only', 'symbol': "▔"},
+        {'colour': 'black', 'name': 'Body only', 'symbol': "▂"},
+        {'colour': 'black', 'name': 'Heading and body', 'symbol': "▤"},
+        {'colour': 'black', 'name': 'Inline', 'symbol': "⌶"}
     ]
 
     event.preventDefault();
@@ -28,6 +28,10 @@ export const showNodeSwitchMenu = (event, state, setState, node, editor) => {
 
 function convertFromInline(node, editor, newStyle) {
     editor.moveToRangeOfNode(node);
+    const parent = editor.value.document.getParent(node.key)
+    if (parent && parent.text === node.text) {
+        editor.moveToRangeOfNode(parent)
+    }
     insertSectionBlock(editor, node.data.get("node_id"), node.text, "")
 }
 
@@ -46,25 +50,13 @@ function convertToInline(node, editor) {
         editor.insertNodeByKey(editor.value.document.key, 0, getEmptyParagraph())
     }
 
-    // don't want to put the new inline in the previous block if its a section
-    // if (prev && (prev.type === "section" || prev.type === "body")) {
-    //     editor.wrap
-    //     // const blockIndex = editor.value.document.nodes.indexOf(node);
-    //     // const paragraph = getEmptyParagraph()
-    //     // editor.insertNodeByKey(editor.value.document.key, blockIndex + 1, paragraph)
-    // }
-
     editor.moveToRangeOfNode(node)
 
+    // don't merge with prev block if prev is another section - wrap it in a fresh paragraph instead
     if (prev && (prev.type === "section" || prev.type === "body")) {
-        console.log("wrapping");
-        
         editor.wrapBlockByKey(node.key, "paragraph")
-        const parent = editor.value.document.getParent(node.key)
-        console.log(parent);
-        
         editor.removeNodeByKey(node.key)
-        editor.moveToEndOfNode(parent)
+        editor.moveForward()
     } else {
         editor.removeNodeByKey(node.key)
     }
