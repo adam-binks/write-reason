@@ -7,14 +7,17 @@ export const showNodeSwitchMenu = (event, state, setState, node, editor) => {
         {'colour': 'black', 'name': 'Heading only', 'symbol': "▔"},
         {'colour': 'black', 'name': 'Body only', 'symbol': "▂"},
         {'colour': 'black', 'name': 'Heading and body', 'symbol': "▤"},
-        {'colour': 'black', 'name': 'Inline', 'symbol': "⌶"}
+        {'colour': 'black', 'name': 'Inline', 'symbol': "⌶"},
+        {'colour': 'red', 'name': 'Delete', 'symbol': "🗙"}
     ]
 
     event.preventDefault();
 
     const onOptionSelect = (selectedEntry) => {
         const selected = selectedEntry.name
-        if (state.nodeStyle !== "Inline" && selected !== "Inline") {
+        if (selected === "Delete") {
+            deleteNode(node, editor)
+        } else if (state.nodeStyle !== "Inline" && selected !== "Inline") {
             setState({nodeStyle: selected})
         } else if (state.nodeStyle === "Inline" && selected !== "Inline") {
             convertFromInline(node, editor, selected)
@@ -24,6 +27,12 @@ export const showNodeSwitchMenu = (event, state, setState, node, editor) => {
     }
 
     new OptionPopup(entries, event.clientX, event.clientY, true, onOptionSelect, state.nodeStyle, document.querySelector(".App"))
+}
+
+function deleteNode(node, editor) {
+    editor.getSharedState().removeDocNode(node.data.get("node_id"))
+
+    editor.removeNodeByKey(node.key)
 }
 
 function convertFromInline(node, editor, newStyle) {

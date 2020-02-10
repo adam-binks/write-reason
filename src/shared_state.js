@@ -87,6 +87,14 @@ export default class SharedState {
         }
     }
 
+    removeDocNode(id) {
+        var map = this.getGraphNodeAndDocNode(id)
+        if (map) {
+            map.graph_node.setIsOnGraph(false);
+            this.map[id] = undefined
+        }
+    }
+
     getDocNodes(id) {
         const map = this.getGraphNodeAndDocNode(id);
         if (map) {
@@ -154,6 +162,14 @@ export default class SharedState {
         
         if (graphNode) {
             graphNode.updateShortText(newText);            
+        }
+    }
+
+    updateGraphLongText(id, newText) {
+        var graphNode = this.getGraphNode(id);
+        
+        if (graphNode) {
+            graphNode.updateLongText(newText);            
         }
     }
 }

@@ -8,7 +8,7 @@ const ARROW_OPTIONS = [
     {'colour': 'green', 'name': 'Supports', 'symbol': "→"},
     {'colour': 'red', 'name': 'Opposes', 'symbol': "→"},
     {'colour': 'blue', 'name': 'Expands', 'symbol': "→"},
-    {'colour': 'black', 'name': 'Delete', 'symbol': "🗙"}
+    {'colour': 'red', 'name': 'Delete', 'symbol': "🗙"}
 ];
 
 class MouseFollower {

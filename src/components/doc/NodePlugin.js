@@ -26,8 +26,9 @@ export default function LinkPlugin(options) {
         },
 
         renderBlock(props, editor, next) {
+            var refAndId;
             if (props.node.type === 'body') {
-                var { ref, id } = getRefAndId(props, editor, "long");
+                refAndId = getRefAndId(props, editor, "long");
 
                 // set up the placeholder text to only appear when the body is empty and no text is selected
                 var isEmpty = (!props.node.text || props.node.text === "");
@@ -36,17 +37,17 @@ export default function LinkPlugin(options) {
                     setTimeout(() => {editor.focus(); editor.moveToStartOfNode(props.node);}, 0)
                 }
 
-                return <BodyNode ref={ref} {...props} sharedState={editor.getSharedState()} nodeId={id} isEmpty={isEmpty} selectNode={selectNode}/>
+                return <BodyNode ref={refAndId.ref} {...props} sharedState={editor.getSharedState()} nodeId={refAndId.id} isEmpty={isEmpty} selectNode={selectNode}/>
 
             } else if (props.node.type === 'link') {
-                var { ref, id } = getRefAndId(props, editor, "short");
+                refAndId = getRefAndId(props, editor, "short");
 
-                return <LinkNode ref={ref} {...props} linkStyle="heading" sharedState={editor.getSharedState()} nodeId={id}/>
+                return <LinkNode ref={refAndId.ref} {...props} linkStyle="heading" sharedState={editor.getSharedState()} nodeId={refAndId.id}/>
 
             } else if (props.node.type === 'section') {
-                var { ref, id } = getRefAndId(props, editor, "section");
+                refAndId = getRefAndId(props, editor, "section");
 
-                return <SectionNode ref={ref} {...props} sharedState={editor.getSharedState()} nodeId={id}/>
+                return <SectionNode ref={refAndId.ref} {...props} sharedState={editor.getSharedState()} nodeId={refAndId.id}/>
             }
 
             return next();
@@ -82,11 +83,14 @@ export default function LinkPlugin(options) {
             // prevent backspace from merging body and link blocks with previous
             if (e.key === 'Backspace') {
                 const { document, selection, startBlock} = value
-                const {start, end} = selection
+                const {start} = selection
 
                 if (startBlock && (startBlock.type === "body" || startBlock.type === "link") && start.offset === 0) {
                     const prevBlock = document.getPreviousBlock(start.key)
-                    return editor.moveToEndOfNode(prevBlock);
+                    if (prevBlock) {
+                        editor.moveToEndOfNode(prevBlock);
+                    }
+                    return editor
                 }
             }
             
