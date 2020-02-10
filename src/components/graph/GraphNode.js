@@ -14,7 +14,8 @@ class GraphNode {
             .translate(-ARROW_HITBOX_MARGIN, -ARROW_HITBOX_MARGIN).opacity(0);
         this.rect = this.group.rect(width, height).radius(10).addClass('node');
         this.text = this.group.text("").addClass('node-text');
-        this.updateShortText(text);
+        this.updateShortText(text)
+        this.updateLongText("")
 
         this.setupRectDragging(this.rect, shared_state);
         this.setupArrowHitbox(this.arrow_hitbox, mouse_follower);
@@ -50,7 +51,7 @@ class GraphNode {
             e.preventDefault();
             
             var entries = [
-                {'colour': 'black', 'name': 'Delete', 'symbol': "🗙"}
+                {'colour': 'red', 'name': 'Delete', 'symbol': "🗙"}
             ]
             var graph_pos = document.getElementById("graph").getBoundingClientRect();
             new OptionPopup(entries, e.clientX - graph_pos.left, e.clientY - graph_pos.top, true, (selected_option) => {
@@ -69,12 +70,18 @@ class GraphNode {
         const startHover = (e) => {
             this.setHovered(true);
             shared_state.getAllDocNodeRefs(this.id).forEach(ref => {
+                if (!ref) {
+                    return
+                }
                 ref.decoratedRef ? ref.decoratedRef.current.decoratedRef.current.setExternalHover(true) : ref.setExternalHover(true);
             });
         };
         const endHover = (e) => {
             this.setHovered(false);
             shared_state.getAllDocNodeRefs(this.id).forEach(ref => {
+                if (!ref) {
+                    return
+                }
                 ref.decoratedRef ? ref.decoratedRef.current.decoratedRef.current.setExternalHover(false) : ref.setExternalHover(false);
             });
         };
@@ -180,6 +187,10 @@ class GraphNode {
         this.resizeRect(formattedText.length);
     }
 
+    updateLongText(newLongText) {
+        this.longText = newLongText;
+    }
+
     splitIntoLines(charsPerLine, text) {
         var formattedText = [];
         var line = "";
@@ -227,7 +238,7 @@ class GraphNode {
     }
 
     getLongText() {
-        return "";
+        return this.longText;
     }
 
     editText(shared_state, delete_if_empty_text = false) {

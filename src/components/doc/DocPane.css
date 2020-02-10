@@ -1,9 +1,13 @@
+.doc.pane {
+    overflow-y: auto;
+}
+
 .slate-editor {
     font-family: 'Crimson Text', serif;
     font-size: 120%;
     padding-right: 50px;
-    padding-top: 50px;
-    padding-bottom: 50px;
+    /* padding-top: 50px; */
+    /* padding-bottom: 50px; */
     min-height: 100%;
 }
 

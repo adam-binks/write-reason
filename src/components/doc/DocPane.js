@@ -5,7 +5,7 @@ import DocEditor from './DocEditor.js'
 class DocPane extends Component {
     render() {
         return (
-            <div className="pane">
+            <div className="pane doc">
                 <DocEditor sharedState={this.props.sharedState} />
             </div>
         );

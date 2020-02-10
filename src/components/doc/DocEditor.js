@@ -5,6 +5,7 @@ import NodePlugin from './NodePlugin.js';
 import GraphPlugin from './GraphPlugin.js';
 import LoggingPlugin from './LoggingPlugin.js';
 import ReorderPlugin from './ReorderPlugin.js';
+import { schema } from './Schema.js'
 
 const plugins = {
     'graph': [
@@ -17,14 +18,6 @@ const plugins = {
         LoggingPlugin(),
     ]
 };
-
-const schema = {
-    // blocks: {
-    //     section: {
-    //         // parent: { object: 'document'}
-    //     }
-    // }
-}
 
 const initialValue = Value.fromJSON({
     document: {

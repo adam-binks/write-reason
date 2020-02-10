@@ -6,6 +6,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     function s(o, u) {
         if (!n[o]) {
             if (!t[o]) {
+                // eslint-disable-next-line no-sequences
                 var a = typeof require == "function" && require;if (!u && a) return a(o, !0);if (i) return i(o, !0);var f = new Error("Cannot find module '" + o + "'");throw f.code = "MODULE_NOT_FOUND", f;
             }var l = n[o] = { exports: {} };t[o][0].call(l.exports, function (e) {
                 var n = t[o][1][e];return s(n ? n : e);
@@ -115,10 +116,6 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                 d: "M 0 0 L 10 5 L 0 10 z"
             });
 
-            // Source and target positions
-            var sPos = {},
-                tPos = {};
-
             // Append the SVG elements
             con.source = elmSource;
             con.target = elmTarget;
@@ -221,19 +218,20 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
                         var xDiff = sT.x - tT.x;
                         var yDiff = sT.y - tT.y;
+                        var x2, y2;
                         if (Math.abs(xDiff) > Math.abs(yDiff)) {
-                            var y2 = tT.y + tB.height / 2 - 20;
+                            y2 = tT.y + tB.height / 2 - 20;
                             if (xDiff < 0) {
-                                var x2 = tT.x - 10;
+                                x2 = tT.x - 10;
                             } else {
-                                var x2 = tT.x + tB.width - 30;
+                                x2 = tT.x + tB.width - 30;
                             }
                         } else {
-                            var x2 = tT.x + tB.width / 2 - 20;
+                            x2 = tT.x + tB.width / 2 - 20;
                             if (yDiff < 0) {
-                                var y2 = tT.y - 10;
+                                y2 = tT.y - 10;
                             } else {
-                                var y2 = tT.y + tB.height - 30;
+                                y2 = tT.y + tB.height - 30;
                             }
                         }
 
@@ -278,9 +276,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                             yR1,
                             yR2,
                             sT = con.source.transform(),
-                            tT = con.target.transform(),
-                            sB = con.source.bbox(),
-                            tB = con.target.bbox();
+                            tT = con.target.transform()
 
                         if (elmS.tagName === "circle") {
                             xR1 = yR1 = parseFloat(elmS.getAttribute("r"));
@@ -576,6 +572,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                 return str ? "undefined" : undefined;
             }
 
+            // eslint-disable-next-line no-self-compare
             if (input !== input) {
                 return str ? "nan" : NaN;
             }
