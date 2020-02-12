@@ -18,8 +18,8 @@ export default class App extends Component {
         super(props);
 
         this.state = {
-            phase: "editor", // "setup",
-            sharedState: new SharedState({"condition": "graph"}), // undefined,
+            phase: "setup", // "editor", // 
+            sharedState: undefined, // new SharedState({"condition": "graph"}), //
             params: undefined,
             completedConditions: []
         }
