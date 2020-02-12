@@ -16,13 +16,26 @@ export const showNodeSwitchMenu = (event, state, setState, node, editor) => {
     const onOptionSelect = (selectedEntry) => {
         const selected = selectedEntry.name
         if (selected === "Delete") {
-            deleteNode(node, editor)
-        } else if (state.nodeStyle !== "Inline" && selected !== "Inline") {
-            setState({nodeStyle: selected})
-        } else if (state.nodeStyle === "Inline" && selected !== "Inline") {
-            convertFromInline(node, editor, selected)
-        }  else if (state.nodeStyle !== "Inline" && selected === "Inline") {
-            convertToInline(node, editor)
+            editor.getSharedState().logger.logEvent({
+                type: "doc_node_delete",
+                id: node.data.get("node_id")
+            });
+            deleteNode(node, editor);
+        } else {
+            editor.getSharedState().logger.logEvent({
+                type: "doc_node_change_format",
+                old: state.nodeStyle,
+                new: selected,
+                id: node.data.get("node_id")
+            });
+
+            if (state.nodeStyle !== "Inline" && selected !== "Inline") {
+                setState({nodeStyle: selected})
+            } else if (state.nodeStyle === "Inline" && selected !== "Inline") {
+                convertFromInline(node, editor, selected)
+            }  else if (state.nodeStyle !== "Inline" && selected === "Inline") {
+                convertToInline(node, editor)
+            }
         }
     }
 
