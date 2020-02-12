@@ -5,6 +5,7 @@ import NodePlugin from './NodePlugin.js';
 import GraphPlugin from './GraphPlugin.js';
 import LoggingPlugin from './LoggingPlugin.js';
 import ReorderPlugin from './ReorderPlugin.js';
+import HoveringMenu from './HoveringMenu.js';
 import { schema } from './Schema.js'
 
 const plugins = {
@@ -16,6 +17,7 @@ const plugins = {
     ],
     'plain': [
         LoggingPlugin(),
+        HoveringMenu(),
     ]
 };
 
