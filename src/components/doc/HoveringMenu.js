@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom'
 import { css } from 'emotion'
 import { Button, Icon, Menu } from './SlateComponents.js'
 
+// adapted from https://github.com/ianstormtaylor/slate/blob/master/site/examples/hovering-toolbar.js
+
 const MarkButton = ({ editor, type, icon }) => {
   const { value } = editor
   const isActive = value.blocks && value.blocks.some(block => block.type === type)
@@ -13,6 +15,10 @@ const MarkButton = ({ editor, type, icon }) => {
       onMouseDown={event => {
         event.preventDefault()
         editor.setBlocks((isActive ? "paragraph" : type))
+
+        editor.getSharedState().logger.logEvent({
+          'type': 'set_title' + (isActive ? "_disabled" : "_enabled"),
+      });
       }}
     >
       <Icon>{icon}</Icon>

@@ -21,6 +21,13 @@ const blockSource = {
         const indexShift = (dropResult.insertBefore ? 1 : 0) - (dropResult.indexDroppedOn > blockIndex ? 1 : 0)
 
         props.editor.moveNodeByKey(props.node.key, dropResult.parentKey, dropResult.indexDroppedOn + indexShift)
+
+        props.editor.getSharedState().logger.logEvent({
+            'type': 'reorder',
+            'id': props.node.data.get('node_id'),
+            'old_index': blockIndex,
+            'new_index': dropResult.indexDroppedOn + indexShift,
+        });
     },
   }
 
