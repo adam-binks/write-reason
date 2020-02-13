@@ -7,7 +7,7 @@ class LinkNode extends Component {
         this.state = {
             hover: false,
             externalHover: false,
-            nodeStyle: "Inline"
+            // nodeStyle: "Inline"
         }
         
         this.setHover = this.setHover.bind(this);
@@ -16,7 +16,7 @@ class LinkNode extends Component {
     setHover(newHover) {     
         var node = this.props.sharedState.getGraphNode(this.props.nodeId);
         if (node) {
-            node.setHovered(newHover);
+            node.setHoverer("link_mouse", newHover);
         }
 
         this.setState({hover: newHover});
@@ -31,9 +31,7 @@ class LinkNode extends Component {
         const { document, selection } = value;
         var cursorInside = document.getDescendantsAtRange(selection).contains(this.props.node)
         var node = this.props.sharedState.getGraphNode(this.props.nodeId);
-        if (node && !this.state.hover && !this.state.externalHover) {
-            node.setHovered(cursorInside);
-        }
+        node.setHoverer("link_cursor", cursorInside);        
         
         var hoverClass = (this.state.externalHover || cursorInside) ? " hovered" : "";
         var classes = "node-link" + hoverClass;
@@ -50,7 +48,7 @@ class LinkNode extends Component {
                 <p className={classes} {...this.props.attributes}
                         onMouseEnter={() => this.setHover(true)} 
                         onMouseLeave={() => this.setHover(false)}
-                        onContextMenu={(e) => showNodeSwitchMenu(e, this.state, this.setState.bind(this), this.props.node, this.props.editor)}>
+                        onContextMenu={(e) => showNodeSwitchMenu(e, this.state, this.setState.bind(this), this.props.node, this.props.editor, ["Heading only", "Body only"])}>
                     {this.props.children}
                 </p>
             );

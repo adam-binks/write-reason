@@ -1,4 +1,6 @@
+import React from 'react';
 import { Text } from 'slate';
+import Html from 'slate-html-serializer'
 import Logger from './logging'
 
 export default class SharedState {
@@ -28,6 +30,57 @@ export default class SharedState {
         element.download = this.logger.getExperimentId() + ".json";
         document.body.appendChild(element); // Required for this to work in FireFox
         element.click();
+    }
+
+    getArgumentMarkdown() {
+        const RULES = [
+            {
+                serialize(node, children) {
+                    if (["block", "inline"].includes(node.object)) {
+                        switch(node.type) {
+                            case 'paragraph':
+                            case 'body':
+                            case '':
+                                return <p>{children}</p>
+
+                            case 'heading':
+                                return <h2>{children}</h2>
+                            
+                            case 'section':
+                                return <div>{children}</div>
+                            
+                            case 'link':
+                                if (node.object === "inline") {
+                                    return <span>{children}</span>
+                                } else {
+                                    return <h2>{children}</h2>
+                                }
+
+                            default:
+                                return undefined;
+                        }
+                    }
+                } 
+            }
+        ]
+
+        const serializer = new Html({rules: RULES})
+        var output = serializer.serialize(this.getEditor().value)
+        
+        var tagReplacements = [
+            {regex: /<p>/g},
+            {regex: /<\/p>/g, replace: "\n\n"},
+            {regex: /<div>/g},
+            {regex: /<\/div>/g},
+            {regex: /<span>/g},
+            {regex: /<\/span>/g},
+            {regex: /<h2>/g, replace: "## "},
+            {regex: /<\/h2>/g, replace: "\n"},
+        ]
+        tagReplacements.forEach((replacement) => {
+            output = output.replace(replacement.regex, replacement.replace ? replacement.replace : "")
+        })
+        return output
     }
 
     finishCondition() {

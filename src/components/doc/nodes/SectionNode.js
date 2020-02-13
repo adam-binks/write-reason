@@ -10,18 +10,18 @@ class SectionNode extends Component {
         this.state = {
             hover: false,
             externalHover: false,
-            nodeStyle: "Heading and body"
+            nodeStyle: props.node.data.get("nodeStyle")
         }
-        this.toggleHover = this.toggleHover.bind(this);
+        this.setHover = this.setHover.bind(this);
     }
 
-    toggleHover() {
+    setHover(newHover) {     
         var node = this.props.sharedState.getGraphNode(this.props.nodeId);
         if (node) {
-            node.setHovered(!this.state.hover);
+            node.setHoverer("section_mouse", newHover);
         }
 
-        this.setState({hover: !this.state.hover});
+        this.setState({hover: newHover});
     }
     
     setExternalHover(isHovered) {
@@ -31,13 +31,25 @@ class SectionNode extends Component {
     render() {
         const { isOverCurrent, connectDropTarget, connectDragSource, dragPreview, isDragging } = this.props;
 
-        var hoverClass = this.state.externalHover ? " hovered" : "";
+        const value = this.props.editor.value
+        var cursorInside = value.blocks && value.blocks.some(block => block === this.props.node || this.props.node.nodes.includes(block))
+
+        var hoverClass = (this.state.externalHover || cursorInside) ? " hovered" : "";
         var classes = "section plain-block " + hoverClass  + (isDragging ? " display-none" : "");
         classes += getNodeStyleClass(this.state.nodeStyle)
 
+        if (this.props.node.data.get("nodeStyle") !== this.state.nodeStyle) {
+            console.log("update");
+            
+            this.props.editor.setNodeByKey(this.props.node.key, {nodeStyle: this.state.nodeStyle})
+        }
+
+        console.log("style " + this.props.node.data.get("nodeStyle"));
+        
+
         return connectDropTarget(
             <div className={classes} {...this.props.attributes} 
-                    onMouseEnter={this.toggleHover} onMouseLeave={this.toggleHover} 
+                    onMouseEnter={() => this.setHover(true)} onMouseLeave={() => this.setHover(false)} 
                     onMouseUp={() => {handleMouseUp(this.props.editor, this.props.node) && this.setState({hover: false})}}
                     onContextMenu={(e) => showNodeSwitchMenu(e, this.state, this.setState.bind(this), this.props.node, this.props.editor)}
                     ref={dragPreview}>

@@ -67,8 +67,10 @@ class GraphNode {
     }
 
     setupHover(shared_state) {
+        this.hoverers = []
+
         const startHover = (e) => {
-            this.setHovered(true);
+            this.setHoverer("mouse_" + e.target, true);
             shared_state.getAllDocNodeRefs(this.id).forEach(ref => {
                 if (!ref) {
                     return
@@ -77,7 +79,7 @@ class GraphNode {
             });
         };
         const endHover = (e) => {
-            this.setHovered(false);
+            this.setHoverer("mouse_" + e.target, false);
             shared_state.getAllDocNodeRefs(this.id).forEach(ref => {
                 if (!ref) {
                     return
@@ -91,7 +93,21 @@ class GraphNode {
         this.text.on('mouseleave', endHover);
     }
 
-    setHovered(isHovered) {
+    setHoverer(hoverer, isHovering) {
+        if (isHovering) {
+            if (!this.hoverers.includes(hoverer)) {
+                this.hoverers.push(hoverer)
+            }
+        } else {
+            // remove the hoverer
+            var index = this.hoverers.indexOf(hoverer);
+            if (index !== -1) this.hoverers.splice(index, 1);
+        }
+
+        this.setHovered(this.hoverers.length > 0)
+    }
+
+    setHovered(isHovered) {        
         if (isHovered) {
             this.rect.addClass("hovered");
         } else {
