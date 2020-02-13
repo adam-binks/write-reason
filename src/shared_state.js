@@ -33,13 +33,17 @@ export default class SharedState {
     }
 
     getArgumentMarkdown() {
+        const parentStyleIs = (node, styleToCheck) => {
+            const parent = this.getEditor().value.document.getParent(node.key)
+            return parent && parent.data.get("nodeStyle") === styleToCheck
+        }
+
         const RULES = [
             {
-                serialize(node, children) {
+                serialize: (node, children) => {
                     if (["block", "inline"].includes(node.object)) {
                         switch(node.type) {
                             case 'paragraph':
-                            case 'body':
                             case '':
                                 return <p>{children}</p>
 
@@ -49,11 +53,22 @@ export default class SharedState {
                             case 'section':
                                 return <div>{children}</div>
                             
+                            case 'body':
+                                if (parentStyleIs(node, "Heading only")) {
+                                    return <p></p>
+                                } else {
+                                    return <p>{children}</p>
+                                }
+
                             case 'link':
                                 if (node.object === "inline") {
                                     return <span>{children}</span>
                                 } else {
-                                    return <h2>{children}</h2>
+                                    if (parentStyleIs(node, "Body only")) {
+                                        return <p></p>
+                                    } else {
+                                        return <h2>{children}</h2>
+                                    }
                                 }
 
                             default:
@@ -68,6 +83,8 @@ export default class SharedState {
         var output = serializer.serialize(this.getEditor().value)
         
         var tagReplacements = [
+            {regex: /<p>\s*<\/p>/g},  // special rule for removing empty paragraphs without inserting a newline
+            
             {regex: /<p>/g},
             {regex: /<\/p>/g, replace: "\n\n"},
             {regex: /<div>/g},

@@ -26,18 +26,20 @@ export const showNodeSwitchMenu = (event, state, setState, node, editor, entries
             });
             deleteNode(node, editor);
         } else {
+            const nodeStyle = node.data.get("nodeStyle")
+
             editor.getSharedState().logger.logEvent({
                 type: "doc_node_change_format",
-                old: state.nodeStyle,
+                old: nodeStyle,
                 new: selected,
                 id: node.data.get("node_id")
             });
 
-            if (state.nodeStyle !== "Inline" && selected !== "Inline") {
-                setState({nodeStyle: selected})
-            } else if (state.nodeStyle === "Inline" && selected !== "Inline") {
+            if (nodeStyle !== "Inline" && selected !== "Inline") {
+                editor.setNodeByKey(node.key, { data: {node_id: node.data.get("node_id"), nodeStyle: selected} })
+            } else if (nodeStyle === "Inline" && selected !== "Inline") {
                 convertFromInline(node, editor)
-            }  else if (state.nodeStyle !== "Inline" && selected === "Inline") {
+            }  else if (nodeStyle !== "Inline" && selected === "Inline") {
                 convertToInline(node, editor, selected)
             }
         }
@@ -58,7 +60,7 @@ function convertFromInline(node, editor) {
     if (parent && parent.text === node.text) {
         editor.moveToRangeOfNode(parent)
     }
-    insertSectionBlock(editor, node.data.get("node_id"), node.text, "")
+    insertSectionBlock(editor, node.data.get("node_id"), node.text, "", "Heading and body")
 }
 
 function convertToInline(node, editor) {
@@ -82,14 +84,13 @@ function convertToInline(node, editor) {
     if ((prev && (prev.type === "section" || prev.type === "body")) || (!prev && next && (next.type === "section" || next.type === "link"))) {
         editor.wrapBlockByKey(node.key, "paragraph")
         editor.removeNodeByKey(node.key)
-        // editor.moveForward()
     } else {
         editor.removeNodeByKey(node.key)
     }
 
     editor.insertInline({
             type: "link",
-            data: {node_id: node.data.get("node_id")},
+            data: {node_id: node.data.get("node_id"), nodeStyle: "Inline"},
         })
         .insertText(shortText)
 }

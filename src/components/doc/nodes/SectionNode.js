@@ -10,7 +10,7 @@ class SectionNode extends Component {
         this.state = {
             hover: false,
             externalHover: false,
-            nodeStyle: props.node.data.get("nodeStyle")
+            // nodeStyle: props.node.data.get("nodeStyle")
         }
         this.setHover = this.setHover.bind(this);
     }
@@ -36,16 +36,7 @@ class SectionNode extends Component {
 
         var hoverClass = (this.state.externalHover || cursorInside) ? " hovered" : "";
         var classes = "section plain-block " + hoverClass  + (isDragging ? " display-none" : "");
-        classes += getNodeStyleClass(this.state.nodeStyle)
-
-        if (this.props.node.data.get("nodeStyle") !== this.state.nodeStyle) {
-            console.log("update");
-            
-            this.props.editor.setNodeByKey(this.props.node.key, {nodeStyle: this.state.nodeStyle})
-        }
-
-        console.log("style " + this.props.node.data.get("nodeStyle"));
-        
+        classes += getNodeStyleClass(this.props.node.data.get("nodeStyle"))
 
         return connectDropTarget(
             <div className={classes} {...this.props.attributes} 

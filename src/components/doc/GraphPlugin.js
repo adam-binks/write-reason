@@ -57,7 +57,7 @@ function addSection(value, document, selection, draggedNode, editor, target) {
 
     editor.getSharedState().addGraphMapping(draggedNode.id, draggedNode.node)
 
-    insertSectionBlock(editor, draggedNode.id, draggedNode.text, draggedNode.longText)
+    insertSectionBlock(editor, draggedNode.id, draggedNode.text, draggedNode.longText, "Heading and body")
 
     editor.getSharedState().logger.logEvent({
         'type': 'doc_create_from_node', 
@@ -70,7 +70,7 @@ function addSection(value, document, selection, draggedNode, editor, target) {
 export function insertSectionBlock(editor, id, text, longText, initialNodeStyle) {
     var section = Block.create({
         type: 'section',
-        data: {node_id: id, initial_node_style: initialNodeStyle}
+        data: {node_id: id, nodeStyle: initialNodeStyle}
     })
     editor.insertBlock(section);
     editor.moveTo(section.key)
