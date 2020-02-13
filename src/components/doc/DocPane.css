@@ -57,7 +57,7 @@
 }
 
 .hovered, .section:hover, .node-link:hover, .node-body:hover {
-    background: rgba(255, 217, 0, 0.5);
+    background: rgba(255, 217, 0, 0.5) !important
 }
 
 .placeholder {

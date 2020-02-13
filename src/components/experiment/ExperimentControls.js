@@ -18,6 +18,7 @@ export default class ExperimentControls extends Component {
         return (
             <div className="experiment-controls">
                 <Countdown date={Date.now() + this.props.sharedState.params.duration} renderer={countdownRenderer} />
+                <button onClick={() => console.log(this.props.sharedState.getArgumentMarkdown())}>Log argument</button>
                 <button onClick={this.props.sharedState.downloadExperimentData}>Download experiment data</button>
                 <button onClick={this.props.completeFunc}>Complete condition</button>
             </div>

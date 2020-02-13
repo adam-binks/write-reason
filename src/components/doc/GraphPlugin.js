@@ -67,10 +67,10 @@ function addSection(value, document, selection, draggedNode, editor, target) {
     });
 }
 
-export function insertSectionBlock(editor, id, text, longText) {
+export function insertSectionBlock(editor, id, text, longText, initialNodeStyle) {
     var section = Block.create({
         type: 'section',
-        data: {node_id: id}
+        data: {node_id: id, initial_node_style: initialNodeStyle}
     })
     editor.insertBlock(section);
     editor.moveTo(section.key)

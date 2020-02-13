@@ -2,14 +2,18 @@ import { Block } from 'slate';
 import OptionPopup from '../graph/OptionPopup.js'
 import { insertSectionBlock } from './GraphPlugin.js';
 
-export const showNodeSwitchMenu = (event, state, setState, node, editor) => {
-    const entries = [
+export const showNodeSwitchMenu = (event, state, setState, node, editor, entriesToHide) => {
+    var entries = [
+        {'colour': 'black', 'name': 'Inline', 'symbol': "⌶"},
+        {'colour': 'black', 'name': 'Heading and body', 'symbol': "▤"},
         {'colour': 'black', 'name': 'Heading only', 'symbol': "▔"},
         {'colour': 'black', 'name': 'Body only', 'symbol': "▂"},
-        {'colour': 'black', 'name': 'Heading and body', 'symbol': "▤"},
-        {'colour': 'black', 'name': 'Inline', 'symbol': "⌶"},
         {'colour': 'red', 'name': 'Delete', 'symbol': "🗙"}
     ]
+
+    if (entriesToHide) {
+        entries = entries.filter((entry) => {return !entriesToHide.includes(entry.name)})
+    }
 
     event.preventDefault();
 
@@ -32,9 +36,9 @@ export const showNodeSwitchMenu = (event, state, setState, node, editor) => {
             if (state.nodeStyle !== "Inline" && selected !== "Inline") {
                 setState({nodeStyle: selected})
             } else if (state.nodeStyle === "Inline" && selected !== "Inline") {
-                convertFromInline(node, editor, selected)
+                convertFromInline(node, editor)
             }  else if (state.nodeStyle !== "Inline" && selected === "Inline") {
-                convertToInline(node, editor)
+                convertToInline(node, editor, selected)
             }
         }
     }
@@ -48,7 +52,7 @@ function deleteNode(node, editor) {
     editor.removeNodeByKey(node.key)
 }
 
-function convertFromInline(node, editor, newStyle) {
+function convertFromInline(node, editor) {
     editor.moveToRangeOfNode(node);
     const parent = editor.value.document.getParent(node.key)
     if (parent && parent.text === node.text) {
@@ -75,17 +79,17 @@ function convertToInline(node, editor) {
     editor.moveToRangeOfNode(node)
 
     // don't merge with prev block if prev is another section - wrap it in a fresh paragraph instead
-    if (prev && (prev.type === "section" || prev.type === "body")) {
+    if ((prev && (prev.type === "section" || prev.type === "body")) || (!prev && next && (next.type === "section" || next.type === "link"))) {
         editor.wrapBlockByKey(node.key, "paragraph")
         editor.removeNodeByKey(node.key)
-        editor.moveForward()
+        // editor.moveForward()
     } else {
         editor.removeNodeByKey(node.key)
     }
 
     editor.insertInline({
             type: "link",
-            data: {node_id: node.data.get("node_id")}
+            data: {node_id: node.data.get("node_id")},
         })
         .insertText(shortText)
 }

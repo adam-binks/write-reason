@@ -57,5 +57,6 @@ export default class OptionPopup {
         }
     
         document.addEventListener('click', outsideClickListener)
+        document.addEventListener('contextmenu', outsideClickListener)
     }
 }
