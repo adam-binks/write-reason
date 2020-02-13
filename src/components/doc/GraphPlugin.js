@@ -31,7 +31,25 @@ export default function GraphPlugin(options) {
 
         commands: {
             removeGraphLink(editor, node) {
-                editor.setNodeByKey(node.key, {"type": ""})
+                if (node.type === "section") {
+                    // move the children out from inside this section to be after it
+                    const section_index = editor.value.document.nodes.indexOf(node)
+                    if (section_index !== -1) {
+                        var child_index = 0;
+                        node.nodes.forEach(child => {
+                            const nodeStyle = node.data.get("nodeStyle")
+                            if ((child_index === 0 && nodeStyle === "Body only") || (child_index === 1 && nodeStyle === "Heading only")) {
+                                editor.removeNodeByKey(child.key)
+                            } else {
+                                editor.moveNodeByKey(child.key, editor.value.document.key, section_index + child_index + 1)
+                            }
+                            child_index ++
+                        });
+                    }
+                    editor.removeNodeByKey(node.key)
+                } else if (editor.value.document.getChild(node.key) || node.object === "inline") {                    
+                    editor.setNodeByKey(node.key, {"type": ""})
+                }
             }
         }
     }

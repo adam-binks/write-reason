@@ -17,14 +17,21 @@ export default class SharedState {
         this.graphPane = undefined;
 
         // log entire document content every 30 seconds
-        this.intervalLogger = window.setInterval((() => this.logger.logEvent({'type': 'document_content', 'content': this.getEditor().getValue()})), 30000)
+        this.intervalLogger = window.setInterval(() => {
+            this.logger.logEvent({'type': 'document_content_detailed', 'content': this.getEditor().getValue()});
+            this.logger.logEvent({'type': 'document_content_markdown', 'content': this.getArgumentMarkdown()});
+        }, 30000);
         
         this.downloadExperimentData = this.downloadExperimentData.bind(this);
     }
 
     downloadExperimentData() {
         const element = document.createElement("a");
-        const file = new Blob([this.logger.getExperimentData()], {type: 'text/plain'});
+        const data = {
+            argument: this.getArgumentMarkdown(),
+            logs: this.logger.getExperimentData()
+        }
+        const file = new Blob([data], {type: 'text/plain'});
 
         element.href = URL.createObjectURL(file);
         element.download = this.logger.getExperimentId() + ".json";
@@ -84,7 +91,7 @@ export default class SharedState {
         
         var tagReplacements = [
             {regex: /<p>\s*<\/p>/g},  // special rule for removing empty paragraphs without inserting a newline
-            
+
             {regex: /<p>/g},
             {regex: /<\/p>/g, replace: "\n\n"},
             {regex: /<div>/g},
