@@ -38,7 +38,7 @@ export const showNodeSwitchMenu = (event, state, setState, node, editor, entries
             if (nodeStyle !== "Inline" && selected !== "Inline") {
                 editor.setNodeByKey(node.key, { data: {node_id: node.data.get("node_id"), nodeStyle: selected} })
             } else if (nodeStyle === "Inline" && selected !== "Inline") {
-                convertFromInline(node, editor)
+                convertFromInline(node, editor, selected)
             }  else if (nodeStyle !== "Inline" && selected === "Inline") {
                 convertToInline(node, editor, selected)
             }
@@ -54,13 +54,13 @@ function deleteNode(node, editor) {
     editor.removeNodeByKey(node.key)
 }
 
-function convertFromInline(node, editor) {
+function convertFromInline(node, editor, newStyle) {
     editor.moveToRangeOfNode(node);
     const parent = editor.value.document.getParent(node.key)
     if (parent && parent.text === node.text) {
         editor.moveToRangeOfNode(parent)
     }
-    insertSectionBlock(editor, node.data.get("node_id"), node.text, "", "Heading and body")
+    insertSectionBlock(editor, node.data.get("node_id"), node.text, "", newStyle)
 }
 
 function convertToInline(node, editor) {

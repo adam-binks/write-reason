@@ -60,7 +60,7 @@ class GraphPane extends React.Component {
         this.addNoNodesIndicator(svg, nodes, mouse_follower);
 
         // temp
-        this.addNodeAtScreenLocation(svg, nodes, mouse_follower, "Radical", 1200, 300, false);
+        // this.addNodeAtScreenLocation(svg, nodes, mouse_follower, "Radical", 1200, 300, false);
     }
 
     addNoNodesIndicator(svg, nodes, mouse_follower) {
