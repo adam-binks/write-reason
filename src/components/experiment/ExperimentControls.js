@@ -12,15 +12,19 @@ const countdownRenderer = ({ hours, minutes, seconds, completed }) => {
     // }
   };
 
-
 export default class ExperimentControls extends Component {
     render() {
+        const buttonText = this.props.sharedState.params.sandboxMode ? "Exit sandbox mode" : "Submit argument";
+        const countdown = this.props.sharedState.params.sandboxMode ? "" : <Countdown date={Date.now() + this.props.sharedState.params.duration} renderer={countdownRenderer} />
         return (
             <div className="experiment-controls">
-                <Countdown date={Date.now() + this.props.sharedState.params.duration} renderer={countdownRenderer} />
-                <button onClick={() => console.log(this.props.sharedState.getArgumentMarkdown())}>Log argument</button>
-                <button onClick={this.props.sharedState.downloadExperimentData}>Download experiment data</button>
-                <button onClick={this.props.completeFunc}>Complete condition</button>
+                {countdown}
+                {/* <button onClick={() => console.log(this.props.sharedState.getArgumentMarkdown())}>Log argument</button>
+                <button onClick={this.props.sharedState.downloadExperimentData}>Download experiment data</button> */}
+                <button onClick={() => {
+                    const msg = this.props.sharedState.params.sandboxMode ? "Please confirm with the researcher before continuing" : 'Please confirm with the researcher before continuing'
+                    if (window.confirm(msg)) this.props.completeFunc()
+                }}>{buttonText}</button>
             </div>
         );
     }

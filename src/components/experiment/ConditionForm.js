@@ -7,7 +7,7 @@ export default class ConditionForm extends Component {
         this.state = {
             experimentId: "",
             novelToolFirst: false,
-            duration: 1.1 * 1000 * 60 // calculates seconds, and then into minutes
+            duration: 10 * 1000 * 60 // calculates seconds, and then into minutes
         };
     
         this.handleChange = this.handleChange.bind(this);
@@ -27,7 +27,10 @@ export default class ConditionForm extends Component {
     handleSubmit(event) {
         event.preventDefault();
 
-        this.setState({'condition': this.state.novelToolFirst ? 'graph' : 'plain'}, () => {
+        this.setState({
+            'condition': this.state.novelToolFirst ? 'graph' : 'plain',
+            "sandboxMode": true
+        }, () => {
             this.props.submitFunc(this.state);
         });
     }

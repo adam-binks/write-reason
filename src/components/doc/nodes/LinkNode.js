@@ -48,7 +48,7 @@ class LinkNode extends Component {
                 <p className={classes} {...this.props.attributes}
                         onMouseEnter={() => this.setHover(true)} 
                         onMouseLeave={() => this.setHover(false)}
-                        onContextMenu={(e) => showNodeSwitchMenu(e, this.state, this.setState.bind(this), this.props.node, this.props.editor, ["Heading only", "Body only"])}>
+                        onContextMenu={(e) => showNodeSwitchMenu(e, this.state, this.setState.bind(this), this.props.node, this.props.editor)}>
                     {this.props.children}
                 </p>
             );

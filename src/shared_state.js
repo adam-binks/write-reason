@@ -28,10 +28,11 @@ export default class SharedState {
     downloadExperimentData() {
         const element = document.createElement("a");
         const data = {
+            params: this.params,
             argument: this.getArgumentMarkdown(),
             logs: this.logger.getExperimentData()
         }
-        const file = new Blob([data], {type: 'text/plain'});
+        const file = new Blob([JSON.stringify(data, null, 2)], {type: 'text/plain'});
 
         element.href = URL.createObjectURL(file);
         element.download = this.logger.getExperimentId() + ".json";
@@ -108,8 +109,9 @@ export default class SharedState {
     }
 
     finishCondition() {
-        // temporarily commented
-        // this.downloadExperimentData();
+        if (!this.params.sandboxMode) {
+            this.downloadExperimentData();
+        }
 
         window.clearInterval(this.intervalLogger)
     }

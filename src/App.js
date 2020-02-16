@@ -18,8 +18,8 @@ export default class App extends Component {
         super(props);
 
         this.state = {
-            phase: "editor", // "setup", //
-            sharedState: new SharedState({"condition": "graph"}), // undefined, //
+            phase: "setup", //"editor", // 
+            sharedState: undefined, // new SharedState({"condition": "graph"}), //
             params: undefined,
             completedConditions: []
         }
@@ -34,18 +34,31 @@ export default class App extends Component {
             completedConditions: this.state.completedConditions.concat([this.state.params.condition])
         }, () => {
             var other_condition = this.state.params.condition === "graph" ? "plain" : "graph";
-            
+            var updatedParams;
+
+            if (this.state.params.sandboxMode) {
+                updatedParams = this.state.params;
+                updatedParams.sandboxMode = undefined;
+                this.setState({
+                    "phase": "reset",
+                    'params': updatedParams, 
+                    'sharedState': new SharedState(this.state.params)
+                });
+                return;
+            }
+
             if (this.state.completedConditions.includes(other_condition)) {
                 // both conditions have been tested
                 this.setState({'phase': 'teardown'})
             } else {
                 // still need to run other condition
-                var updatedParams = this.state.params;
+                updatedParams = this.state.params;
                 updatedParams.condition = other_condition;
+                updatedParams.sandboxMode = true;
 
                 this.setState({
                     'params': updatedParams, 
-                    'sharedState': new SharedState(this.state.params)
+                    'sharedState': new SharedState(this.state.params),
                 });
             }
         })
@@ -69,7 +82,7 @@ export default class App extends Component {
                             <div className="App">
                                 <DndProvider backend={Backend}>
                                     <SplitPane split="vertical" defaultSize="50%">
-                                        <DocPane key="graph" sharedState={this.state.sharedState} />
+                                        <DocPane key={"graph" + (this.state.params.sandboxMode ? "sandbox" : "")} sharedState={this.state.sharedState} />
                                         <GraphPane sharedState={this.state.sharedState} />
                                     </SplitPane>
                                     <ExperimentControls sharedState={this.state.sharedState} completeFunc={this.finishCondition} />
@@ -80,7 +93,7 @@ export default class App extends Component {
                     case "plain":
                         return (
                             <div className="App">
-                                <DocPane key="plain" sharedState={this.state.sharedState} />
+                                <DocPane key={"plain" + this.state.params.sandboxMode ? "sandbox" : ""} sharedState={this.state.sharedState} />
                                 <ExperimentControls sharedState={this.state.sharedState} completeFunc={this.finishCondition} />
                             </div>
                         );
@@ -89,6 +102,13 @@ export default class App extends Component {
             case "teardown":
                 return (
                     <TeardownScreen />
+                )
+            
+            case "reset":
+                // hacky way to destroy and recreate all components
+                window.setTimeout(() => this.setState({phase: "editor"}), 0.1)
+                return (
+                    <p>...</p>
                 )
         }
     }

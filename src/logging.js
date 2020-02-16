@@ -8,7 +8,7 @@ export default class Logger {
     }
 
     getExperimentData() {
-        return JSON.stringify(this.getLog(), null, 2);
+        return this.getLog();
     }
 
     getExperimentId() {
