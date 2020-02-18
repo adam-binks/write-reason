@@ -1,5 +1,13 @@
 import { Block } from 'slate';
 
+function tryOrIgnore(tryBlock) {
+    try {
+        tryBlock()
+    } catch(error) {
+        // do nothing
+    }
+}
+
 export default function GraphPlugin(options) {
     return {
         onMouseUp(event, editor, next) {
@@ -39,16 +47,16 @@ export default function GraphPlugin(options) {
                         node.nodes.forEach(child => {
                             const nodeStyle = node.data.get("nodeStyle")
                             if ((child_index === 0 && nodeStyle === "Body only") || (child_index === 1 && nodeStyle === "Heading only")) {
-                                editor.removeNodeByKey(child.key)
+                                tryOrIgnore(editor.removeNodeByKey(child.key))
                             } else {
-                                editor.moveNodeByKey(child.key, editor.value.document.key, section_index + child_index + 1)
+                                tryOrIgnore(editor.moveNodeByKey(child.key, editor.value.document.key, section_index + child_index + 1))
                             }
                             child_index ++
                         });
                     }
-                    editor.removeNodeByKey(node.key)
-                } else if (editor.value.document.getChild(node.key) || node.object === "inline") {                    
-                    editor.setNodeByKey(node.key, {"type": ""})
+                    tryOrIgnore(editor.removeNodeByKey(node.key))
+                } else if (editor.value.document.getChild(node.key) || node.object === "inline") {           
+                    tryOrIgnore(editor.setNodeByKey(node.key, {"type": ""}))
                 }
             }
         }
