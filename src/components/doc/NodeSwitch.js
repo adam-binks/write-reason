@@ -26,7 +26,10 @@ export const showNodeSwitchMenu = (event, state, setState, node, editor, entries
             });
             deleteNode(node, editor);
         } else {
-            const nodeStyle = node.data.get("nodeStyle")
+            var nodeStyle = node.data.get("nodeStyle")
+            if (!nodeStyle) {
+                nodeStyle = "Inline"
+            }
 
             editor.getSharedState().logger.logEvent({
                 type: "doc_node_change_format",
@@ -60,7 +63,7 @@ function convertFromInline(node, editor, newStyle) {
     if (parent && parent.text === node.text) {
         editor.moveToRangeOfNode(parent)
     }
-    insertSectionBlock(editor, node.data.get("node_id"), node.text, "", newStyle)
+    insertSectionBlock(editor, node.data.get("node_id"), node.text, "", newStyle)    
 }
 
 function convertToInline(node, editor) {

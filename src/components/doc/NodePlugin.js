@@ -115,6 +115,16 @@ export default function LinkPlugin(options) {
                 const { document, selection, startBlock} = value
                 const {start, end} = selection
 
+                var isInLinkInline = false;
+                value.inlines.forEach((inline) => {
+                    if (inline.type === "link") {
+                        isInLinkInline = true;
+                    }
+                })
+                if (isInLinkInline) {
+                    return; // do nothing to avoid splitting the link
+                }
+
                 // when enter is pressed inside a link *block* (not inline), just go to body
                 if (startBlock && startBlock.type === "link" && start.key === end.key) {
                     const nextBlock = document.getNextBlock(start.key)
