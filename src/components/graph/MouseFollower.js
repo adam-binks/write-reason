@@ -53,7 +53,9 @@ class MouseFollower {
             this.connector.source = new_source;
             this.connector.update();
         }
-        this.connector.setLineColor(POTENTIAL_ARROW_COLOUR);
+        if (this.connector) {
+            this.connector.setLineColor(POTENTIAL_ARROW_COLOUR);
+        }
     }
 
     hide() {
@@ -66,7 +68,9 @@ class MouseFollower {
 
     start_arrow(source_node) {
         this.drawing_arrow_from = source_node;
-        this.connector.setLineColor(DRAWING_ARROW_COLOUR);
+        if (this.connector) {
+            this.connector.setLineColor(DRAWING_ARROW_COLOUR);
+        }
     }
 
     complete_arrow(end_node) {
