@@ -91,6 +91,23 @@ export default function LinkPlugin(options) {
                         editor.moveToEndOfNode(prevBlock);
                     }
                     return editor
+                } else {
+                    // don't delete body on backspace of empty block
+                    var block = startBlock
+                    while (block) {
+                        const prevBlock = document.getPreviousBlock(block.key)
+                        if ((block && (block.text !== "" && value.selection.start.offset !== 0)) || !prevBlock) {
+                            break
+                        }
+                        if (prevBlock.type === "section" || prevBlock.type === "body") {
+                            if (!block.text) {
+                                editor.removeNodeByKey(block.key)
+                            }
+                            editor.moveToEndOfNode(prevBlock);
+                            return editor
+                        }
+                        block = prevBlock
+                    }
                 }
             }
             
