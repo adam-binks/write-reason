@@ -13,6 +13,22 @@ QUESTIONS = {
     'biohacking': 'Should greater regulatory control be exerted over genetic biohacking?'
 }
 
+# initially generated with random.shuffle
+ORDERINGS = [
+{'graph': [26, 16, 31, 22, 10, 34, 15, 18, 20, 33, 29, 14, 12, 24, 27, 28, 21, 32, 23, 19, 30, 25, 17, 11],
+ 'plain': [29, 21, 30, 33, 34, 18, 11, 26, 24, 12, 19, 25, 31, 20, 17, 28, 10, 32, 27, 15, 22, 14, 23, 16]},
+{'graph': [10, 23, 33, 31, 32, 28, 17, 19, 26, 20, 22, 11, 21, 27, 15, 24, 34, 12, 25, 30, 16, 18, 29, 14],
+ 'plain': [33, 19, 21, 14, 16, 29, 12, 23, 31, 15, 28, 34, 20, 17, 24, 32, 27, 11, 30, 26, 25, 10, 18, 22]},
+{'graph': [34, 10, 22, 32, 28, 29, 33, 23, 30, 26, 11, 31, 25, 14, 19, 20, 12, 24, 16, 17, 15, 21, 18, 27],
+ 'plain': [15, 29, 27, 25, 10, 17, 20, 30, 24, 23, 16, 19, 18, 33, 34, 14, 21, 32, 28, 31, 22, 11, 12, 26]}
+]
+
+CONDITION_ORDERINGS = [
+    ["plain", "graph"],
+    ["graph", "plain"],
+    ["plain", "graph"],
+]
+
 
 def get_question(cond, graph_is_first, sspace_is_first):
     is_first = (cond == "graph" and graph_is_first) or (cond == "plain" and not graph_is_first)
@@ -37,7 +53,18 @@ def get_args():
             arg = data['argument'].replace('&#x27;', "'").replace('&quot;', '"').replace('&gt;', '>')
             params = data['params']
             question = get_question(params['condition'], params['novelToolFirst'], params['sspaceFirst'])
+
+            if int(params['experimentId']) in args[params['condition']].keys():
+                print(f"ERROR: duplicate at {params['condition']}, num {params['experimentId']}")
+
             args[params['condition']][int(params['experimentId'])] = {'arg': arg, 'question': question}
+
+    print(f'files: {len(os.listdir(DATA_DIR))}')
+
+    for c, cond in args.items():
+        sspaces = [t for t in cond.values() if t['question'] == 'sspace']
+        biohacking = [t for t in cond.values() if t['question'] == 'biohacking']
+        print(f'tot {len(cond.values())} {c}: sspaces: {len(sspaces)}, bio: {len(biohacking)}')
 
     return args
 
@@ -75,14 +102,8 @@ def add_arg(doc, arg, question):
         cell.text = "       /10"
 
 
-def generate_doc(first_cond, second_cond):
+def generate_doc(args, orderings, first_cond, second_cond):
     document = docx.Document()
-
-    args = get_args()
-    assert (len(args['graph']) == len(args['plain']))
-
-    orderings = get_orderings(args)
-    print(orderings)
 
     for i in range(len(orderings['graph'])):
         for cond in [first_cond, second_cond]:
@@ -98,19 +119,21 @@ def generate_doc(first_cond, second_cond):
     return document
 
 
-if __name__ == '__main__':
-    condition_orderings = [
-        ["plain", "graph"],
-        ["graph", "plain"],
-        ["plain", "graph"],
-    ]
-    for i in range(1, 4):
-        doc_filename = f'marker_sheet_{i}.docx'
-        document_generated = generate_doc(*condition_orderings[i-1])
+def generate_all_docs():
+    args = get_args()
+    assert (len(args['graph']) == len(args['plain']))
 
+    for i in range(3):
+        document_generated = generate_doc(args, ORDERINGS[i], *CONDITION_ORDERINGS[i])
+
+        doc_filename = f'marker_sheet_{i+1}.docx'
         try:
             os.remove(doc_filename)
         except FileNotFoundError:
             pass
 
         document_generated.save(doc_filename)
+
+
+if __name__ == '__main__':
+    generate_all_docs()
