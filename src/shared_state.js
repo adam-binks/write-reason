@@ -169,7 +169,9 @@ export default class SharedState {
     removeDocNode(id) {
         var map = this.getGraphNodeAndDocNode(id)
         if (map) {
-            map.graph_node.setIsOnGraph(false);
+            if (map.graph_node) {
+                map.graph_node.setIsOnGraph(false);
+            }
             this.map[id] = undefined
         }
     }
@@ -197,7 +199,7 @@ export default class SharedState {
 
     getDocNodeRef(id, long_or_short) {
         const map = this.getGraphNodeAndDocNode(id);
-        if (map) {
+        if (map && map.doc_link_node) {
             return map.doc_link_node[long_or_short].current;
         }
     }
@@ -207,7 +209,7 @@ export default class SharedState {
         const map = this.getGraphNodeAndDocNode(id);
         if (map) {
             ["long", "short", "section"].forEach(long_or_short => {
-                if (map.doc_link_node[long_or_short]) {
+                if (map.doc_link_node && map.doc_link_node[long_or_short]) {
                     docNodes.push(map.doc_link_node[long_or_short].current)
                 }
             })

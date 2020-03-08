@@ -80,6 +80,11 @@ export default function LinkPlugin(options) {
         onKeyDown(e, editor, next) {
             const {value} = editor
 
+            // disable delete key (lots of bugs)
+            if (e.key === "Delete") {
+                return editor
+            }
+
             // prevent backspace from merging body and link blocks with previous
             if (e.key === 'Backspace') {
                 const { document, selection, startBlock} = value
@@ -91,6 +96,31 @@ export default function LinkPlugin(options) {
                         editor.moveToEndOfNode(prevBlock);
                     }
                     return editor
+                }if (startBlock && start.offset === 0) {
+                    const prevBlock = document.getPreviousBlock(start.key)
+                    if (prevBlock && (prevBlock.type === "section" || prevBlock.type === "body")) {
+                        editor.moveToEndOfNode(prevBlock);
+                        return editor
+                    }
+                } else {
+                    // don't delete body on backspace of empty block
+                    var block = startBlock
+                    if (block) {
+                        while (block) {
+                            const prevBlock = document.getPreviousBlock(block.key)
+                            if ((block && (block.text || ((block === startBlock) && value.selection.start.offset !== 0))) || !prevBlock) {
+                                break
+                            }
+                            if (prevBlock.type === "section" || prevBlock.type === "body") {
+                                if (!block.text) {
+                                    editor.removeNodeByKey(block.key)
+                                }
+                                editor.moveToEndOfNode(prevBlock);
+                                return editor
+                            }
+                            block = prevBlock
+                        }
+                    }
                 }
             }
             
