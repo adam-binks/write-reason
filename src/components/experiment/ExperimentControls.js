@@ -21,7 +21,7 @@ export default class ExperimentControls extends Component {
                 {countdown}
                 {/* <button onClick={() => console.log(this.props.sharedState.getArgumentMarkdown())}>Log argument</button>
                 <button onClick={this.props.sharedState.downloadExperimentData}>Download experiment data</button> */}
-                <button onClick={() => {
+                <button tabIndex="-1" onClick={() => {
                     const msg = this.props.sharedState.params.sandboxMode ? "Please confirm with the researcher before continuing" : 'Please confirm with the researcher before continuing'
                     if (window.confirm(msg)) this.props.completeFunc()
                 }}>{buttonText}</button>
