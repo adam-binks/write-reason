@@ -1,11 +1,9 @@
 import random
 import json
 import os
-import docx
-from docx.shared import Inches
+from const import DATA_DIR
 
 
-DATA_DIR = 'C:\\Users\\jelly\\Desktop\\sh_data'
 HEADING = '## '
 
 QUESTIONS = {
@@ -43,6 +41,10 @@ def get_question(cond, graph_is_first, sspace_is_first):
         else:
             return "sspace"
 
+        
+def parse_arg(arg):
+    return arg.replace('&#x27;', "'").replace('&quot;', '"').replace('&gt;', '>')
+        
 
 def get_args():
     args = {'graph': {}, 'plain': {}}
@@ -50,7 +52,7 @@ def get_args():
     for filename in os.listdir(DATA_DIR):
         with open(os.path.join(DATA_DIR, filename), 'r') as f:
             data = json.load(f)
-            arg = data['argument'].replace('&#x27;', "'").replace('&quot;', '"').replace('&gt;', '>')
+            arg = parse_arg(data['argument'])
             params = data['params']
             question = get_question(params['condition'], params['novelToolFirst'], params['sspaceFirst'])
 
@@ -136,4 +138,7 @@ def generate_all_docs():
 
 
 if __name__ == '__main__':
+    import docx
+    from docx.shared import Inches
+    
     generate_all_docs()
