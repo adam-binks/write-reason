@@ -21,3 +21,12 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/workspace.xml
+.idea/write-reason.iml
+.idea/inspectionProfiles/Project_Default.xml
+analysis/__pycache__/arguments.cpython-36.pyc
+analysis/__pycache__/const.cpython-36.pyc
+analysis/.ipynb_checkpoints/analyse-checkpoint.ipynb
