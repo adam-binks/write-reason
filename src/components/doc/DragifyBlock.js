@@ -2,6 +2,13 @@ import { DragSource } from 'react-dnd';
 import { ItemTypes } from '../../dragtypes';
 
 const blockSource = {
+    canDrag(props) {
+        // don't drag if there is a non-collapsed selection, so it doesn't interfere with dragging selections to graph
+        const value = props.editor.value;
+        const drag = value.selection.isCollapsed
+        return drag
+    },
+
     beginDrag(props) {
       // Return the data describing the dragged item
       const item = { id: props.node.id }
