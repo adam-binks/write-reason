@@ -109,9 +109,7 @@ export default class SharedState {
     }
 
     finishCondition() {
-        if (!this.params.sandboxMode) {
-            this.downloadExperimentData();
-        }
+        this.downloadExperimentData();
 
         window.clearInterval(this.intervalLogger)
     }
