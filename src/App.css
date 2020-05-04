@@ -1,7 +1,7 @@
 /* Disable the create-react-app error overlay */
-iframe {
+/* iframe {
     display: none;
-}
+} */
 
 .pane {
     height: 100%;
