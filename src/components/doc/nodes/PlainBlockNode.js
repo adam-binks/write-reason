@@ -26,9 +26,9 @@ class PlainBlockNode extends Component {
             <div className={classes} {...this.props.attributes} 
                     onMouseUp={() => {handleMouseUp(this.props.editor, this.props.node) && this.setState({hover: false})}} 
                     onMouseEnter={this.toggleHover} onMouseLeave={this.toggleHover}
-                    ref={dragPreview}>
+                    ref={connectDragSource}>
                 {(isOverCurrent && !this.state.overHalf && <div className="drop-indicator" />)}
-                <div ref={connectDragSource} className="drag-handle"/>
+                {/* <div  className="drag-handle"/> */}
                 {this.props.children}
                 {(isOverCurrent && this.state.overHalf && <div className="drop-indicator" />)}
                 {(this.state.hover && this.props.editor.getSharedState().draggedNode) && <div className="drop-indicator" />}
