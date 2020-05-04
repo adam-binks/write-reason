@@ -1,4 +1,7 @@
-DATA_DIR = 'C:\\Users\\jelly\\Documents\\sh_data\\sh_data'  # '/cs/home/ab390/Documents/sh_data'
-SCORES_DATA_DIR = 'C:\\Users\\jelly\\Documents\\sh_data\\sh_score_data'
-QUESTIONNAIRE_RESPONSES_FILE = 'C:\\Users\\jelly\\Documents\\sh_data\\questionnaire_responses.csv' # '/cs/home/ab390/Documents/sh_misc_data/questionnaire_responses.csv'
-GRAPH_CATEGORISATION_FILE = 'C:\\Users\\jelly\\Documents\\sh_data\\graph_categorisation.csv'
+import os
+
+DATA_ROOT = './../data'
+DATA_DIR = os.path.join(DATA_ROOT, 'sh_data')
+SCORES_DATA_DIR = os.path.join(DATA_ROOT, 'sh_score_data')
+QUESTIONNAIRE_RESPONSES_FILE = os.path.join(DATA_ROOT, 'questionnaire_responses.csv')
+GRAPH_CATEGORISATION_FILE = os.path.join(DATA_ROOT, 'graph_categorisation.csv')
