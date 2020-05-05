@@ -1,4 +1,5 @@
-import { Block } from 'slate';
+import { Block, Text } from 'slate';
+import { toast } from 'react-toastify';
 
 function tryOrIgnore(tryBlock) {
     try {
@@ -17,15 +18,21 @@ export default function GraphPlugin(options) {
                 draggedNode.resetPos();
 
                 if (editor.getSharedState().getGraphNode(draggedNode.id)) {
-                    // todo possibly display a message to the user?
-                    console.log("Duplicate!");
+                    toast.error('You can\'t add the same node twice!')
+                    console.log('Duplicate editor')
                 } else {
-                    const { value } = editor
-                    const { document, selection } = value
                     const target = editor.findEventRange(event)
                     if (target) {
                         editor.select(target)
-                        addSection(value, document, selection, draggedNode, editor, target)
+
+                        // prevent insertion inside an inline link
+                        // (insertion inside a section is fixed by schema)
+                        const linkNode = editor.value.inlines.find(inline => inline.type === 'link')
+                        if (linkNode) {
+                            editor.moveToEndOfNode(linkNode)
+                        }
+
+                        addSection(draggedNode, editor, target)
                     }
                 }
             }
@@ -63,9 +70,10 @@ export default function GraphPlugin(options) {
     }
 }
 
-function addSection(value, document, selection, draggedNode, editor, target) {
+function addSection(draggedNode, editor, target) {
     // this bit seems necessary, taken from slate.js onDrop
     const { anchor } = target
+    const document = editor.value.document
     let hasVoidParent = document.hasVoidParent(anchor.path, editor)
     if (hasVoidParent) {
         let p = anchor.path
@@ -94,27 +102,24 @@ function addSection(value, document, selection, draggedNode, editor, target) {
 }
 
 export function insertSectionBlock(editor, id, text, longText, initialNodeStyle) {
-    var section = Block.create({
-        type: 'section',
-        data: {node_id: id, nodeStyle: initialNodeStyle}
-    })
-    editor.insertBlock(section);
-    editor.moveTo(section.key)
-
-    // insert the link
     var link = Block.create({
         type: 'link',
-        data: {node_id: id}
+        data: {node_id: id},
+        nodes: [Text.create({text: text})]
     })
-    editor.insertNodeByKey(section.key, 0, link); // just doing this once seems to make everything else insert into the section too:)
-    editor.insertText(text)
 
-    // add the body of the node
-    editor.insertBlock({
+    var body = Block.create({
         type: 'body',
         data: {node_id: id}
     })
-    editor.insertText(longText)
+
+    var section = Block.create({
+        type: 'section',
+        data: {node_id: id, nodeStyle: initialNodeStyle},
+        nodes: [link, body]
+    })
+    editor.insertBlock(section);
+    editor.moveToEndOfNode(section)
 
     return section
 }
@@ -126,11 +131,12 @@ export function handleMouseUp(editor, clickedNode) {
         draggedNode.resetPos();
 
         if (editor.getSharedState().getGraphNode(draggedNode.id)) {
-            // todo possibly display a message to the user?
-            console.log("Duplicate! 2");
+            toast.error('You can\'t add the same node twice!')
+            console.log('Duplicate - node');
+            
         } else {
             const { value } = editor
-            const { document, selection } = value
+            const { document } = value
             editor.focus()
 
             if (clickedNode.type === "body" || clickedNode.type === "link") {
@@ -139,7 +145,9 @@ export function handleMouseUp(editor, clickedNode) {
 
             editor.moveToEndOfNode(clickedNode);
 
-            addSection(value, document, selection, draggedNode, editor, editor.value.selection);
+            addSection(draggedNode, editor, editor.value.selection);
+
+            editor.getSharedState().draggedNode = false;
             return true;
         }
     }

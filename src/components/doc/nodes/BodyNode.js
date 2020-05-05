@@ -27,8 +27,10 @@ export default class BodyNode extends Component {
         const { document, selection } = value;
         var cursorInside = document.getDescendantsAtRange(selection).contains(this.props.node)
         var node = this.props.sharedState.getGraphNode(this.props.nodeId);
-        node.setHoverer("body_cursor", cursorInside);
-        node.setHoverer("body_mouse", this.state.hover);
+        if (node) {
+            node.setHoverer("body_cursor", cursorInside);
+            node.setHoverer("body_mouse", this.state.hover);
+        }
 
         if (this.props.isEmpty) {
                 return (

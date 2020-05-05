@@ -11,6 +11,7 @@ export default class SharedState {
         
         this.node_id_counter = 0;
         this.map = {};
+        this.map_recycle_bin = {};
 
         // this.editor_ref and this.graphPane set in the editor and graphpane
         this.editor_ref = undefined;
@@ -123,6 +124,13 @@ export default class SharedState {
         return this.node_id_counter;
     }
 
+    canAddLinkAtSelection() {
+        const value = this.getEditor().value;
+        const is_in_linked_block = value.blocks.some(block => (block.type === 'link' || block.type === 'section' || block.type === 'body'));
+        const is_in_linked_inline = value.inlines.some(inline => (inline.type === 'link'));
+        return !is_in_linked_block && !is_in_linked_inline;
+    }
+
     addLinkAtSelection(id, graph_node) {
         this.getEditor().wrapLinkAtSelection(id);
         this.addGraphMapping(id, graph_node);
@@ -134,10 +142,15 @@ export default class SharedState {
     }
 
     setLinkMapping(id, doc_node, long_or_short) {
-        if (this.map[id] === undefined) {
-            console.log(this.map + " id " + id);
+        if (!this.map[id]) {
+            // uh oh, this should exist
+            this.map[id] = {}
+
+            // maybe the mapping was deleted and re-added with ctrl-Z
+            // if so, hopefully it's stored as recently deleted
+            this.checkRecycleBinForGraphNode(id)
         }
-        
+
         if (this.map[id].doc_nodes === undefined) {
             this.map[id].doc_nodes = {};
         }
@@ -146,6 +159,24 @@ export default class SharedState {
 
     getGraphNodeAndDocNode(id) {
         return this.map[id];
+    }
+
+    checkRecycleBinForGraphNode(id) {
+        if (!this.map[id]) {
+            this.map[id] = {}
+        }
+
+        if (this.map[id].graph_node) {
+            // no need to restore
+            return;
+        }
+
+        const prev_version = this.map_recycle_bin[id]
+        if (prev_version && prev_version.graph_node) {
+            console.log('restored from recycle');
+            
+            this.addGraphMapping(id, prev_version.graph_node)
+        }
     }
 
     getGraphNode(id) {
@@ -170,6 +201,8 @@ export default class SharedState {
             if (map.graph_node) {
                 map.graph_node.setIsOnGraph(false);
             }
+            
+            this.map_recycle_bin[id] = this.map[id]
             this.map[id] = undefined
         }
     }
@@ -227,6 +260,12 @@ export default class SharedState {
         
         if (docNode) {
             var editor = this.getEditor();
+
+            if (!editor.value.document.hasNode(docNode.key)) {
+                // tell the graph node that there is no doc node any more, for whatever reason
+                this.removeDocNode(id)
+                return
+            }
 
             // replace any text with newText
             docNode.nodes.forEach(child => {

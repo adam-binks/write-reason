@@ -6,6 +6,7 @@ import 'svg.draggy.js';
 import './svg.connectable.js';
 import MouseFollower from './MouseFollower.js';
 import GraphNode from './GraphNode.js';
+import { toast } from 'react-toastify';
 
 class GraphPane extends React.Component {
     componentDidMount() {
@@ -78,11 +79,21 @@ class GraphPane extends React.Component {
         this.$el.addEventListener("drop", (e) => {
             e.preventDefault();
             var data = e.dataTransfer.getData("Text");
-            var node = this.addNodeAtScreenLocation(svg, nodes, mouse_follower, data, e.clientX, e.clientY, false);
-            this.props.sharedState.addLinkAtSelection(node.id, node);
-            document.activeElement.blur();
 
-            this.props.sharedState.logger.logEvent({'type': 'node_create_from_doc', 'node_id': node.id, 'text': data});
+            if (data.includes('\n')) {
+                toast.error('You can\'t add multiple paragraphs to the graph at once')
+                return
+            }
+
+            if (!this.props.sharedState.canAddLinkAtSelection()) {
+                toast.error('You can\'t add the same node to the graph twice!')
+                return
+            }
+
+            var node = this.addNodeAtScreenLocation(svg, nodes, mouse_follower, data, e.clientX, e.clientY, false);
+                this.props.sharedState.addLinkAtSelection(node.id, node);
+                this.props.sharedState.logger.logEvent({'type': 'node_create_from_doc', 'node_id': node.id, 'text': data});
+                document.activeElement.blur();
         });
     }
 

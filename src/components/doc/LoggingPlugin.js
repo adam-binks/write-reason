@@ -1,7 +1,7 @@
 
 import { getEventTransfer } from 'slate-react';
 
-export default function LinkPlugin(options) {
+export default function LoggingPlugin(options) {
     return {
         onCopy(event, editor, next) {
             editor.getSharedState().logger.logEvent({
