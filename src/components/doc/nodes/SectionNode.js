@@ -29,7 +29,7 @@ class SectionNode extends Component {
     }
 
     render() {
-        const { isOverCurrent, connectDropTarget, connectDragSource, dragPreview, isDragging } = this.props;
+        const { isOverCurrent, connectDropTarget, connectDragSource, isDragging } = this.props;
 
         const value = this.props.editor.value
         var cursorInside = value.blocks && value.blocks.some(block => block === this.props.node || this.props.node.nodes.includes(block))

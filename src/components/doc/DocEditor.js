@@ -10,10 +10,10 @@ import { schema } from './Schema.js'
 
 const plugins = {
     'graph': [
+        LoggingPlugin(),
         GraphPlugin(),
         NodePlugin(),
         ReorderPlugin(),
-        LoggingPlugin(),
     ],
     'plain': [
         LoggingPlugin(),

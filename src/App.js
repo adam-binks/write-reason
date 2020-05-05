@@ -8,6 +8,8 @@ import SplitPane from 'react-split-pane';
 import SharedState from './shared_state.js';
 import { DndProvider } from 'react-dnd'
 import Backend from 'react-dnd-html5-backend'
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 export default class App extends Component {
@@ -32,6 +34,17 @@ export default class App extends Component {
                                 <GraphPane sharedState={this.state.sharedState} />
                             </SplitPane>
                         </DndProvider>
+                        <ToastContainer
+                            position="bottom-center"
+                            autoClose={5000}
+                            hideProgressBar
+                            newestOnTop={false}
+                            closeOnClick
+                            rtl={false}
+                            pauseOnFocusLoss
+                            draggable={false}
+                            pauseOnHover
+                        />
                     </div>
                 );
             

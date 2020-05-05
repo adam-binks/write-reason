@@ -2,7 +2,9 @@ import React from 'react';
 import LinkNode from './nodes/LinkNode.js'
 import BodyNode from './nodes/BodyNode.js'
 import SectionNode from './nodes/SectionNode.js'
-import {Block} from 'slate'
+import { Block } from 'slate'
+import { getEventTransfer } from 'slate-react';
+import { deleteNode } from './NodeSwitch.js'
 
 export default function LinkPlugin(options) {
     return {
@@ -31,7 +33,7 @@ export default function LinkPlugin(options) {
                 refAndId = getRefAndId(props, editor, "long");
 
                 // set up the placeholder text to only appear when the body is empty and no text is selected
-                var isEmpty = (!props.node.text || props.node.text === "");
+                var isEmpty = !props.node.text
 
                 var selectNode = () => {
                     setTimeout(() => {editor.focus(); editor.moveToStartOfNode(props.node);}, 0)
@@ -55,34 +57,106 @@ export default function LinkPlugin(options) {
 
         onDrop(event, editor, next) {
             // suppress drop events
-            // next();
+            // do not call next()
+        },
+
+        onPaste(event, editor, next) {
+            const getLinkInlines = (the_doc) => the_doc.filterDescendants(node => node.type === 'link' && node.object === 'inline')
+
+            var transfer = getEventTransfer(event);
+
+            if (transfer.type === "fragment") {
+
+                // if pasting into a link or body, just paste plain text, not a fragment
+                if (editor.value.blocks.some(block => block.type === "link" || block.type === "body")) {
+                    const textNoNewlines = transfer.fragment.text.replace(/(\r\n|\n|\r)/gm, "")
+                    editor.insertText(textNoNewlines)
+
+                    // NB: no next() call, so this plugin must be the last one in the stack that handles onPaste()
+                    return
+                }
+
+                const fragmentInlines = getLinkInlines(transfer.fragment)
+
+                if (fragmentInlines) {
+                    const docInlines = getLinkInlines(editor.value.document)
+                    const usedIds = []
+                    docInlines.forEach(inline => {usedIds.push({key: inline.key, id: inline.data.get("node_id")})})
+                    
+                    // let the paste happen so we can operate on the document instead of inline
+                    next()
+
+                    // if an inline in the pasted content has the same id as one in the document, unwrap the pasted inline
+                    fragmentInlines.forEach(inline => {
+                        console.log("link");
+                        
+                        usedIds.forEach(usedId => {
+                            const id = inline.data.get("node_id")
+                            if (usedId.id === id) {
+                                const inlinesWithId = editor.value.document.filterDescendants(node => node.type === 'link' && node.object === 'inline' && node.data.get('node_id') === id)
+                                inlinesWithId.forEach(inlineWithId => {
+                                    if (inlineWithId.key !== usedId.key) {
+                                        editor.unwrapInlineByKey(inlineWithId.key)
+                                    }
+                                })
+                            }
+                        })
+                    })
+                }
+            } else {
+                next()
+            }
         },
 
         onChange(editor, next) {
-            const { value } = editor;
-            const { document, selection } = value;
-            var inlines = document.getLeafInlinesAtRange(selection);
-            var blocks = document.getLeafBlocksAtRange(selection).filter(block => {return block.type === "link"});
-            [inlines, blocks].forEach(nodes => {
-                if (nodes) {
-                    nodes.forEach(node => {
-                        var fullText = "";
-                        node.getTexts().forEach(text => {
-                            fullText += text.text;
-                        })
-                        editor.getSharedState().updateGraphShortText(node.data.get("node_id"), fullText);
-                    });
-                }
-            })
-            
+            // update all node texts (both link and body)
+            const sharedState = editor.getSharedState();
+            [
+                {nodeType: 'link', updateFunc: sharedState.updateGraphShortText.bind(sharedState)},
+                {nodeType: 'body', updateFunc: sharedState.updateGraphLongText.bind(sharedState)}
+            ].forEach( update =>
+                editor.value.blocks.forEach(block => {
+                    const updateText = (linkNode) => {
+                        // if we've just emptied an inline text node, we should delete the node and its link to the graph
+                        // also if we ever have a link node disconnected from the graph, just remove it to restore legal state
+                        const id = linkNode.data.get('node_id')
+                        sharedState.checkRecycleBinForGraphNode(id) // in case there was an undo and redo, we should restore the graph link
+                        if (linkNode.object === 'inline' && (linkNode.text === "" || !sharedState.getGraphNode(id))) {
+                            deleteNode(linkNode, editor)
+                        } else {
+                            update.updateFunc(linkNode.data.get("node_id"), linkNode.text)
+                        }
+                    }
+
+                    var linkNodes = block.filterDescendants(node => node.type === update.nodeType)
+                    linkNodes.forEach(updateText)
+
+                    if (block.type === update.nodeType) {
+                        updateText(block)
+                    }
+                })
+            )
+
+            next()
         },
 
         onKeyDown(e, editor, next) {
             const {value} = editor
 
-            // disable delete key (lots of bugs)
+            // prevent delete key from merging body and link blocks with next
             if (e.key === "Delete") {
-                return editor
+                const { document, selection, startBlock} = value
+                const {start} = selection
+
+                if (startBlock && value.selection.isCollapsed && value.selection.end.isAtEndOfNode(startBlock)) {
+                    const nextBlock = document.getNextBlock(start.key)
+                    if (nextBlock && (nextBlock.type === "body" || nextBlock.type === "link" || nextBlock.type === "section")) {
+                        editor.moveToStartOfNode(nextBlock);
+                        if (startBlock.text === "") {
+                            editor.removeNodeByKey(startBlock.key)
+                        }
+                    }
+                }
             }
 
             // prevent backspace from merging body and link blocks with previous
@@ -90,56 +164,18 @@ export default function LinkPlugin(options) {
                 const { document, selection, startBlock} = value
                 const {start} = selection
 
-                if (startBlock && (startBlock.type === "body" || startBlock.type === "link") && start.offset === 0) {
-                    const prevBlock = document.getPreviousBlock(start.key)
+                const prevBlock = document.getPreviousBlock(start.key)
+                if (startBlock && start.offset === 0 && prevBlock &&
+                            (startBlock.type === "body" || startBlock.type === "link" || prevBlock.type === "section" || prevBlock.type === "body")) {
                     if (prevBlock) {
                         editor.moveToEndOfNode(prevBlock);
-                    }
-                    return editor
-                }if (startBlock && start.offset === 0) {
-                    const prevBlock = document.getPreviousBlock(start.key)
-                    if (prevBlock && (prevBlock.type === "section" || prevBlock.type === "body")) {
-                        editor.moveToEndOfNode(prevBlock);
-                        return editor
-                    }
-                } else {
-                    // don't delete body on backspace of empty block
-                    var block = startBlock
-                    if (block) {
-                        while (block) {
-                            const prevBlock = document.getPreviousBlock(block.key)
-                            if ((block && (block.text || ((block === startBlock) && value.selection.start.offset !== 0))) || !prevBlock) {
-                                break
-                            }
-                            if (prevBlock.type === "section" || prevBlock.type === "body") {
-                                if (!block.text) {
-                                    editor.removeNodeByKey(block.key)
-                                }
-                                editor.moveToEndOfNode(prevBlock);
-                                return editor
-                            }
-                            block = prevBlock
+                        if (startBlock.text === "") {
+                            editor.removeNodeByKey(startBlock.key)
                         }
                     }
+                    return editor
                 }
             }
-            
-            // if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-            //     const start = value.selection.start
-            //     const adjacentBlock = e.key === 'ArrowDown' ? value.document.getNextBlock(start.key) : value.document.getPreviousBlock(start.key)
-            //     const closestFunc = e.key === 'ArrowDown' ? editor.moveToStartOfNode : editor.moveToEndOfNode
-            //     const furthestFunc = e.key === 'ArrowDown' ?  editor.moveToEndOfNode : editor.moveToStartOfNode
-                
-            //     console.log("x");
-
-            //     if (adjacentBlock) {
-            //         console.log("adj");
-                    
-            //         return editor.moveToStartOfNode(adjacentBlock);
-            //     } else if (value.startBlock) {
-            //         return editor.moveToStartOfNode(value.startBlock);
-            //     }
-            // }
 
             if (e.key === 'Enter') {
                 const { document, selection, startBlock} = value

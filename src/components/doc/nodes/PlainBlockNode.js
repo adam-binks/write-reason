@@ -18,7 +18,7 @@ class PlainBlockNode extends Component {
     }
 
     render() {
-        const { isOverCurrent, connectDropTarget, connectDragSource, dragPreview, isDragging } = this.props
+        const { isOverCurrent, connectDropTarget, connectDragSource, isDragging } = this.props
 
         const classes = "plain-block " + (isDragging ? " display-none" : "")
 

@@ -51,7 +51,7 @@ export const showNodeSwitchMenu = (event, state, setState, node, editor, entries
     new OptionPopup(entries, event.clientX, event.clientY, true, onOptionSelect, state.nodeStyle, document.querySelector(".App"))
 }
 
-function deleteNode(node, editor) {
+export function deleteNode(node, editor) {
     editor.getSharedState().removeDocNode(node.data.get("node_id"))
 
     editor.removeNodeByKey(node.key)

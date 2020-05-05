@@ -31,7 +31,9 @@ class LinkNode extends Component {
         const { document, selection } = value;
         var cursorInside = document.getDescendantsAtRange(selection).contains(this.props.node)
         var node = this.props.sharedState.getGraphNode(this.props.nodeId);
-        node.setHoverer("link_cursor", cursorInside);        
+        if (node) {
+            node.setHoverer("link_cursor", cursorInside)
+        }
         
         var hoverClass = (this.state.externalHover || cursorInside) ? " hovered" : "";
         var classes = "node-link" + hoverClass;

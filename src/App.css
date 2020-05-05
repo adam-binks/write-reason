@@ -38,6 +38,13 @@ html, body {
 .Resizer.disabled {
   cursor: not-allowed;
 }
+
 .Resizer.disabled:hover {
   border-color: transparent;
+}
+
+.Toastify__toast-body {
+    font-family: 'Varela Round', sans-serif;
+    font-size: 1em;
+    padding: 1em;
 }
