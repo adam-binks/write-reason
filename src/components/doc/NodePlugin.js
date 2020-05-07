@@ -88,8 +88,6 @@ export default function LinkPlugin(options) {
 
                     // if an inline in the pasted content has the same id as one in the document, unwrap the pasted inline
                     fragmentInlines.forEach(inline => {
-                        console.log("link");
-                        
                         usedIds.forEach(usedId => {
                             const id = inline.data.get("node_id")
                             if (usedId.id === id) {
@@ -141,13 +139,25 @@ export default function LinkPlugin(options) {
         },
 
         onKeyDown(e, editor, next) {
-            const {value} = editor
+            const { value } = editor
+            const { document, selection, startBlock} = value
+            const { start, end } = selection
+
+            // if a whole section (block or inline) is deleted, tell the graph node
+            if ((e.key === 'Backspace' || e.key === 'Delete') && selection.isExpanded) {
+                document.getNodesAtRange(selection).forEach(node => {
+                    if (node.type === 'section' || node.type === 'link') {
+                        // it's not certain whether the section will be deleted, as it may only be partially selected
+                        // so check in 0 seconds, once the deletion happens, whether that's the case
+                        setTimeout(() => {
+                            editor.getSharedState().updateIsOnGraphStatus(node.data.get('node_id'))
+                        }, 0)
+                    }
+                })
+            }
 
             // prevent delete key from merging body and link blocks with next
             if (e.key === "Delete") {
-                const { document, selection, startBlock} = value
-                const {start} = selection
-
                 if (startBlock && value.selection.isCollapsed && value.selection.end.isAtEndOfNode(startBlock)) {
                     const nextBlock = document.getNextBlock(start.key)
                     if (nextBlock && (nextBlock.type === "body" || nextBlock.type === "link" || nextBlock.type === "section")) {
@@ -157,59 +167,50 @@ export default function LinkPlugin(options) {
                         }
                     }
                 }
+
+                
             }
 
             // prevent backspace from merging body and link blocks with previous
             if (e.key === 'Backspace') {
-                const { document, selection, startBlock} = value
-                const {start} = selection
-
                 const prevBlock = document.getPreviousBlock(start.key)
-                if (startBlock && start.offset === 0 && prevBlock &&
-                            (startBlock.type === "body" || startBlock.type === "link" || prevBlock.type === "section" || prevBlock.type === "body")) {
+                if (startBlock && start.offset === 0 && prevBlock && (startBlock.type === "body" || startBlock.type === "link")) {
                     if (prevBlock) {
                         editor.moveToEndOfNode(prevBlock);
                         if (startBlock.text === "") {
                             editor.removeNodeByKey(startBlock.key)
-                        }
+                        } else if (prevBlock.text === "") {
+                            editor.removeNodeByKey(prevBlock.key)
+                         }
                     }
                     return editor
                 }
             }
 
             if (e.key === 'Enter') {
-                const { document, selection, startBlock} = value
-                const {start, end} = selection
-
-                var isInLinkInline = false;
-                value.inlines.forEach((inline) => {
-                    if (inline.type === "link") {
-                        isInLinkInline = true;
-                    }
-                })
-                if (isInLinkInline) {
-                    return; // do nothing to avoid splitting the link
+                if (value.inlines.some(inline => inline.type === 'link')) {
+                    return // do nothing to avoid splitting the link
                 }
 
                 // when enter is pressed inside a link *block* (not inline), just go to body
                 if (startBlock && startBlock.type === "link" && start.key === end.key) {
-                    const nextBlock = document.getNextBlock(start.key)
-                    if (nextBlock) {
-                        return editor.moveToStartOfNode(nextBlock);
+                    // unless the offset is 0, in which case insert a block before and go to that
+                    if (start.offset === 0) {
+                        const blockToInsert = Block.create({object: 'block', type: ''})
+                        const section = document.getParent(startBlock.key);
+                        const sectionParent = document.getParent(section.key);                    
+                        const sectionIndex = sectionParent.nodes.indexOf(section);
+
+                        editor.insertNodeByKey(sectionParent.key, sectionIndex, blockToInsert);
+                        return editor.moveBackward(1)
                     } else {
-                        return editor.moveToEndOfNode(startBlock);
+                        const nextBlock = document.getNextBlock(start.key)
+                        if (nextBlock) {
+                            return editor.moveToStartOfNode(nextBlock);
+                        } else {
+                            return editor.moveToEndOfNode(startBlock);
+                        }
                     }
-                }
-
-                // when enter is pressed inside a body block, insert a block after the section
-                if (startBlock && startBlock.type === "body" && start.key === end.key) {
-                    const blockToInsert = Block.create({object: 'block', type: ''})
-                    const section = document.getParent(startBlock.key);
-                    const sectionParent = document.getParent(section.key);                    
-                    const sectionIndex = sectionParent.nodes.indexOf(section);
-
-                    editor.insertNodeByKey(sectionParent.key, sectionIndex + 1, blockToInsert);
-                    return editor.moveToEndOfNode(startBlock).moveForward(1)
                 }
             }
             return next()
