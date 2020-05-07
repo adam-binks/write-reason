@@ -39,13 +39,15 @@ class SectionNode extends Component {
         classes += getNodeStyleClass(this.props.node.data.get("nodeStyle"))
 
         return connectDropTarget(
-            <div className={classes} {...this.props.attributes} 
-                    onMouseEnter={() => this.setHover(true)} onMouseLeave={() => this.setHover(false)} 
-                    onMouseUp={() => {handleMouseUp(this.props.editor, this.props.node) && this.setState({hover: false})}}
-                    onContextMenu={(e) => showNodeSwitchMenu(e, this.state, this.setState.bind(this), this.props.node, this.props.editor)}
-                    ref={connectDragSource}>
+            <div>
                 {(isOverCurrent && !this.state.overHalf && <div className="drop-indicator" />)}
-                {this.props.children}
+                <div className={classes} {...this.props.attributes} 
+                        onMouseEnter={() => this.setHover(true)} onMouseOver={() => this.setHover(true)} onMouseLeave={() => this.setHover(false)} 
+                        onMouseUp={() => {handleMouseUp(this.props.editor, this.props.node) && this.setState({hover: false})}}
+                        onContextMenu={(e) => showNodeSwitchMenu(e, this.state, this.setState.bind(this), this.props.node, this.props.editor)}
+                        ref={connectDragSource}>
+                    {this.props.children}
+                </div>
                 {(isOverCurrent && this.state.overHalf && <div className="drop-indicator" />)}
                 {(this.state.hover && this.props.editor.getSharedState().draggedNode) && <div className="drop-indicator" />}
             </div>
