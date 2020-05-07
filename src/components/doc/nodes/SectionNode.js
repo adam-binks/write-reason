@@ -37,9 +37,10 @@ class SectionNode extends Component {
         var hoverClass = (this.state.externalHover || cursorInside) ? " hovered" : "";
         var classes = "section plain-block " + hoverClass  + (isDragging ? " display-none" : "");
         classes += getNodeStyleClass(this.props.node.data.get("nodeStyle"))
+        
 
         return connectDropTarget(
-            <div>
+            <div className='block-outer-div'>
                 {(isOverCurrent && !this.state.overHalf && <div className="drop-indicator" />)}
                 <div className={classes} {...this.props.attributes} 
                         onMouseEnter={() => this.setHover(true)} onMouseOver={() => this.setHover(true)} onMouseLeave={() => this.setHover(false)} 

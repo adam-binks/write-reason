@@ -5,12 +5,33 @@ import { ItemTypes } from "../../dragtypes";
 const blockTarget = {
     hover(props, monitor, component) {
         const mouse = monitor.getClientOffset();
-        const rect = ReactDOM.findDOMNode(component).getBoundingClientRect();
+
+        // calculate based on height of firstChild because if this is the last node in the doc, its outer div expands to fill the remaining vertical space
+        const outerDiv = ReactDOM.findDOMNode(component)        
+        const outerRect = outerDiv.getBoundingClientRect()
         
-        if (mouse.y > (rect.y + rect.height / 2)) {
-            component.setState({overHalf: true});
-        } else {
-            component.setState({overHalf: false});
+        var innerDiv;
+        for (let item of outerDiv.children) {
+            if (item.classList.contains('plain-block') || item.classList.contains('section')) {
+                innerDiv = item;
+                break;
+            }
+        }
+
+        if (!innerDiv) {
+            console.log('error: couldn\'t find the inner div!');
+            return
+        }
+        const innerRect = innerDiv.getBoundingClientRect()       
+    
+        // subtract offset of the innerRect from the outerRect, to prevent the insertion of the drag indicator from affecting things
+        const offset = (innerRect.y - outerRect.y)
+        var newState = false
+        if (mouse.y + offset > (innerRect.y + innerRect.height / 2)) {
+            newState = true
+        }
+        if (component.state.overHalf !== newState) {
+            component.setState({overHalf: newState});
         }
     },
 

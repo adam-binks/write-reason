@@ -6,6 +6,10 @@
     font-family: 'Crimson Text', serif;
     font-size: 120%;
     min-height: 100%;
+
+    /* to allow bottom-most block to extend to full remaining height */
+    display: flex;
+    flex-flow: column;
 }
 
 .slate-editor-no-graph {
@@ -15,6 +19,10 @@
 
 .display-none {
     display: none
+}
+
+.block-outer-div:last-child {
+    flex-grow: 1; /* extend to fill to bottom of screen so you can drop below the bottom-most paragraph */
 }
 
 .plain-block, .section {

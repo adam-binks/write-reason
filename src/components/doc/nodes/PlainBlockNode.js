@@ -23,7 +23,7 @@ class PlainBlockNode extends Component {
         const classes = "plain-block " + (isDragging ? " display-none" : "")
 
         return connectDropTarget(
-            <div>
+            <div className='block-outer-div'>
                 {(isOverCurrent && !this.state.overHalf && <div className="drop-indicator" />)}
                 <div className={classes} {...this.props.attributes} 
                         onMouseUp={() => {handleMouseUp(this.props.editor, this.props.node) && this.setState({hover: false})}} 
