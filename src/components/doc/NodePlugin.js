@@ -29,6 +29,7 @@ export default function LinkPlugin(options) {
 
         renderBlock(props, editor, next) {
             var refAndId;
+
             if (props.node.type === 'body') {
                 refAndId = getRefAndId(props, editor, "long");
 
@@ -39,17 +40,35 @@ export default function LinkPlugin(options) {
                     setTimeout(() => {editor.focus(); editor.moveToStartOfNode(props.node);}, 0)
                 }
 
-                return <BodyNode ref={refAndId.ref} {...props} sharedState={editor.getSharedState()} nodeId={refAndId.id} isEmpty={isEmpty} selectNode={selectNode}/>
+                return <BodyNode
+                            ref={refAndId.ref}
+                            {...props}
+                            sharedState={editor.getSharedState()}
+                            nodeId={refAndId.id}
+                            isEmpty={isEmpty}
+                            selectNode={selectNode}
+                        />
 
             } else if (props.node.type === 'link') {
                 refAndId = getRefAndId(props, editor, "short");
 
-                return <LinkNode ref={refAndId.ref} {...props} linkStyle="heading" sharedState={editor.getSharedState()} nodeId={refAndId.id}/>
+                return <LinkNode
+                            ref={refAndId.ref}
+                            {...props}
+                            linkStyle="heading"
+                            sharedState={editor.getSharedState()}
+                            nodeId={refAndId.id}
+                        />
 
             } else if (props.node.type === 'section') {
                 refAndId = getRefAndId(props, editor, "section");
 
-                return <SectionNode ref={refAndId.ref} {...props} sharedState={editor.getSharedState()} nodeId={refAndId.id}/>
+                return <SectionNode
+                    ref={refAndId.ref}
+                    {...props}
+                    sharedState={editor.getSharedState()}
+                    nodeId={refAndId.id}
+                />
             }
 
             return next();
