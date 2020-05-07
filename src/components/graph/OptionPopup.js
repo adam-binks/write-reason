@@ -33,7 +33,8 @@ export default class OptionPopup {
             var colourCell = row.insertCell();
             colourCell.appendChild(document.createTextNode(entry.symbol));
             colourCell.style.color = entry.colour;
-            colourCell.style.fontSize = "200%";
+            colourCell.style.fontSize = "150%";
+            colourCell.style.padding = '10px'
 
             var nameCell = row.insertCell();
             nameCell.appendChild(document.createTextNode(entry.name))
