@@ -2,7 +2,7 @@ import { Block } from 'slate';
 import OptionPopup from '../graph/OptionPopup.js'
 import { insertSectionBlock } from './GraphPlugin.js';
 
-export const showNodeSwitchMenu = (event, state, setState, node, editor, entriesToHide) => {
+export const showNodeSwitchMenu = (event, node, editor, entriesToHide) => {
     var entries = [
         {'colour': 'black', 'name': 'Inline', 'symbol': "⌶"},
         {'colour': 'black', 'name': 'Heading and body', 'symbol': "▤"},
@@ -48,7 +48,7 @@ export const showNodeSwitchMenu = (event, state, setState, node, editor, entries
         }
     }
 
-    new OptionPopup(entries, event.clientX, event.clientY, true, onOptionSelect, state.nodeStyle, document.querySelector(".App"))
+    new OptionPopup(entries, event.clientX, event.clientY, true, onOptionSelect, node.data.get('nodeStyle'), document.querySelector(".App"))
 }
 
 export function deleteNode(node, editor) {

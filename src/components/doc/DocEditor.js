@@ -85,6 +85,7 @@ class DocEditor extends React.Component {
             value={this.state.value}
             onChange={this.onChange}
             placeholder="Write your document here..."
+            spellCheck='false'
         />
     }
 }

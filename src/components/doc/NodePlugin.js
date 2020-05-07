@@ -12,7 +12,7 @@ export default function LinkPlugin(options) {
             wrapLinkAtSelection(editor, node_id) {
                 return editor.wrapInline({
                     type: "link",
-                    data: { "node_id": node_id }
+                    data: { "node_id": node_id, "nodeStyle": "Inline" }
                 });
             }
         },
@@ -232,6 +232,28 @@ export default function LinkPlugin(options) {
                     }
                 }
             }
+            
+            // prevent the cursor disappearing when navigating into the body placeholder text
+            if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                const relevantBlock = e.key === 'ArrowDown' ? document.getNextBlock(start.key) : document.getPreviousBlock(start.key)
+                const ESTIMATED_CHARS_PER_LINE = 130 // calibrated on a 1920x1080 screen... :/
+                // we only need to handle the case where the cursor offset is < the length of the placeholder
+                if (relevantBlock && relevantBlock.type === 'body' && start.offset < 'Type some text... '.length) {
+                    // if down arrow was pressed, only jump to the body if there is only one line of text in the block
+                    // its hard to work out how many lines of text there so use an estimate
+                    if (e.key === 'ArrowUp' || startBlock.text.length < ESTIMATED_CHARS_PER_LINE) {
+                        editor.moveToEndOfNode(relevantBlock)
+                        e.preventDefault()
+                        return
+                    }
+                }
+            }
+
+            // prevent tab from taking focus from the editor
+            if (e.key === 'Tab') {
+                e.preventDefault()
+            }
+
             return next()
         }
     }

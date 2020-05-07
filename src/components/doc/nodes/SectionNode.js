@@ -10,7 +10,6 @@ class SectionNode extends Component {
         this.state = {
             hover: false,
             externalHover: false,
-            // nodeStyle: props.node.data.get("nodeStyle")
         }
         this.setHover = this.setHover.bind(this);
     }
@@ -45,7 +44,7 @@ class SectionNode extends Component {
                 <div className={classes} {...this.props.attributes} 
                         onMouseEnter={() => this.setHover(true)} onMouseOver={() => this.setHover(true)} onMouseLeave={() => this.setHover(false)} 
                         onMouseUp={() => {handleMouseUp(this.props.editor, this.props.node) && this.setState({hover: false})}}
-                        onContextMenu={(e) => showNodeSwitchMenu(e, this.state, this.setState.bind(this), this.props.node, this.props.editor)}
+                        onContextMenu={(e) => showNodeSwitchMenu(e, this.props.node, this.props.editor)}
                         ref={connectDragSource}>
                     {this.props.children}
                 </div>

@@ -1,14 +1,6 @@
 import { Block, Text } from 'slate';
 import { toast } from 'react-toastify';
 
-function tryOrIgnore(tryBlock) {
-    try {
-        tryBlock()
-    } catch(error) {
-        // do nothing
-    }
-}
-
 export default function GraphPlugin(options) {
     return {
         onMouseUp(event, editor, next) {
@@ -46,24 +38,35 @@ export default function GraphPlugin(options) {
 
         commands: {
             removeGraphLink(editor, node) {
+                const document = editor.value.document
+                if (!document.hasNode(node.key)) {
+                    console.log('couldnt remove graph link, node doesnt exist');
+                    
+                    return
+                }
+
                 if (node.type === "section") {
                     // move the children out from inside this section to be after it
                     const section_index = editor.value.document.nodes.indexOf(node)
                     if (section_index !== -1) {
                         var child_index = 0;
                         node.nodes.forEach(child => {
+                            if (!document.hasNode(child.key)) {
+                                return
+                            }
+
                             const nodeStyle = node.data.get("nodeStyle")
                             if ((child_index === 0 && nodeStyle === "Body only") || (child_index === 1 && nodeStyle === "Heading only")) {
-                                tryOrIgnore(editor.removeNodeByKey(child.key))
+                                editor.removeNodeByKey(child.key)
                             } else {
-                                tryOrIgnore(editor.moveNodeByKey(child.key, editor.value.document.key, section_index + child_index + 1))
+                                editor.moveNodeByKey(child.key, editor.value.document.key, section_index + child_index + 1)
                             }
                             child_index ++
                         });
                     }
-                    tryOrIgnore(editor.removeNodeByKey(node.key))
+                    editor.removeNodeByKey(node.key)
                 } else if (editor.value.document.getChild(node.key) || node.object === "inline") {           
-                    tryOrIgnore(editor.setNodeByKey(node.key, {"type": ""}))
+                    editor.setNodeByKey(node.key, {"type": ""})
                 }
             }
         }
