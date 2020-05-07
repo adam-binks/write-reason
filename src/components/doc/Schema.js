@@ -31,15 +31,18 @@ export const schema = {
                     match: {type: 'body'},
                     min: 1,
                     max: 1,
-                },
-                {
-                    match: {type: 'paragraph'},
-                    min: 0
                 }
             ],
 
             normalize: (editor, error) => {
                 switch (error.code) {
+                    case 'child_max_invalid':
+                        // if we somehow end up with multiple headings/bodies inside the section, make it a paragraph move it after the section                     
+                        // this can happen if the enter key is pressed (splits the current node)
+                        moveBlockAfterSection(editor, error.child, error.node)
+                        editor.setNodeByKey(error.child.key, 'paragraph')
+                        return
+
                     case 'child_type_invalid':
                         // if we somehow end up with a paragraph inside the section, put the content in the heading instead                     
                         if (error.child.object === "text" || error.child.type === "paragraph") {
@@ -75,21 +78,25 @@ export const schema = {
                     
                     case 'parent_object_invalid':
                         // a section has ended up inside another section - shift it out
-                        const parent_index = editor.value.document.nodes.indexOf(error.parent)
-                        if (parent_index === -1) {
-                            return
-                        }
-                        editor.moveNodeByKey(error.node.key, editor.value.document.key, parent_index + 1)
+                        moveBlockAfterSection(editor, error.node, error.parent)
                         return
 
                     default:
-                        console.log("unhandled err " + error);
+                        console.log("unhandled section schema err " + error);
                         
                         return
                 }
             }
-        }
+        },
     }
+}
+
+function moveBlockAfterSection(editor, blockToMove, sectionToMoveAfter) {
+    const sectionIndex = editor.value.document.nodes.indexOf(sectionToMoveAfter)
+    if (sectionIndex === -1) {
+        return
+    }
+    editor.moveNodeByKey(blockToMove.key, editor.value.document.key, sectionIndex + 1)
 }
 
 function addMissing(editor, error, nodeType, text="") {

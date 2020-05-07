@@ -18,7 +18,7 @@ const blockTarget = {
         const document = props.editor.value.document;
         const blockParent = document.getParent(props.node.key);
         const blockIndex = blockParent.nodes.indexOf(props.node);
-        return { parentKey: blockParent.key, indexDroppedOn: blockIndex, insertBefore: component.state.overHalf }
+        return { droppedOnGraph: false, parentKey: blockParent.key, indexDroppedOn: blockIndex, insertBefore: component.state.overHalf }
     },
 }
 

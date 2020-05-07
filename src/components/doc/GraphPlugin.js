@@ -19,7 +19,7 @@ export default function GraphPlugin(options) {
 
                 if (editor.getSharedState().getGraphNode(draggedNode.id)) {
                     toast.error('You can\'t add the same node twice!')
-                    console.log('Duplicate editor')
+                    console.log('Duplicate - editor')
                 } else {
                     const target = editor.findEventRange(event)
                     if (target) {
@@ -32,7 +32,7 @@ export default function GraphPlugin(options) {
                             editor.moveToEndOfNode(linkNode)
                         }
 
-                        addSection(draggedNode, editor, target)
+                        addSection(draggedNode, editor)
                     }
                 }
             }
@@ -70,28 +70,10 @@ export default function GraphPlugin(options) {
     }
 }
 
-function addSection(draggedNode, editor, target) {
-    // this bit seems necessary, taken from slate.js onDrop
-    const { anchor } = target
-    const document = editor.value.document
-    let hasVoidParent = document.hasVoidParent(anchor.path, editor)
-    if (hasVoidParent) {
-        let p = anchor.path
-        let n = document.getNode(anchor.path)
-        while (hasVoidParent) {
-            const [nxt] = document.texts({ path: p })
-            if (!nxt) {
-                break
-            }
-            ;[n, p] = nxt
-            hasVoidParent = document.hasVoidParent(p, editor)
-        }
-        if (n) editor.moveToStartOfNode(n)
-    }
-
+export function addSection(draggedNode, editor, initialNodeStyle="Heading and body") {
     editor.getSharedState().addGraphMapping(draggedNode.id, draggedNode.node)
 
-    insertSectionBlock(editor, draggedNode.id, draggedNode.text, draggedNode.longText, "Heading and body")
+    insertSectionBlock(editor, draggedNode.id, draggedNode.text, draggedNode.longText, initialNodeStyle)
 
     editor.getSharedState().logger.logEvent({
         'type': 'doc_create_from_node', 
@@ -110,7 +92,8 @@ export function insertSectionBlock(editor, id, text, longText, initialNodeStyle)
 
     var body = Block.create({
         type: 'body',
-        data: {node_id: id}
+        data: {node_id: id},
+        nodes: [Text.create({text: longText})]
     })
 
     var section = Block.create({
@@ -118,6 +101,8 @@ export function insertSectionBlock(editor, id, text, longText, initialNodeStyle)
         data: {node_id: id, nodeStyle: initialNodeStyle},
         nodes: [link, body]
     })
+    
+    
     editor.insertBlock(section);
     editor.moveToEndOfNode(section)
 
@@ -145,7 +130,7 @@ export function handleMouseUp(editor, clickedNode) {
 
             editor.moveToEndOfNode(clickedNode);
 
-            addSection(draggedNode, editor, editor.value.selection);
+            addSection(draggedNode, editor);
 
             editor.getSharedState().draggedNode = false;
             return true;

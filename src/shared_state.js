@@ -255,23 +255,35 @@ export default class SharedState {
         this.map[id].doc_link_node[long_or_short] = ref;
     }
 
+    // check whether a graph node's doc node still exists
+    updateIsOnGraphStatus(id) {
+        var docNode = this.getDocNodeShortText(id);
+        if (!docNode) {
+            return false
+        }
+
+        if (docNode && !this.getEditor().value.document.hasNode(docNode.key)) {
+            // tell the graph node that there is no doc node any more, for whatever reason
+            this.removeDocNode(id)
+            return false
+        }
+
+        return true
+    }
+
     updateDocShortText(id, newText) {
         var docNode = this.getDocNodeShortText(id);
         
         if (docNode) {
             var editor = this.getEditor();
 
-            if (!editor.value.document.hasNode(docNode.key)) {
-                // tell the graph node that there is no doc node any more, for whatever reason
-                this.removeDocNode(id)
-                return
+            if (this.updateIsOnGraphStatus(id)) {
+                // replace any text with newText
+                docNode.nodes.forEach(child => {
+                    editor.removeNodeByKey(child.key);
+                });
+                editor.insertNodeByKey(docNode.key, 0, Text.create({text: newText}));
             }
-
-            // replace any text with newText
-            docNode.nodes.forEach(child => {
-                editor.removeNodeByKey(child.key);
-            });
-            editor.insertNodeByKey(docNode.key, 0, Text.create({text: newText}));
         }
     }
 

@@ -12,7 +12,7 @@ class GraphNode {
 
         this.arrow_hitbox = this.group.rect(width + 2 * ARROW_HITBOX_MARGIN, height + 2 * ARROW_HITBOX_MARGIN)
             .translate(-ARROW_HITBOX_MARGIN, -ARROW_HITBOX_MARGIN).opacity(0);
-        this.rect = this.group.rect(width, height).radius(10).addClass('node');
+        this.rect = this.group.rect(width, height).radius(5).addClass('node');
         this.text = this.group.text("").addClass('node-text');
         this.updateShortText(text)
         this.updateLongText("")

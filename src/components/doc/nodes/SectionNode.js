@@ -45,7 +45,6 @@ class SectionNode extends Component {
                     onContextMenu={(e) => showNodeSwitchMenu(e, this.state, this.setState.bind(this), this.props.node, this.props.editor)}
                     ref={connectDragSource}>
                 {(isOverCurrent && !this.state.overHalf && <div className="drop-indicator" />)}
-                {/* <div ref={} className="drag-handle" /> */}
                 {this.props.children}
                 {(isOverCurrent && this.state.overHalf && <div className="drop-indicator" />)}
                 {(this.state.hover && this.props.editor.getSharedState().draggedNode) && <div className="drop-indicator" />}

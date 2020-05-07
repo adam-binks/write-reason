@@ -6,6 +6,7 @@ import 'svg.draggy.js';
 import './svg.connectable.js';
 import MouseFollower from './MouseFollower.js';
 import GraphNode from './GraphNode.js';
+import DropifyGraphPane from './DropifyGraphPane.js'
 import { toast } from 'react-toastify';
 
 class GraphPane extends React.Component {
@@ -60,6 +61,10 @@ class GraphPane extends React.Component {
 
         this.addNoNodesIndicator(svg, nodes, mouse_follower);
 
+        this.props.sharedState.addGraphNode = (text, x, y) => {
+            return this.addNodeAtScreenLocation(svg, nodes, mouse_follower, text, x, y, true)
+        }
+
         // temp
         // this.addNodeAtScreenLocation(svg, nodes, mouse_follower, "Radical", 1200, 300, false);
     }
@@ -78,6 +83,10 @@ class GraphPane extends React.Component {
 
         this.$el.addEventListener("drop", (e) => {
             e.preventDefault();
+            if (!e.dataTransfer.types.includes("text/plain")) {
+                return // the dropped thing is probably a whole block, which is handled by React-DnD in DragifyGraph.js
+            }
+            
             var data = e.dataTransfer.getData("Text");
 
             if (data.includes('\n')) {
@@ -91,9 +100,9 @@ class GraphPane extends React.Component {
             }
 
             var node = this.addNodeAtScreenLocation(svg, nodes, mouse_follower, data, e.clientX, e.clientY, false);
-                this.props.sharedState.addLinkAtSelection(node.id, node);
-                this.props.sharedState.logger.logEvent({'type': 'node_create_from_doc', 'node_id': node.id, 'text': data});
-                document.activeElement.blur();
+            this.props.sharedState.addLinkAtSelection(node.id, node);
+            this.props.sharedState.logger.logEvent({'type': 'node_create_from_doc', 'node_id': node.id, 'text': data});
+            document.activeElement.blur();
         });
     }
 
@@ -112,7 +121,7 @@ class GraphPane extends React.Component {
     }
 
     render() {
-        return (
+        return this.props.connectDropTarget(
             <div id="graph" className="pane" ref={el => this.el = el}>
                 <textarea id='nodeedit'></textarea>
             </div>
@@ -120,4 +129,4 @@ class GraphPane extends React.Component {
     }
 }
 
-export default GraphPane;
+export default DropifyGraphPane(GraphPane);
