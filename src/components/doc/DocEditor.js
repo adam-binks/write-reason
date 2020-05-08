@@ -21,7 +21,7 @@ const plugins = {
     ]
 };
 
-const initialValue = Value.fromJSON({
+const emptyValue = Value.fromJSON({
     document: {
         nodes: [
             {
@@ -32,17 +32,6 @@ const initialValue = Value.fromJSON({
                         object: 'text',
                         text: '',
                     },
-                    // {
-                    //     object: 'inline',
-                    //     type: 'link',
-                    //     data: {node_id: 'sometghing'},
-                    //     nodes: [
-                    //         {
-                    //             object: 'text',
-                    //             text: 'This is a link.'
-                    //         }
-                    //     ]
-                    // }
                 ],
             },
         ],
@@ -56,8 +45,17 @@ class DocEditor extends React.Component {
         this.props.sharedState.editor_ref = React.createRef();
     }
 
+    componentDidMount() {
+        this.props.sharedState.getSavedDocValue((savedValue) => {
+            if (savedValue) {
+                this.setState({ value: Value.fromJSON(savedValue) })
+            }
+        })
+    }
+
+    // don't display editor until the db's saved document loads
     state = {
-        value: initialValue,
+        value: undefined
     }
     
     queries = {
@@ -70,23 +68,29 @@ class DocEditor extends React.Component {
     }
 
     onChange = ({ value }) => {
+        console.log(value);
+        
         this.setState({ value })
     }
 
     render() {
         const plainClass = this.props.sharedState.condition === "plain" ? " slate-editor-no-graph" : "";
 
-        return <Editor
-            className={"slate-editor" + plainClass}
-            ref={this.props.sharedState.editor_ref}
-            schema={schema}
-            plugins={plugins[this.props.sharedState.condition]}
-            queries={this.queries}
-            value={this.state.value}
-            onChange={this.onChange}
-            placeholder="Write your document here..."
-            spellCheck='false'
-        />
+        if (this.state.value) {
+            return <Editor
+                className={"slate-editor" + plainClass}
+                ref={this.props.sharedState.editor_ref}
+                schema={schema}
+                plugins={plugins[this.props.sharedState.condition]}
+                queries={this.queries}
+                value={this.state.value}
+                onChange={this.onChange}
+                placeholder="Write your document here..."
+                spellCheck={false}
+            />
+        } else {
+            return <p></p>
+        }
     }
 }
 

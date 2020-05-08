@@ -2,9 +2,11 @@ import React from 'react';
 import { Text } from 'slate';
 import Html from 'slate-html-serializer'
 import Logger from './logging'
+import db from './db.js'
+import { toast } from 'react-toastify';
 
 export default class SharedState {
-    constructor(params) {      
+    constructor(db_id, params) {      
         this.logger = new Logger(Logger.getNewId(), params)
         this.condition = params.condition;
         this.params = params;
@@ -12,6 +14,7 @@ export default class SharedState {
         this.node_id_counter = 0;
         this.map = {};
         this.map_recycle_bin = {};
+        this.db_id = db_id
 
         // this.editor_ref and this.graphPane set in the editor and graphpane
         this.editor_ref = undefined;
@@ -24,6 +27,54 @@ export default class SharedState {
         }, 30000);
         
         this.downloadExperimentData = this.downloadExperimentData.bind(this);
+        this.save = this.save.bind(this)
+
+        // load general saved properties
+        db.table('projects')
+            .get(this.db_id)
+            .then(project => {
+                this.map = project.map ? project.map : {}
+                console.log('map');                
+                console.log(this.map);
+                
+                this.node_id_counter = project.node_id_counter ? project.node_id_counter : 0
+            })
+    }
+
+    save() {
+        const changes = {
+            map: this.map,
+            node_id_counter: this.node_id_counter,
+            doc_value: this.getEditor().getValue().toJSON(),
+            graph_value: this.graphPane.toJSON(),
+        }
+        db.table('projects')
+            .update(this.db_id, changes)
+            .then((idExists) => {
+                if (!idExists) {
+                    const message = 'Save error: file with ID ' + this.db_id.toString() + ' does not exist!'
+                    console.log(message)
+                    toast.error(message)
+                } else {
+                    toast.info('Changes saved!')
+                }
+            })
+    }
+
+    getSavedDocValue = async function(callback) {
+        db.table('projects')
+            .get(this.db_id)
+            .then(project => {
+                callback(project.doc_value)
+            })
+    }
+
+    getSavedGraph = async function(callback) {
+        db.table('projects')
+            .get(this.db_id)
+            .then(project => {
+                callback(project.graph_value)
+            })
     }
 
     downloadExperimentData() {

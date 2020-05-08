@@ -3,11 +3,11 @@ import OptionPopup from "./OptionPopup";
 var ARROW_HITBOX_MARGIN = 20;
 
 class GraphNode {
-    constructor(nodes, mouse_follower, shared_state, text, x, y, width, height, focus_text_area) {
-        this.id = shared_state.getNodeId();
-        this.isOnGraph = false;
+    constructor(nodes, mouse_follower, shared_state, text, x, y, width, height, focus_text_area, id, isOnGraph, longText, nodesList) {
+        this.id = id ? id : shared_state.getNodeId();
 
-        this.nodes = nodes;
+        this.nodesList = nodesList;
+        
         this.group = nodes.group().translate(x, y);
 
         this.arrow_hitbox = this.group.rect(width + 2 * ARROW_HITBOX_MARGIN, height + 2 * ARROW_HITBOX_MARGIN)
@@ -15,7 +15,7 @@ class GraphNode {
         this.rect = this.group.rect(width, height).radius(5).addClass('node');
         this.text = this.group.text("").addClass('node-text');
         this.updateShortText(text)
-        this.updateLongText("")
+        this.updateLongText(longText)
 
         this.setupRectDragging(this.rect, shared_state);
         this.setupArrowHitbox(this.arrow_hitbox, mouse_follower);
@@ -33,8 +33,24 @@ class GraphNode {
         if (focus_text_area) {
             this.editText(shared_state, true);
         }
+        
+        this.setIsOnGraph(isOnGraph);
 
         shared_state.logger.logEvent({'type': 'node_create', 'id': this.id});
+    }
+
+    static fromJSON(json, nodes, mouse_follower, shared_state, nodesList) {
+        return new GraphNode(nodes, mouse_follower, shared_state, json.shortText, json.screenCoords.x, json.screenCoords.y, 100, 50, false, json.id, json.isOnGraph, nodesList)
+    }
+
+    toJSON() {
+        return {
+            id: this.id,
+            shortText: this.shortText,
+            longText: this.longText,
+            screenCoords: this.group.getScreenCoords(),
+            isOnGraph: this.isOnGraph,
+        }
     }
 
     setIsOnGraph(newVal) {
@@ -303,6 +319,14 @@ class GraphNode {
 
     delete(shared_state) {
         shared_state.removeGraphNode(this.id);
+        
+        // remove from the list of nodes (used for saving)
+        var index = this.nodesList.indexOf(this);
+        if (index !== -1) {
+            this.nodesList.splice(index, 1)
+        } else {
+            console.log('node not found in this.nodesList when deleting');
+        }        
 
         this.group.remove();
 

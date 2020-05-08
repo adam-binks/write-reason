@@ -5,12 +5,12 @@ import './App.css';
 import DocPane from './components/doc/DocPane.js';
 import GraphPane from './components/graph/GraphPane.js';
 import SplitPane from 'react-split-pane';
-import SharedState from './shared_state.js';
-import LoadFile from './components/loadfile/LoadFile.js';
+import LoadProject from './components/loadproject/LoadProject.js';
 import { DndProvider } from 'react-dnd'
 import Backend from 'react-dnd-html5-backend'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import SaveButton from './components/experiment/SaveButton';
 
 
 export default class App extends Component {
@@ -18,8 +18,7 @@ export default class App extends Component {
         super(props);
 
         this.state = {
-            phase: "loadfile",
-            // sharedState: new SharedState({"condition": "graph"}),
+            phase: "loadproject",
             params: undefined
         }
 
@@ -35,9 +34,9 @@ export default class App extends Component {
 
     render() {
         switch(this.state.phase) {
-            case "loadfile":
+            case "loadproject":
                 return (
-                    <LoadFile transitionToEditor={this.transitionToEditor}/>
+                    <LoadProject transitionToEditor={this.transitionToEditor} autoload={26} />
                 )
             case "editor":
                 return (
@@ -47,6 +46,7 @@ export default class App extends Component {
                                 <DocPane sharedState={this.state.sharedState} />
                                 <GraphPane sharedState={this.state.sharedState} />
                             </SplitPane>
+                            <SaveButton sharedState={this.state.sharedState} />
                         </DndProvider>
                         <ToastContainer
                             position="bottom-center"
