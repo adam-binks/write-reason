@@ -1,5 +1,5 @@
 export default class Logger {
-    shouldLogToConsole = true;
+    shouldLogToConsole = false;
 
     constructor(id, params) {
         this.id = id;

@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import './LoadFile.css'
+import './LoadProject.css'
 import db from '../../db.js'
-import FileList from './FilesList.js'
+import ProjectList from './ProjectsList.js'
 import SharedState from '../../shared_state.js';
 
-export default class LoadFile extends Component {
+export default class LoadProject extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -14,10 +14,17 @@ export default class LoadFile extends Component {
         this.deleteProject = this.deleteProject.bind(this)
         this.loadProject = this.loadProject.bind(this)
         this.updateProjectsFromDb = this.updateProjectsFromDb.bind(this)
+        
+        // skip the project select screen if the autoload prop is supplied, instead load project with that id
+        if (this.props.autoload) {
+            this.loadProject(this.props.autoload)
+        }
     }
 
     componentDidMount() {
-        this.updateProjectsFromDb()
+        if (!this.props.autoload) {
+            this.updateProjectsFromDb()
+        }
     }
 
     updateProjectsFromDb() {
@@ -29,7 +36,8 @@ export default class LoadFile extends Component {
     }
 
     loadProject(id) {
-        const sharedState = new SharedState({})
+        const params = { condition: 'graph' }
+        const sharedState = new SharedState(id, params)
         this.props.transitionToEditor(sharedState)
     }
 
@@ -54,8 +62,8 @@ export default class LoadFile extends Component {
     
     render() {
         return (
-            <div className="load-file">
-                <FileList projects={this.state.projects} deleteProject={this.deleteProject} loadProject={this.loadProject}/>
+            <div className="load-project">
+                <ProjectList projects={this.state.projects} deleteProject={this.deleteProject} loadProject={this.loadProject}/>
                 <p>
                     <button className="pure-button pure-button-primary" onClick={this.addProject}>New project</button>
                 </p>

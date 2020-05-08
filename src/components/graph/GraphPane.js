@@ -11,7 +11,7 @@ import { toast } from 'react-toastify';
 
 class GraphPane extends React.Component {
     componentDidMount() {
-        this.nodes = [];
+        this.nodesList = [];
 
         this.props.sharedState.graphPane = this;
 
@@ -59,14 +59,31 @@ class GraphPane extends React.Component {
             textarea.style.height = (textarea.scrollHeight) + 'px';
         });
 
-        this.addNoNodesIndicator(svg, nodes, mouse_follower);
-
         this.props.sharedState.addGraphNode = (text, x, y) => {
             return this.addNodeAtScreenLocation(svg, nodes, mouse_follower, text, x, y, true)
         }
 
+        this.props.sharedState.getSavedGraph((json) => {
+            if (json) {
+                this.loadFromJSON(json, mouse_follower, nodes)
+            }
+            if (!this.nodesList) {
+                this.addNoNodesIndicator(svg, nodes, mouse_follower);
+            }
+        })
+
         // temp
         // this.addNodeAtScreenLocation(svg, nodes, mouse_follower, "Radical", 1200, 300, false);
+    }
+
+    toJSON() {
+        return {
+            nodes: this.nodesList.map(node => node.toJSON()),
+        }
+    }
+
+    loadFromJSON(json, mouse_follower, nodes) {
+        this.nodesList = json.nodes.map(nodeJSON => GraphNode.fromJSON(nodeJSON, nodes, mouse_follower, this.props.sharedState, this.nodesList))
     }
 
     addNoNodesIndicator(svg, nodes, mouse_follower) {
@@ -108,10 +125,12 @@ class GraphPane extends React.Component {
 
     addNodeAtScreenLocation(svg, nodes, mouse_follower, text, x, y, focus_text_area) {
         var point = svg.point(x, y);
-        var node = new GraphNode(nodes, mouse_follower, this.props.sharedState, text, point.x, point.y, 100, 80, focus_text_area);
-        this.nodes.push(node);
+        var node = new GraphNode(nodes, mouse_follower, this.props.sharedState, text, point.x, point.y, 100, 80, focus_text_area, null, false, "", this.nodesList);
+        this.nodesList.push(node);
 
-        this.noNodesIndicator.hide();
+        if (this.noNodesIndicator) {
+            this.noNodesIndicator.hide();
+        }
 
         return node;
     }
