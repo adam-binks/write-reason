@@ -6,6 +6,7 @@ import DocPane from './components/doc/DocPane.js';
 import GraphPane from './components/graph/GraphPane.js';
 import SplitPane from 'react-split-pane';
 import SharedState from './shared_state.js';
+import LoadFile from './components/loadfile/LoadFile.js';
 import { DndProvider } from 'react-dnd'
 import Backend from 'react-dnd-html5-backend'
 import { ToastContainer } from 'react-toastify';
@@ -17,14 +18,27 @@ export default class App extends Component {
         super(props);
 
         this.state = {
-            phase: "editor",
-            sharedState: new SharedState({"condition": "graph"}),
+            phase: "loadfile",
+            // sharedState: new SharedState({"condition": "graph"}),
             params: undefined
         }
+
+        this.transitionToEditor = this.transitionToEditor.bind(this)
+    }
+
+    transitionToEditor(newSharedState) {
+        this.setState({ 
+            sharedState: newSharedState,
+            phase: "editor"
+        })
     }
 
     render() {
         switch(this.state.phase) {
+            case "loadfile":
+                return (
+                    <LoadFile transitionToEditor={this.transitionToEditor}/>
+                )
             case "editor":
                 return (
                     <div className="App">

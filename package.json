@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "color-string": "^1.5.3",
+    "dexie": "^3.0.1",
     "emotion": "^10.0.27",
     "immutable": "^4.0.0-rc.12",
     "react": "^16.12.0",
