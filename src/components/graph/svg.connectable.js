@@ -125,8 +125,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
             if (options.specialCoords) {
                 // remove this when node is deleted
-                con.source.on("deletenode", () => con.source.node.instance.delete_connectable(con));
-                con.target.on("deletenode", () => con.target.node.instance.delete_connectable(con));
+                // con.source.on("deletenode", () => con.source.node.instance.delete_connectable(con));
+                // con.target.on("deletenode", () => con.target.node.instance.delete_connectable(con));
             }
 
             SetOrGet(_connections, con.source.id(), []).push(con);
