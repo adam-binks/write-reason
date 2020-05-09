@@ -5,11 +5,20 @@ const COMPLETED_ARROW_COLOUR = "#5D4037";
 const POTENTIAL_ARROW_COLOUR = "#d4b8b0";
 const DRAWING_ARROW_COLOUR = "#719deb";
 
-const ARROW_OPTIONS = [
+const COLOURS = [
+    'red',
+    'yellow',
+    'green',
+    'aqua',
+    'blue',
+    'fuchsia',
+    'purple',
+]
+
+var DEFAULT_ARROW_OPTIONS = [
     {'colour': 'green', 'name': 'Supports', 'symbol': "→"},
     {'colour': 'red', 'name': 'Opposes', 'symbol': "→"},
     {'colour': 'blue', 'name': 'Expands', 'symbol': "→"},
-    {'colour': 'red', 'name': 'Delete', 'symbol': "🗙"}
 ];
 
 export default class MouseFollower {
@@ -48,6 +57,7 @@ export default class MouseFollower {
         return {
             arrows: this.completed_arrows,
             arrow_id_counter: this.arrow_id_counter,
+            arrowOptions: this.arrowOptions,
         }
     }
 
@@ -55,6 +65,7 @@ export default class MouseFollower {
         var mf = new MouseFollower(shared_state, svg, connectables_container, markers, links)
         mf.arrow_id_counter = json && json.arrow_id_counter ? json.arrow_id_counter : 0
         mf.completed_arrows = json && json.arrows ? json.arrows : []
+        mf.arrowOptions = json && json.arrowOptions ? json.arrowOptions : DEFAULT_ARROW_OPTIONS
 
         return mf
     }
@@ -158,6 +169,14 @@ export default class MouseFollower {
             connector.target.node.instance.delete_connectable(connector)
             this.remove_arrow(connector, arrowObject)
         });
+
+        // detect if the user changes the colour of this arrow
+        window.addEventListener('colourchange', (e) => {
+            if (e.detail.oldColour === arrowObject.colour) {
+                connector.setLineColor(e.detail.newColour)
+                arrowObject.colour = e.detail.newColour
+            }
+        })
     }
 
     complete_arrow(end_node) {
@@ -204,16 +223,118 @@ export default class MouseFollower {
         return this.arrow_id_counter
     }
 
+    changeArrowColour(entry, direction) {
+        const oldColour = entry.colour
+        const newColour = this.getNextAvailableColour(entry, direction)
+        entry.colour = newColour
+
+        window.dispatchEvent(new CustomEvent('colourchange', {
+            detail: {
+                oldColour: oldColour,
+                newColour: newColour,
+            }
+        }))
+
+        return newColour
+    }
+
+    getNextAvailableColour(entry, direction) {
+        // find all the colours which are not used by arrowOptions other than this one
+        const availableColours = COLOURS.filter(colour => 
+            !this.arrowOptions.find(option => option.colour === colour && option !== entry)
+        )
+
+        if (!availableColours) {
+            return entry.colour
+        } else {
+            const thisColourIndex = availableColours.indexOf(entry.colour)
+            if (thisColourIndex !== -1) {
+                var nextIndex = (thisColourIndex + 1 * direction) % availableColours.length
+                if (nextIndex < 0) {
+                    nextIndex = availableColours.length - 1
+                }
+                return availableColours[nextIndex]
+            }
+        }
+    }
+
+    getArrowOptions() {
+        const clickEditButton = (e, colourCell, nameCell, buttonCell, underlyingEntry, transientEntry) => {
+            transientEntry.isClickable = false
+
+            var editButton = buttonCell.children[0]
+
+            const finishEditing = () => {
+                if (input.value) {
+                    underlyingEntry.name = input.value
+                }
+                nameCell.removeChild(input)
+                if (input.value) {
+                    nameCell.textContent = underlyingEntry.name
+                }
+                underlyingEntry.isClickable = true
+
+                colourCell.textContent = colourButton.textContent
+                colourCell.style.color = colourButton.style.color
+                
+                editButton.textContent = "Edit"
+                editButton.onclick = (e) => clickEditButton(e, colourCell, nameCell, buttonCell, underlyingEntry, transientEntry)
+            }
+
+            editButton.textContent = "Done"
+            editButton.onclick = finishEditing
+
+            var input = document.createElement("input")
+            input.value = nameCell.textContent
+            input.addEventListener('keyup', (e) => {
+                if (e.key === 'Enter' && input.value) {
+                    finishEditing()
+                }
+            })
+
+            nameCell.textContent = ""
+            nameCell.appendChild(input)
+
+            var colourButton = document.createElement("button")
+            colourButton.className = 'pure-button'
+            colourButton.textContent = colourCell.textContent
+            colourCell.textContent = ""
+            colourCell.appendChild(colourButton)
+            colourButton.style.color = colourCell.style.color
+            colourButton.style.padding = 0
+            colourButton.addEventListener("click", () => {
+                colourButton.style.color = this.changeArrowColour(underlyingEntry, 1)
+            })
+            colourButton.addEventListener("contextmenu", (e) => {
+                colourButton.style.color = this.changeArrowColour(underlyingEntry, -1)  // on right click, scroll backwards through the colours
+                e.preventDefault()
+            })
+        }
+
+        const arrowOptionsWithButtons = this.arrowOptions.map(entry => {
+            var entryWithButtons = {...entry}
+            entryWithButtons.buttons = [
+                {
+                    label: 'Edit',
+                    click: clickEditButton,
+                    underlyingEntry: entry,
+                }
+            ]
+            return entryWithButtons
+        })
+        
+        return [...arrowOptionsWithButtons, {'colour': 'red', 'name': 'Delete', 'symbol': "🗙"}]
+    }
+
     edit_connector_type(connector, popup_x, popup_y, hideOnClickOutside, onColourSelected, arrowObject) {
         var prev_selected = undefined;
         
-        ARROW_OPTIONS.forEach(entry => {
-            if (entry.colour === connector.line.attr('stroke')) {
-                prev_selected = entry.name;
-            }
-        })
+        const arrowOptions = this.getArrowOptions()
 
-        new OptionPopup(ARROW_OPTIONS, popup_x, popup_y, hideOnClickOutside, (selected_option) => {
+        prev_selected = arrowOptions.find(entry => entry.colour === connector.line.attr('stroke'))
+        prev_selected = prev_selected ? prev_selected.name : undefined
+
+        new OptionPopup(arrowOptions, popup_x, popup_y, hideOnClickOutside, (selected_option) => {
             if (selected_option.name === "Delete") {
                 this.shared_state.logger.logEvent({'type': 'arrow_delete', 'id': connector.id});
                 this.remove_arrow(connector, arrowObject);
