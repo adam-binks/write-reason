@@ -12,6 +12,7 @@ export default class SharedState {
         this.params = params;
         
         this.node_id_counter = 0;
+        this.slate_id_counter = 10
         this.map = {};
         this.map_recycle_bin = {};
         this.db_id = db_id
@@ -27,23 +28,24 @@ export default class SharedState {
         }, 30000);
         
         this.downloadExperimentData = this.downloadExperimentData.bind(this);
+        this.editorHasLoaded = this.editorHasLoaded.bind(this);
         this.save = this.save.bind(this)
+    }
 
-        // load general saved properties
+    // called by editor once the database saved value has been set as the document.value
+    editorHasLoaded() {
         db.table('projects')
             .get(this.db_id)
             .then(project => {
-                this.map = project.map ? project.map : {}
-                console.log('map');                
-                console.log(this.map);
-                
                 this.node_id_counter = project.node_id_counter ? project.node_id_counter : 0
+                this.map = project.map ? this.mapFromJSON(project.map) : {}
+                this.getEditor().mapHasLoaded()
             })
     }
 
     save() {
         const changes = {
-            map: this.map,
+            map: this.mapToJSON(),
             node_id_counter: this.node_id_counter,
             doc_value: this.getEditor().getValue().toJSON(),
             graph_value: this.graphPane.toJSON(),
@@ -58,23 +60,80 @@ export default class SharedState {
                 } else {
                     toast.info('Changes saved!')
                 }
+            }).catch(err => {
+                toast.error('Save error: ' + err.toString())
             })
     }
 
-    getSavedDocValue = async function(callback) {
+    getSavedDocValue = async function(onDataLoad) {
         db.table('projects')
             .get(this.db_id)
             .then(project => {
-                callback(project.doc_value)
+                onDataLoad(project.doc_value)
             })
     }
 
-    getSavedGraph = async function(callback) {
+    getSavedGraph = async function(onDataLoad) {
         db.table('projects')
             .get(this.db_id)
             .then(project => {
-                callback(project.graph_value)
+                onDataLoad(project.graph_value)
             })
+    }
+
+    mapToJSON() {
+        var mapJson = {}
+        const document = this.getEditor().value.document
+        for (const id in this.map) {
+            let doc_nodes = {};
+            ['section', 'long', 'short'].forEach(part => {
+                const docNodeObjects = this.getDocNodes(id)
+                if (docNodeObjects) {
+                    if (docNodeObjects[part]) {
+                        const path = document.getPath(docNodeObjects[part])
+                        doc_nodes[part] = path.toArray()
+                    }
+                } 
+            })
+
+            mapJson[id] = {
+                graph_node: this.getGraphNode(id) ? this.getGraphNode(id).id : undefined,
+                doc_nodes: doc_nodes
+            }
+        }
+
+        return mapJson
+    }
+
+    mapFromJSON(json) {
+        this.map = {}
+        for (const id in json) {
+            if (json[id].graph_node) {
+                const graphNode = this.graphPane.getNodeById(id)
+                if (graphNode) {
+                    this.addGraphMapping(id, graphNode)
+                } else {
+                    toast.error("Error when loading: could not find graph node with ID " + id)
+                }
+            }
+
+            if (json[id].doc_nodes) {
+                for (const part in json[id].doc_nodes) {
+                    const path = json[id].doc_nodes[part]
+                    
+                    const document = this.getEditor().value.document
+                    if (document.hasNode(path)) {
+                        this.setLinkMapping(id, document.getNode(path), part)
+                    } else {
+                        console.log(document);
+                        
+                        toast.error("Error when loading: could not find " + part + " with ID " + id)
+                    }
+                }
+            }
+        }
+
+        return this.map
     }
 
     downloadExperimentData() {
@@ -161,8 +220,6 @@ export default class SharedState {
     }
 
     finishCondition() {
-        this.downloadExperimentData();
-
         window.clearInterval(this.intervalLogger)
     }
 

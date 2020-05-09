@@ -11,62 +11,67 @@ import { toast } from 'react-toastify';
 
 class GraphPane extends React.Component {
     componentDidMount() {
-        this.nodesList = [];
-
-        this.props.sharedState.graphPane = this;
-
-        this.$el = document.querySelector("#graph")
-
-        var svg = new SVG(this.$el).size("100%", "100%").panZoom({ zoomMin: 1, zoomMax: 1 }); // just pan, no zoom
-
-        SVG.extend(SVG.Element, {
-            getScreenCoords: function () {
-                var root_point = this.doc().node.getBoundingClientRect();
-                var point = this.point(0, 0);
-                return {
-                    x: -point.x - root_point.left,
-                    y: -point.y - root_point.top
-                };
-            }
-        })
-
-        var links = svg.group();
-        var markers = svg.group();
-        var nodes = svg.group();
-
-        var mouse_follower = new MouseFollower(this.props.sharedState, svg, links, markers, links);
-
-        // add new nodes on mouse click
-        svg.on('dblclick', (e) => {
-            // only clicks on background and not when dragging
-            if (e.target !== svg.node && !mouse_follower.drawing_arrow_from) {
-                return;
-            }
-
-            this.addNodeAtScreenLocation(svg, nodes, mouse_follower, "", e.clientX, e.clientY, true);
-        });
-
-        this.setupTextDropping(svg, nodes, mouse_follower);
-
-        svg.on('panStart', (e) => {
-            document.activeElement.blur();
-        });
-
-        var textarea = document.querySelector('#nodeedit');
-        textarea.setAttribute('style', 'height:' + (textarea.scrollHeight) + 'px;overflow-y:hidden;');
-        textarea.addEventListener("input", (e) => {
-            textarea.style.height = 'auto';
-            textarea.style.height = (textarea.scrollHeight) + 'px';
-        });
-
-        this.props.sharedState.addGraphNode = (text, x, y) => {
-            return this.addNodeAtScreenLocation(svg, nodes, mouse_follower, text, x, y, true)
-        }
-
         this.props.sharedState.getSavedGraph((json) => {
-            if (json) {
-                this.loadFromJSON(json, mouse_follower, nodes)
+            this.nodesList = [];
+
+            this.props.sharedState.graphPane = this;
+
+            this.$el = document.querySelector("#graph")
+
+            var svg = new SVG(this.$el).size("100%", "100%").panZoom({ zoomMin: 1, zoomMax: 1 }); // just pan, no zoom
+
+            SVG.extend(SVG.Element, {
+                getScreenCoords: function () {
+                    var root_point = this.doc().node.getBoundingClientRect();
+                    var point = this.point(0, 0);
+                    return {
+                        x: -point.x - root_point.left,
+                        y: -point.y - root_point.top
+                    };
+                }
+            })
+
+            var links = svg.group();
+            var markers = svg.group();
+            var nodes = svg.group();
+
+            const json_connections = json ? json.connections : undefined
+            var mouse_follower = MouseFollower.fromJSON(json_connections, this.props.sharedState, svg, links, markers, links);
+            this.mouse_follower = mouse_follower
+
+            // add new nodes on mouse click
+            svg.on('dblclick', (e) => {
+                // only clicks on background and not when dragging
+                if (e.target !== svg.node && !mouse_follower.drawing_arrow_from) {
+                    return;
+                }
+
+                this.addNodeAtScreenLocation(svg, nodes, mouse_follower, "", e.clientX, e.clientY, true);
+            });
+
+            this.setupTextDropping(svg, nodes, mouse_follower);
+
+            svg.on('panStart', (e) => {
+                document.activeElement.blur();
+            });
+
+            var textarea = document.querySelector('#nodeedit');
+            textarea.setAttribute('style', 'height:' + (textarea.scrollHeight) + 'px;overflow-y:hidden;');
+            textarea.addEventListener("input", (e) => {
+                textarea.style.height = 'auto';
+                textarea.style.height = (textarea.scrollHeight) + 'px';
+            });
+
+            this.props.sharedState.addGraphNode = (text, x, y) => {
+                return this.addNodeAtScreenLocation(svg, nodes, mouse_follower, text, x, y, true)
             }
+            if (json && json.nodes) {
+                this.loadNodesFromJSON(json.nodes, mouse_follower, nodes)
+            }
+
+            this.getNodeById = this.getNodeById.bind(this)
+            mouse_follower.draw_loaded_arrows(this.getNodeById)
+
             if (!this.nodesList) {
                 this.addNoNodesIndicator(svg, nodes, mouse_follower);
             }
@@ -76,14 +81,19 @@ class GraphPane extends React.Component {
         // this.addNodeAtScreenLocation(svg, nodes, mouse_follower, "Radical", 1200, 300, false);
     }
 
+    getNodeById(id) {
+        return this.nodesList.find(node => node.id.toString() === id.toString())
+    }
+
     toJSON() {
         return {
             nodes: this.nodesList.map(node => node.toJSON()),
+            connections: this.mouse_follower.toJSON()
         }
     }
 
-    loadFromJSON(json, mouse_follower, nodes) {
-        this.nodesList = json.nodes.map(nodeJSON => GraphNode.fromJSON(nodeJSON, nodes, mouse_follower, this.props.sharedState, this.nodesList))
+    loadNodesFromJSON(json, mouse_follower, nodes) {
+        this.nodesList = json.map(nodeJSON => GraphNode.fromJSON(nodeJSON, nodes, mouse_follower, this.props.sharedState, () => this.nodesList))
     }
 
     addNoNodesIndicator(svg, nodes, mouse_follower) {
@@ -125,7 +135,17 @@ class GraphPane extends React.Component {
 
     addNodeAtScreenLocation(svg, nodes, mouse_follower, text, x, y, focus_text_area) {
         var point = svg.point(x, y);
-        var node = new GraphNode(nodes, mouse_follower, this.props.sharedState, text, point.x, point.y, 100, 80, focus_text_area, null, false, "", this.nodesList);
+        const params = {
+            shortText: text,
+            longText: "", 
+            x: point.x,
+            y: point.y,
+            width: 100,
+            height: 80,
+            isOnGraph: false,
+            id: undefined, // set automatically
+        }
+        var node = new GraphNode(params, nodes, mouse_follower, this.props.sharedState, focus_text_area, () => this.nodesList);
         this.nodesList.push(node);
 
         if (this.noNodesIndicator) {

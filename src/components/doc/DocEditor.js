@@ -46,16 +46,17 @@ class DocEditor extends React.Component {
     }
 
     componentDidMount() {
-        this.props.sharedState.getSavedDocValue((savedValue) => {
-            if (savedValue) {
-                this.setState({ value: Value.fromJSON(savedValue) })
-            }
+        const sharedState = this.props.sharedState
+        sharedState.getSavedDocValue((savedValue) => {
+            this.setState({
+                value: savedValue ? Value.fromJSON(savedValue) : emptyValue
+            }, sharedState.editorHasLoaded)
         })
     }
 
-    // don't display editor until the db's saved document loads
     state = {
-        value: undefined
+        value: undefined, // don't display editor until the db's saved document loads
+        mapHasLoaded: false, // force a refresh of the component once the sharedState.map has loaded so section refs are hooked up to graph nodes
     }
     
     queries = {
@@ -64,21 +65,23 @@ class DocEditor extends React.Component {
         },
         getValue: () => {
             return this.state.value;
+        },
+        mapHasLoaded: () => {
+            this.setState({ mapHasLoaded: true })
         }
     }
 
     onChange = ({ value }) => {
-        console.log(value);
-        
         this.setState({ value })
     }
 
     render() {
-        const plainClass = this.props.sharedState.condition === "plain" ? " slate-editor-no-graph" : "";
+        const plainClass = this.props.sharedState.condition === "plain" ? " slate-editor-no-graph" : ""
 
-        if (this.state.value) {
+        if (this.state.value !== undefined) {
             return <Editor
                 className={"slate-editor" + plainClass}
+                key={this.state.mapHasLoaded ? "map-loading" : "map-loaded"}
                 ref={this.props.sharedState.editor_ref}
                 schema={schema}
                 plugins={plugins[this.props.sharedState.condition]}

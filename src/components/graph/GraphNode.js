@@ -3,10 +3,11 @@ import OptionPopup from "./OptionPopup";
 var ARROW_HITBOX_MARGIN = 20;
 
 class GraphNode {
-    constructor(nodes, mouse_follower, shared_state, text, x, y, width, height, focus_text_area, id, isOnGraph, longText, nodesList) {
+    constructor(params, nodes, mouse_follower, shared_state, focus_text_area, getNodesList) {
+        var { shortText, x, y, width, height, id, isOnGraph, longText } = params
         this.id = id ? id : shared_state.getNodeId();
 
-        this.nodesList = nodesList;
+        this.getNodesList = getNodesList;
         
         this.group = nodes.group().translate(x, y);
 
@@ -14,7 +15,7 @@ class GraphNode {
             .translate(-ARROW_HITBOX_MARGIN, -ARROW_HITBOX_MARGIN).opacity(0);
         this.rect = this.group.rect(width, height).radius(5).addClass('node');
         this.text = this.group.text("").addClass('node-text');
-        this.updateShortText(text)
+        this.updateShortText(shortText)
         this.updateLongText(longText)
 
         this.setupRectDragging(this.rect, shared_state);
@@ -39,8 +40,13 @@ class GraphNode {
         shared_state.logger.logEvent({'type': 'node_create', 'id': this.id});
     }
 
-    static fromJSON(json, nodes, mouse_follower, shared_state, nodesList) {
-        return new GraphNode(nodes, mouse_follower, shared_state, json.shortText, json.screenCoords.x, json.screenCoords.y, 100, 50, false, json.id, json.isOnGraph, nodesList)
+    static fromJSON(json, nodes, mouse_follower, shared_state, getNodesList) {
+        var params = json
+        params.x = json.screenCoords.x
+        params.y = json.screenCoords.y
+        params.width = 100
+        params.height = 50
+        return new GraphNode(params, nodes, mouse_follower, shared_state, false, getNodesList)
     }
 
     toJSON() {
@@ -321,9 +327,10 @@ class GraphNode {
         shared_state.removeGraphNode(this.id);
         
         // remove from the list of nodes (used for saving)
-        var index = this.nodesList.indexOf(this);
+        const nodesList = this.getNodesList()
+        var index = nodesList.indexOf(this);
         if (index !== -1) {
-            this.nodesList.splice(index, 1)
+            nodesList.splice(index, 1)
         } else {
             console.log('node not found in this.nodesList when deleting');
         }        

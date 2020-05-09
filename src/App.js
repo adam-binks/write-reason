@@ -23,6 +23,7 @@ export default class App extends Component {
         }
 
         this.transitionToEditor = this.transitionToEditor.bind(this)
+        this.transitionToMenu = this.transitionToMenu.bind(this)
     }
 
     transitionToEditor(newSharedState) {
@@ -32,11 +33,21 @@ export default class App extends Component {
         })
     }
 
+    transitionToMenu() {
+        if (this.state.sharedState) {
+            this.state.sharedState.finishCondition()
+        }
+        this.setState({
+            sharedState: undefined,
+            phase: "loadproject"
+        })
+    }
+
     render() {
         switch(this.state.phase) {
             case "loadproject":
                 return (
-                    <LoadProject transitionToEditor={this.transitionToEditor} autoload={26} />
+                    <LoadProject transitionToEditor={this.transitionToEditor} autoload={false} />
                 )
             case "editor":
                 return (
@@ -46,7 +57,7 @@ export default class App extends Component {
                                 <DocPane sharedState={this.state.sharedState} />
                                 <GraphPane sharedState={this.state.sharedState} />
                             </SplitPane>
-                            <SaveButton sharedState={this.state.sharedState} />
+                            <SaveButton sharedState={this.state.sharedState} backToMenu={this.transitionToMenu} />
                         </DndProvider>
                         <ToastContainer
                             position="bottom-center"
