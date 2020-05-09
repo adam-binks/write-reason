@@ -47,7 +47,7 @@ export default class App extends Component {
         switch(this.state.phase) {
             case "loadproject":
                 return (
-                    <LoadProject transitionToEditor={this.transitionToEditor} autoload={false} />
+                    <LoadProject transitionToEditor={this.transitionToEditor} autoload={39} />
                 )
             case "editor":
                 return (

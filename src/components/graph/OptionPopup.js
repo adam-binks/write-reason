@@ -19,25 +19,44 @@ export default class OptionPopup {
     generateTable(entries, div, callback, selected) {
         var table = document.createElement("table");
         entries.forEach(entry => {
+            entry.isClickable = entry.isClickable !== undefined ? entry.isClickable : true
+
             var row = table.insertRow();
             row.classList.add("option-row");
             if (entry.name === selected) {
                 row.classList.add("option-row-selected");
             }
 
-            row.addEventListener("click", e => {
-                callback(entry);
-                div.remove();
-            });
+            const selectItem = (e) => {
+                if (entry.isClickable) {
+                    callback(entry);
+                    div.remove();
+                }
+            }
 
             var colourCell = row.insertCell();
-            colourCell.appendChild(document.createTextNode(entry.symbol));
+            colourCell.textContent = entry.symbol;
             colourCell.style.color = entry.colour;
             colourCell.style.fontSize = "150%";
             colourCell.style.padding = '10px'
 
+            
             var nameCell = row.insertCell();
-            nameCell.appendChild(document.createTextNode(entry.name))
+            nameCell.textContent = entry.name
+
+            colourCell.addEventListener('click', selectItem)
+            nameCell.addEventListener('click', selectItem)
+
+            if (entry.buttons) {
+                entry.buttons.forEach(buttonEntry => {
+                    var buttonCell = row.insertCell()
+                    var button = document.createElement('BUTTON')
+                    button.innerHTML = buttonEntry.label
+                    button.className = "pure-button"
+                    buttonCell.appendChild(button)
+                    button.onclick = (e) => buttonEntry.click(e, colourCell, nameCell, buttonCell, buttonEntry.underlyingEntry, entry)
+                })
+            }
         });
 
         return table;
