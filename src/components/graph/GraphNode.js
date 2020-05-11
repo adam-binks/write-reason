@@ -32,7 +32,9 @@ class GraphNode {
         this.setupContextMenu(shared_state);
 
         if (focus_text_area) {
-            this.editText(shared_state, true);
+            console.log(params.doNotDeleteIfEmptyText);
+            
+            this.editText(shared_state, !params.doNotDeleteIfEmptyText);
         }
         
         this.setIsOnGraph(isOnGraph);

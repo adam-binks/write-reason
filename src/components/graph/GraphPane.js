@@ -62,8 +62,8 @@ class GraphPane extends React.Component {
                 textarea.style.height = (textarea.scrollHeight) + 'px';
             });
 
-            this.props.sharedState.addGraphNode = (text, x, y) => {
-                return this.addNodeAtScreenLocation(svg, nodes, mouse_follower, text, x, y, true)
+            this.props.sharedState.addGraphNode = (text, x, y, doNotDeleteIfEmptyText) => {
+                return this.addNodeAtScreenLocation(svg, nodes, mouse_follower, text, x, y, true, doNotDeleteIfEmptyText)
             }
             if (json && json.nodes) {
                 this.loadNodesFromJSON(json.nodes, mouse_follower, nodes)
@@ -133,7 +133,7 @@ class GraphPane extends React.Component {
         });
     }
 
-    addNodeAtScreenLocation(svg, nodes, mouse_follower, text, x, y, focus_text_area) {
+    addNodeAtScreenLocation(svg, nodes, mouse_follower, text, x, y, focus_text_area, doNotDeleteIfEmptyText=false) {
         var point = svg.point(x, y);
         const params = {
             shortText: text,
@@ -144,6 +144,7 @@ class GraphPane extends React.Component {
             height: 80,
             isOnGraph: false,
             id: undefined, // set automatically
+            doNotDeleteIfEmptyText: doNotDeleteIfEmptyText
         }
         var node = new GraphNode(params, nodes, mouse_follower, this.props.sharedState, focus_text_area, () => this.nodesList);
         this.nodesList.push(node);

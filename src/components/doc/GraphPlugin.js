@@ -76,9 +76,6 @@ export default function GraphPlugin(options) {
 export function addSection(draggedNode, editor, initialNodeStyle="Heading and body") {
     editor.getSharedState().addGraphMapping(draggedNode.id, draggedNode.node)
 
-    console.log(draggedNode);
-    
-
     insertSectionBlock(editor, draggedNode.id, draggedNode.text, draggedNode.longText, initialNodeStyle)
 
     editor.getSharedState().logger.logEvent({

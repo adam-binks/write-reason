@@ -21,6 +21,10 @@
     display: none
 }
 
+.block-outer-div {
+    padding: 1px;
+}
+
 .block-outer-div:last-child {
     flex-grow: 1; /* extend to fill to bottom of screen so you can drop below the bottom-most paragraph */
 }

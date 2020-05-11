@@ -2,6 +2,16 @@
     background-color: rgb(241, 241, 241);
 }
 
+.edit-icon {
+    content: url('https://api.iconify.design/simple-line-icons:pencil.svg?height=14&inline=true');
+    vertical-align: -0.062em;
+}
+
+.delete-icon {
+    content: url('https://api.iconify.design/simple-line-icons:trash.svg?height=14&inline=true');
+    vertical-align: -0.062em;
+}
+
 #nodeedit {
     position:absolute;
     display: none;
