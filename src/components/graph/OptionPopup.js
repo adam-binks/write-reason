@@ -11,6 +11,15 @@ export default class OptionPopup {
         }
         parent.appendChild(div);
 
+        // prevent the popup from showing up partially offscreen
+        const rect = div.getBoundingClientRect()
+        if (rect.right > window.innerWidth) {
+            div.style.left = (x - (rect.right - window.innerWidth)) + "px"
+        }
+        if (rect.bottom > window.innerHeight) {
+            div.style.top = (y - (rect.bottom - window.innerHeight)) + "px"
+        }
+
         if (shouldHideOnClickOutside) {
             setTimeout(() => this.hideOnClickOutside(div), 0.01);
         }

@@ -309,12 +309,16 @@ export default class MouseFollower {
             editButton.onclick = finishEditing
 
             var input = document.createElement("input")
-            console.log(nameCell);
             
             input.style.width = (nameCell.getBoundingClientRect().width - 5).toString() + "px"
             input.value = nameCell.textContent
             input.addEventListener('keyup', (e) => {
                 if (e.key === 'Enter' && input.value) {
+                    finishEditing()
+                }
+            })
+            input.addEventListener('blur', (e) => {
+                if (input.value) {
                     finishEditing()
                 }
             })

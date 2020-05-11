@@ -193,7 +193,7 @@ export default function LinkPlugin(options) {
             // prevent backspace from merging body and link blocks with previous
             if (e.key === 'Backspace') {
                 const prevBlock = document.getPreviousBlock(start.key)
-                if (startBlock && start.offset === 0 && prevBlock && (startBlock.type === "body" || startBlock.type === "link")) {
+                if (startBlock && selection.isCollapsed && start.offset === 0 && prevBlock && (startBlock.type === "body" || startBlock.type === "link")) {
                     if (prevBlock) {
                         editor.moveToEndOfNode(prevBlock);
                         if (startBlock.text === "") {
