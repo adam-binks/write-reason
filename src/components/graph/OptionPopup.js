@@ -28,7 +28,7 @@ export default class OptionPopup {
             }
 
             const selectItem = (e) => {
-                if (entry.isClickable) {
+                if (entry.isClickable) {                    
                     callback(entry);
                     div.remove();
                 }
@@ -39,9 +39,9 @@ export default class OptionPopup {
             colourCell.style.color = entry.colour;
             colourCell.style.fontSize = "150%";
             colourCell.style.padding = '10px'
-
             
             var nameCell = row.insertCell();
+            nameCell.classList.add('option-cell')
             nameCell.textContent = entry.name
 
             colourCell.addEventListener('click', selectItem)
@@ -51,10 +51,12 @@ export default class OptionPopup {
                 entry.buttons.forEach(buttonEntry => {
                     var buttonCell = row.insertCell()
                     var button = document.createElement('BUTTON')
-                    button.innerHTML = buttonEntry.label
+                    button.innerHTML = '<p class="' + buttonEntry.className + '"></p>'
                     button.className = "pure-button"
+                    button.style.padding = "0px 10px 0px 10px"
                     buttonCell.appendChild(button)
-                    button.onclick = (e) => buttonEntry.click(e, colourCell, nameCell, buttonCell, buttonEntry.underlyingEntry, entry)
+                    button.onclick = (e) => buttonEntry.click(e, {colourCell, nameCell, buttonCell, underlyingEntry: buttonEntry.underlyingEntry, 
+                            transientEntry: entry, underlyingEntries: buttonEntry.underlyingEntries, row})
                 })
             }
         });

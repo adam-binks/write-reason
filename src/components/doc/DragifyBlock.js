@@ -23,9 +23,9 @@ const blockSource = {
         const sharedState = props.editor.getSharedState()
 
         if (dropResult.droppedOnGraph) {
-            const graphNode = sharedState.addGraphNode('', dropResult.position.x, dropResult.position.y)
+            const graphNode = sharedState.addGraphNode('', dropResult.position.x, dropResult.position.y, true)
             const draggedNode = {
-                id: props.node.data.get('node_id'),
+                id: graphNode.id,
                 node: graphNode,
                 text: "",
                 longText: props.node.text
