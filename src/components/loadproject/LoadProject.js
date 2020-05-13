@@ -97,15 +97,15 @@ export default class LoadProject extends Component {
     render() {
         return (
             <div className="load-project">
-                <ProjectList projects={this.state.projects}
-                    deleteProject={this.deleteProject}
-                    loadProject={this.loadProject}
-                    renameProject={this.renameProject}
-                    duplicateProject={this.duplicateProject}
-                />
-                <p>
-                    <button className="pure-button pure-button-primary" onClick={this.addProject}>New project</button>
-                </p>
+                <button className="pure-button pure-button-primary" onClick={this.addProject}>New project</button>
+                <div className="load-project-table">
+                    {this.state.projects && this.state.projects.length > 0 && <ProjectList projects={this.state.projects}
+                        deleteProject={this.deleteProject}
+                        loadProject={this.loadProject}
+                        renameProject={this.renameProject}
+                        duplicateProject={this.duplicateProject}
+                    />}
+                </div>
             </div>
         );
       }

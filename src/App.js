@@ -26,6 +26,10 @@ export default class App extends Component {
         this.transitionToMenu = this.transitionToMenu.bind(this)
     }
 
+    componentDidMount() {
+        this.getStorageUsed()
+    }
+
     transitionToEditor(newSharedState) {
         this.setState({ 
             sharedState: newSharedState,
@@ -43,11 +47,20 @@ export default class App extends Component {
         })
     }
 
+    getStorageUsed() {
+        navigator.storage.estimate().then(estimate => {
+            this.setState({ storageUsed: (estimate.usage / estimate.quota * 100).toPrecision(2) })
+        });
+    }
+
     render() {
         switch(this.state.phase) {
             case "loadproject":
                 return (
-                    <LoadProject transitionToEditor={this.transitionToEditor} autoload={false} />
+                    <>
+                        <LoadProject transitionToEditor={this.transitionToEditor} autoload={39} />
+                        {this.state.storageUsed && <footer>Storage used: {this.state.storageUsed}%</footer>}
+                    </>
                 )
             case "editor":
                 return (

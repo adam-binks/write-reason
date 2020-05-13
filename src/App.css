@@ -22,6 +22,7 @@
 html, body {
     height: 100%;
     width: 100%;
+    font-family: 'Varela Round', sans-serif;
 }
 
 .Resizer {
@@ -48,3 +49,15 @@ html, body {
     font-size: 1em;
     padding: 1em;
 }
+
+footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    padding: 20px;
+    width: 100%;
+    color: dimgray;
+    font-size: 70%;
+    text-align: center;
+    background-color: lightgrey;
+  }

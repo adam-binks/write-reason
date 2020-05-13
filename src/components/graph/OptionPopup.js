@@ -1,31 +1,33 @@
 export default class OptionPopup {
     constructor(entries, x, y, shouldHideOnClickOutside, callback, selected=undefined, parent=undefined) {
-        var div = document.createElement("div");
-        div.classList.add("option-popup-div");
-        div.appendChild(this.generateTable(entries, div, callback, selected));
-        div.style.left = x + "px";
-        div.style.top = y + "px";
+        this.hidePopup = this.hidePopup.bind(this)
+
+        this.div = document.createElement("div");
+        this.div.classList.add("option-popup-div");
+        this.div.appendChild(this.generateTable(entries, callback, selected));
+        this.div.style.left = x + "px";
+        this.div.style.top = y + "px";
 
         if (parent === undefined) {
             parent = document.getElementById("graph");
         }
-        parent.appendChild(div);
+        parent.appendChild(this.div);
 
         // prevent the popup from showing up partially offscreen
-        const rect = div.getBoundingClientRect()
+        const rect = this.div.getBoundingClientRect()
         if (rect.right > window.innerWidth) {
-            div.style.left = (x - (rect.right - window.innerWidth)) + "px"
+            this.div.style.left = (x - (rect.right - window.innerWidth)) + "px"
         }
         if (rect.bottom > window.innerHeight) {
-            div.style.top = (y - (rect.bottom - window.innerHeight)) + "px"
+            this.div.style.top = (y - (rect.bottom - window.innerHeight)) + "px"
         }
 
         if (shouldHideOnClickOutside) {
-            setTimeout(() => this.hideOnClickOutside(div), 0.01);
+            setTimeout(() => this.hideOnClickOutside(this.div), 0.01);
         }
     }
 
-    generateTable(entries, div, callback, selected) {
+    generateTable(entries, callback, selected) {
         var table = document.createElement("table");
         entries.forEach(entry => {
             entry.isClickable = entry.isClickable !== undefined ? entry.isClickable : true
@@ -39,7 +41,7 @@ export default class OptionPopup {
             const selectItem = (e) => {
                 if (entry.isClickable) {                    
                     callback(entry);
-                    div.remove();
+                    this.hidePopup();
                 }
             }
 
@@ -65,12 +67,17 @@ export default class OptionPopup {
                     button.style.padding = "0px 10px 0px 10px"
                     buttonCell.appendChild(button)
                     button.onclick = (e) => buttonEntry.click(e, {colourCell, nameCell, buttonCell, underlyingEntry: buttonEntry.underlyingEntry, 
-                            transientEntry: entry, underlyingEntries: buttonEntry.underlyingEntries, row})
+                            transientEntry: entry, underlyingEntries: buttonEntry.underlyingEntries, row, selected: entry.name === selected,
+                            hidePopup: this.hidePopup})
                 })
             }
         });
 
         return table;
+    }
+
+    hidePopup() {
+        this.div.remove()
     }
 
     hideOnClickOutside(element) {
