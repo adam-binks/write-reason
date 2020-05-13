@@ -1,5 +1,14 @@
-.load-project {
-    display:flex;
+.load-project-table {
     justify-content:center;
     align-items:center;
+    display:flex;
+    padding: 30px;
+    text-align: left;
+}
+
+.load-project {
+    padding: 30px;
+    justify-content:center;
+    align-items:center;
+    text-align: center;
 }

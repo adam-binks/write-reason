@@ -96,6 +96,9 @@ export default class MouseFollower {
                 arrow.colour
             )
             this.add_context_menu_to_arrow(connector, arrow)
+            
+            // update the arrow start and end points
+            originNode.group.node.dispatchEvent(new CustomEvent("dragmove"))
         })
     }
 
@@ -283,16 +286,21 @@ export default class MouseFollower {
 
             var editButton = buttonCell.children[0]
 
-            const finishEditing = () => {
+            const updateName = () => {
                 var newValue = input.value
                 if (newValue.length >= MAX_ARROW_TYPE_NAME_LENGTH) {
                     newValue = newValue.substring(0, MAX_ARROW_TYPE_NAME_LENGTH)
                 }
-                
-                nameCell.removeChild(input)
-
                 if (newValue) {
                     underlyingEntry.name = newValue
+                }
+
+                return newValue
+            }
+
+            const finishEditing = () => {
+                var newValue = updateName()
+                if (newValue) {
                     nameCell.textContent = newValue
                 }
 
@@ -317,11 +325,7 @@ export default class MouseFollower {
                     finishEditing()
                 }
             })
-            input.addEventListener('blur', (e) => {
-                if (input.value) {
-                    finishEditing()
-                }
-            })
+            input.addEventListener('change', updateName)
 
             nameCell.textContent = ""
             nameCell.appendChild(input)
@@ -347,7 +351,7 @@ export default class MouseFollower {
         }
 
         const clickDeleteArrowTypeButton = (e, params) => {
-            var { row, underlyingEntries, underlyingEntry, transientEntry } = params
+            var { row, underlyingEntries, underlyingEntry, transientEntry, selected, hidePopup } = params
             transientEntry.isClickable = false
             
             if (window.confirm('Are you sure you want to delete all "' + underlyingEntry.name + '" arrows? This cannot be undone.')) {
@@ -367,8 +371,15 @@ export default class MouseFollower {
                     }
                 }))
 
-                this.shared_state.logger.logEvent({'type': 'delete_arrow_type', 'colour': underlyingEntry.colour});
+                this.shared_state.logger.logEvent({'type': 'delete_arrow_type', 'colour': underlyingEntry.colour})
+
+                // if the selected arrow type was deleted, hide the optionpopup
+                if (selected) {
+                    hidePopup()
+                }
             }
+
+            transientEntry.isClickable = true
         }
 
         const arrowOptionsWithButtons = this.arrowOptions.map(entry => {
@@ -404,33 +415,42 @@ export default class MouseFollower {
         prev_selected = arrowOptions.find(entry => entry.colour === connector.line.attr('stroke') && entry.name !== 'Delete' && entry.name !== ADD_ARROW_TYPE_MENU_ITEM)
         prev_selected = prev_selected ? prev_selected.name : undefined
 
+        const setArrowColour = (selected_option) => {
+            connector.setLineColor(selected_option.colour);
+            this.shared_state.logger.logEvent({'type': 'arrow_set_type', 'id': connector.id, 'new_type': selected_option.name});
+
+            if (onColourSelected) {
+                onColourSelected(selected_option.colour)
+            }
+        }
+
         new OptionPopup(arrowOptions, popup_x, popup_y, hideOnClickOutside, (selected_option) => {
             if (selected_option.name === "Delete") {
                 this.shared_state.logger.logEvent({'type': 'arrow_delete', 'id': connector.id});
                 this.remove_arrow(connector, arrowObject);
-            } if (selected_option.name === ADD_ARROW_TYPE_MENU_ITEM) {
+            } else if (selected_option.name === ADD_ARROW_TYPE_MENU_ITEM) {
                 const colour = this.getNextAvailableColour(null, 1)
 
                 if (!colour) {
                     toast.error("Maximum number of arrow types reached!")
                 } else {
-                    this.arrowOptions.push({
+                    const newRelation = {
                         'name': 'New relation',
                         'colour': colour,
                         'symbol': "→",
-                    })
+                    }
+                    this.arrowOptions.push(newRelation)
                     this.shared_state.logger.logEvent({'type': 'add_arrow_type', 'colour': colour});
 
+                    if (!prev_selected) {
+                        setArrowColour(newRelation)
+                    }
+
                     // open a new option popup to allow the user to select the new arrow type and edit it
-                    this.edit_connector_type(connector, popup_x, popup_y, hideOnClickOutside, onColourSelected, arrowObject)
+                    this.edit_connector_type(connector, popup_x, popup_y, true, onColourSelected, arrowObject)
                 }
             } else {
-                connector.setLineColor(selected_option.colour);
-                this.shared_state.logger.logEvent({'type': 'arrow_set_type', 'id': connector.id, 'new_type': selected_option.name});
-
-                if (onColourSelected) {
-                    onColourSelected(selected_option.colour)
-                }
+                setArrowColour(selected_option)
             }
         }, prev_selected);
     }

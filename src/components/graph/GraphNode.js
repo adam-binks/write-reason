@@ -11,8 +11,10 @@ class GraphNode {
         
         this.group = nodes.group().translate(x, y);
 
+        this.dropShadow = this.group.rect(width, height).radius(5).addClass('node-drop-shadow')
         this.arrow_hitbox = this.group.rect(width + 2 * ARROW_HITBOX_MARGIN, height + 2 * ARROW_HITBOX_MARGIN)
-            .translate(-ARROW_HITBOX_MARGIN, -ARROW_HITBOX_MARGIN).opacity(0);
+            .translate(-ARROW_HITBOX_MARGIN, -ARROW_HITBOX_MARGIN).opacity(0).addClass('arrow-hitbox');
+        
         this.rect = this.group.rect(width, height).radius(5).addClass('node');
         this.text = this.group.text("").addClass('node-text');
         this.updateShortText(shortText)
@@ -25,6 +27,7 @@ class GraphNode {
                 mouse_follower.complete_arrow(this);
             }
         };
+        this.arrow_hitbox.on('mouseup', complete_arrow);
         this.rect.on('mouseup', complete_arrow);
         this.text.on('mouseup', complete_arrow);
 
@@ -32,22 +35,24 @@ class GraphNode {
         this.setupContextMenu(shared_state);
 
         if (focus_text_area) {
-            console.log(params.doNotDeleteIfEmptyText);
-            
             this.editText(shared_state, !params.doNotDeleteIfEmptyText);
         }
         
         this.setIsOnGraph(isOnGraph);
 
-        shared_state.logger.logEvent({'type': 'node_create', 'id': this.id});
+        // don't log add node events if they are just loaded from a save
+        if (!params.isFromJSON) {
+            shared_state.logger.logEvent({'type': 'node_create', 'id': this.id});
+        }
     }
 
     static fromJSON(json, nodes, mouse_follower, shared_state, getNodesList) {
         var params = json
         params.x = json.screenCoords.x
         params.y = json.screenCoords.y
-        params.width = 100
-        params.height = 50
+        params.width = 200
+        params.height = 42
+        params.isFromJSON = true
         return new GraphNode(params, nodes, mouse_follower, shared_state, false, getNodesList)
     }
 
@@ -172,6 +177,10 @@ class GraphNode {
                 },
                 node: this
             };
+
+            this.dropShadow.translate(5, 5)
+            this.dropShadow.addClass('visible')
+            
             rect.off('dragmove');
             rect.on('dragmove', (e) => {
                 this.group.move(start_x + e.detail.delta.movedX, start_y + e.detail.delta.movedY);
@@ -195,6 +204,9 @@ class GraphNode {
                     setTimeout(() => { just_dropped_obj.just_dropped = false; }, 0.05);
                 }
                 shared_state.draggedNode = false;
+
+                this.dropShadow.translate(0, 0)
+                this.dropShadow.removeClass('visible')
             });
         });
     }
@@ -265,8 +277,10 @@ class GraphNode {
     // resize the rect so that the text fits on it
     resizeRect(numLinesOfText) {
         this.rect.width(200);
-        this.rect.height(numLinesOfText * 21 + 20);
+        const rectHeight = numLinesOfText * 21 + 20
+        this.rect.height(rectHeight);
         this.text.center(0.5 * this.rect.width(), 0.5 * this.rect.height());
+        this.dropShadow.height(rectHeight)
 
         this.arrow_hitbox.size(this.rect.width() + ARROW_HITBOX_MARGIN * 2, this.rect.height() + ARROW_HITBOX_MARGIN * 2);
 
@@ -286,6 +300,8 @@ class GraphNode {
 
         var textarea = document.querySelector('#nodeedit');
         textarea.value = this.getShortText();
+
+        const preEditText = this.getShortText()
 
         var screen_coords = this.group.getScreenCoords();
         textarea.style.left = screen_coords.x + "px";
@@ -312,7 +328,9 @@ class GraphNode {
             this.text.show();
             this.updateShortText(this.shortText);
 
-            shared_state.logger.logEvent({'type': 'node_edit_short_text', 'id': this.id, 'text': this.shortText});
+            if (this.getShortText() !== preEditText) {
+                shared_state.logger.logEvent({'type': 'node_edit_short_text', 'id': this.id, 'text': this.shortText});
+            }
         };
         textarea.onblur = save_and_hide;
         textarea.onkeyup = (e) => {

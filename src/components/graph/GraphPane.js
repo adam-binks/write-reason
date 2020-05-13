@@ -72,7 +72,7 @@ class GraphPane extends React.Component {
             this.getNodeById = this.getNodeById.bind(this)
             mouse_follower.draw_loaded_arrows(this.getNodeById)
 
-            if (!this.nodesList) {
+            if (this.nodesList.length === 0) {
                 this.addNoNodesIndicator(svg, nodes, mouse_follower);
             }
         })

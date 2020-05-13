@@ -35,6 +35,8 @@
 }
 
 .plain-block {
+    transition: 0.15s;
+    transition-property: background-color;
     padding-left: 50px;
     background-color: rgba(255, 255, 255, 0.5);
 }
@@ -69,25 +71,15 @@
     margin: 0px;
 }
 
-.hovered, .section:hover, .node-link:hover, .node-body:hover {
+.section.hovered, .section.hovered,
+.section:hover, .node-link:hover, .node-body:hover {
+    transition: 0.2s;
     background: rgba(255, 217, 0, 0.5) !important
 }
 
 .placeholder {
     /* font-style: oblique; */
     color: grey;
-}
-
-.drag-handle {
-    background-color: lightgrey;
-    width: 1rem;
-    height: 1rem;
-    display: none;
-    position: relative;
-    left: -30px;
-    top: 22px;
-    cursor: ns-resize;
-    /* user-select: none; */
 }
 
 .drag-handle:hover {

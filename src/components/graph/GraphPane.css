@@ -45,19 +45,44 @@
     font-size: 1em;
 }
 
+.arrow-hitbox {
+    transition-property: opacity;
+    transition: 0.3s;
+    opacity: 0;
+}
+
+.arrow-hitbox:hover {
+    fill: #4bbce2;
+    transition: 0.8s;
+    transition-property: opacity;
+    opacity: 0.1;
+}
+
 .indicator-text {
     -moz-user-select: -moz-none;
     -khtml-user-select: none;
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    fill: grey; /* text colour (it's SVG text) */
+    fill: rgb(153, 153, 153); /* text colour (it's SVG text) */
     
     font-family: 'Varela Round', sans-serif;
     font-size: 1em;
 }
 
+.node-drop-shadow {
+    transition: 0.1s;
+    opacity: 0;
+}
+
+.node-drop-shadow.visible {
+    fill: grey;
+    opacity: 0.1;
+}
+
 .node {
+    transition: 0.2s;
+    transition-property: fill;
     fill: #4fabca !important;
 }
 
@@ -76,6 +101,7 @@
 .hovered.node-on-graph ~ .node-text {
     fill:black
 }
+
 
 table { border-collapse:collapse }
 
@@ -99,10 +125,11 @@ table { border-collapse:collapse }
 }
 
 /* is only for completed lines, not potential ones */
-.connector-line:hover {
-    stroke: black !important;
+.connector-line {
+    transition: 0.1s;
+    transition-property: opacity;
 }
 
-.connector-marker:hover {
-    fill: black !important;
+.connector-line:hover {
+    opacity: 0.6;
 }

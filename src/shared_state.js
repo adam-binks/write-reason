@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 
 export default class SharedState {
     constructor(db_id, params) {      
-        this.logger = new Logger(Logger.getNewId(), params)
+        this.logger = new Logger(db_id, params)
         this.condition = params.condition;
         this.params = params;
         
@@ -29,7 +29,15 @@ export default class SharedState {
         
         this.downloadExperimentData = this.downloadExperimentData.bind(this);
         this.editorHasLoaded = this.editorHasLoaded.bind(this);
-        this.save = this.save.bind(this)
+        this.save = this.save.bind(this)        
+
+        // when the tab is closed, if the document has been edited, warn before closing
+        window.onbeforeunload = (e) => {
+            if (process.env.NODE_ENV !== 'development' && this.getStateIsDirty()) { // disable in development for webpack hot reloading
+                e.preventDefault()
+                e.returnValue = '' // for Chrome
+            }
+        }
     }
 
     // called by editor once the database saved value has been set as the document.value
@@ -41,6 +49,8 @@ export default class SharedState {
                 this.map = project.map ? this.mapFromJSON(project.map) : {}
                 this.getEditor().mapHasLoaded()
             })
+        
+        this.lastSavedDocumentState = this.getEditor().getValue().document // editor is definitely not dirty right now
     }
 
     save() {
@@ -59,10 +69,19 @@ export default class SharedState {
                     toast.error(message)
                 } else {
                     toast.info('Changes saved!')
+                    this.lastSavedDocumentState = this.getEditor().getValue().document
                 }
             }).catch(err => {
                 toast.error('Save error: ' + err.toString())
             })
+            
+        this.logger.logEvent({'type': 'save'})
+    }
+
+    getStateIsDirty() {
+        return this.logger.stateIsDirty || (
+            this.getEditor() && this.getEditor().getValue() && this.getEditor().getValue().document !== this.lastSavedDocumentState
+        ) 
     }
 
     getSavedDocValue = async function(onDataLoad) {
@@ -137,18 +156,20 @@ export default class SharedState {
     }
 
     downloadExperimentData() {
-        const element = document.createElement("a");
-        const data = {
-            params: this.params,
-            argument: this.getArgumentMarkdown(),
-            logs: this.logger.getExperimentData()
-        }
-        const file = new Blob([JSON.stringify(data, null, 2)], {type: 'text/plain'});
-
-        element.href = URL.createObjectURL(file);
-        element.download = this.logger.getExperimentId() + ".json";
-        document.body.appendChild(element); // Required for this to work in FireFox
-        element.click();
+        this.logger.getLog(log => {
+            const element = document.createElement("a");
+            const data = {
+                params: this.params,
+                argument: this.getArgumentMarkdown(),
+                logs: log
+            }
+            const file = new Blob([JSON.stringify(data, null, 2)], {type: 'text/plain'});
+    
+            element.href = URL.createObjectURL(file);
+            element.download = this.logger.getExperimentId() + ".json";
+            document.body.appendChild(element); // Required for this to work in FireFox
+            element.click();
+        })
     }
 
     getArgumentMarkdown() {
@@ -220,6 +241,7 @@ export default class SharedState {
     }
 
     finishCondition() {
+        window.onbeforeunload = undefined // remove the warning about closing the tab
         window.clearInterval(this.intervalLogger)
     }
 
