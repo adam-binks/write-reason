@@ -102,6 +102,16 @@
     fill:black
 }
 
+.editing-node-rect {
+    pointer-events: none;
+    opacity: 0;
+    transition: 0.2s;
+}
+
+.editing-node-rect.visible {
+    opacity: 0.3;
+}
+
 
 table { border-collapse:collapse }
 

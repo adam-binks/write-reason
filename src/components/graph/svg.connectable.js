@@ -219,19 +219,58 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                         var xDiff = sT.x - tT.x;
                         var yDiff = sT.y - tT.y;
                         var x2, y2;
-                        if (Math.abs(xDiff) > Math.abs(yDiff)) {
-                            y2 = tT.y + tB.height / 2 - 20;
-                            if (xDiff < 0) {
-                                x2 = tT.x - 10;
-                            } else {
-                                x2 = tT.x + tB.width - 30;
+
+                        var x2centre = tT.x + tB.width / 2
+                        var y2centre = tT.y + tB.height / 2
+
+                        var grad = (y2centre - y1) / ((x2centre - x1) === 0 ? 0.0000001 : (x2centre - x1))
+
+                        if (grad === 0) {
+                            grad = 0.0000001
+                        }
+
+                        var left = tT.x - 10
+                        var right = tT.x + tB.width - 30
+                        var top = tT.y - 10
+                        var bottom = tT.y + tB.height - 30
+                        
+                        var rightLeftCalc = () => {
+                            var x2 = xDiff < 0 ? left : right
+                            return { 
+                                x: x2,
+                                y: ((x2 - x1) * grad) + y1
                             }
+                        }
+
+                        var topBotCalc = () => {
+                            var y2 = yDiff < 0 ? top : bottom
+                            return {
+                                x: ((y2 - y1) * (1/grad)) + x1,
+                                y: y2
+                            }
+                        }
+
+                        var vals
+                        if (Math.abs(xDiff) >= Math.abs(yDiff)) {
+                            vals = rightLeftCalc()
+                            x2 = vals.x
+                            y2 = vals.y
+
+                            if (y2 > bottom || y2 < top) {
+                                vals = topBotCalc()
+                                x2 = vals.x
+                                y2 = vals.y
+                            }
+
                         } else {
-                            x2 = tT.x + tB.width / 2 - 20;
-                            if (yDiff < 0) {
-                                y2 = tT.y - 10;
-                            } else {
-                                y2 = tT.y + tB.height - 30;
+                            vals = topBotCalc()
+                            x2 = vals.x
+                            y2 = vals.y
+
+                            if (x2 > right || x2 < left) {
+                                vals = rightLeftCalc()
+                                x2 = vals.x
+                                y2 = vals.y
                             }
                         }
 

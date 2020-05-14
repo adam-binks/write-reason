@@ -13,9 +13,10 @@ class GraphNode {
 
         this.dropShadow = this.group.rect(width, height).radius(5).addClass('node-drop-shadow')
         this.arrow_hitbox = this.group.rect(width + 2 * ARROW_HITBOX_MARGIN, height + 2 * ARROW_HITBOX_MARGIN)
-            .translate(-ARROW_HITBOX_MARGIN, -ARROW_HITBOX_MARGIN).opacity(0).addClass('arrow-hitbox');
+            .translate(-ARROW_HITBOX_MARGIN, -ARROW_HITBOX_MARGIN).opacity(0).radius(10).addClass('arrow-hitbox');
         
         this.rect = this.group.rect(width, height).radius(5).addClass('node');
+        this.editRect = this.group.rect(width - 10, height - 10).radius(5).translate(5, 5).addClass('editing-node-rect')
         this.text = this.group.text("").addClass('node-text');
         this.updateShortText(shortText)
         this.updateLongText(longText)
@@ -281,6 +282,7 @@ class GraphNode {
         this.rect.height(rectHeight);
         this.text.center(0.5 * this.rect.width(), 0.5 * this.rect.height());
         this.dropShadow.height(rectHeight)
+        this.editRect.height(rectHeight - 10)
 
         this.arrow_hitbox.size(this.rect.width() + ARROW_HITBOX_MARGIN * 2, this.rect.height() + ARROW_HITBOX_MARGIN * 2);
 
@@ -315,6 +317,9 @@ class GraphNode {
 
         this.text.hide();
 
+        this.editRect.addClass('visible')
+        this.setHoverer('editNodeDirectly', true)
+
         var save_changes = () => {
             this.updateShortText(textarea.value);
             shared_state.updateDocShortText(this.id, this.getShortText());
@@ -331,6 +336,9 @@ class GraphNode {
             if (this.getShortText() !== preEditText) {
                 shared_state.logger.logEvent({'type': 'node_edit_short_text', 'id': this.id, 'text': this.shortText});
             }
+
+            this.editRect.removeClass('visible')
+            this.setHoverer('editNodeDirectly', false)
         };
         textarea.onblur = save_and_hide;
         textarea.onkeyup = (e) => {
