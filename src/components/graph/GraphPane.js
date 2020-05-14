@@ -76,9 +76,6 @@ class GraphPane extends React.Component {
                 this.addNoNodesIndicator(svg, nodes, mouse_follower);
             }
         })
-
-        // temp
-        // this.addNodeAtScreenLocation(svg, nodes, mouse_follower, "Radical", 1200, 300, false);
     }
 
     getNodeById(id) {
@@ -140,8 +137,8 @@ class GraphPane extends React.Component {
             longText: "", 
             x: point.x,
             y: point.y,
-            width: 100,
-            height: 80,
+            width: 200,
+            height: 42,
             isOnGraph: false,
             id: undefined, // set automatically
             doNotDeleteIfEmptyText: doNotDeleteIfEmptyText
