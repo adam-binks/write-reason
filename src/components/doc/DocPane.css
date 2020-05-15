@@ -25,6 +25,10 @@
     padding: 1px;
 }
 
+.block-outer-div:first-child {
+    padding-top: 30px; /* gap above the first paragraph */
+}
+
 .block-outer-div:last-child {
     flex-grow: 1; /* extend to fill to bottom of screen so you can drop below the bottom-most paragraph */
 }
@@ -38,11 +42,12 @@
     transition: 0.15s;
     transition-property: background-color;
     padding-left: 50px;
+    padding-right: 50px;
     background-color: rgba(255, 255, 255, 0.5);
 }
 
 .plain-block:hover {
-    background-color: rgba(245, 245, 245, 0.5);
+    background-color: rgba(245, 245, 245, 0.6);
 }
 
 .section {
@@ -71,7 +76,7 @@
     margin: 0px;
 }
 
-.section.hovered, .section.hovered,
+.section.hovered, .section.hovered, .node-link.hovered,
 .section:hover, .node-link:hover, .node-body:hover {
     transition: 0.2s;
     background: rgba(255, 217, 0, 0.5) !important
@@ -80,10 +85,6 @@
 .placeholder {
     /* font-style: oblique; */
     color: grey;
-}
-
-.drag-handle:hover {
-    background-color: grey;
 }
 
 .drop-indicator {
@@ -104,3 +105,22 @@
         background-color: yellowgreen;
     }
   }
+
+@media print {
+    /* .doc.pane {
+        margin: 20px;
+    } */
+
+    .section {
+        background-color: white !important;
+    }
+
+    /* @page  
+    {
+        margin: 20mm 20mm 20mm 20mm;  
+    }  */
+/* 
+    body { 
+    margin: 10mm 10mm 10mm 10mm;
+    } */
+}

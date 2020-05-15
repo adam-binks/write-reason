@@ -18,14 +18,16 @@ export default class LoadProject extends Component {
         this.duplicateProject = this.duplicateProject.bind(this)
         this.updateProjectsFromDb = this.updateProjectsFromDb.bind(this)
         
+        document.title = "Write Reason"
+
         // skip the project select screen if the autoload prop is supplied, instead load project with that id
-        if (this.props.autoload) {
+        if (process.env.NODE_ENV === 'development' && this.props.autoload) {
             this.loadProject(this.props.autoload)
         }
     }
 
     componentDidMount() {
-        if (!this.props.autoload) {
+        if (process.env.NODE_ENV !== 'development' || !this.props.autoload) {
             this.updateProjectsFromDb()
         }
     }
@@ -87,17 +89,19 @@ export default class LoadProject extends Component {
     }
 
     deleteProject(id) {
-        db.table('projects')
-            .delete(id)
-            .then(() => {
-                this.updateProjectsFromDb()
-            })
+        if (window.confirm('Are you sure you want to delete this project? This cannot be undone.')) {
+            db.table('projects')
+                .delete(id)
+                .then(() => {
+                    this.updateProjectsFromDb()
+                })
+        }
     }
     
     render() {
         return (
             <div className="load-project">
-                <button className="pure-button pure-button-primary" onClick={this.addProject}>New project</button>
+                <button className="pure-button button-primary" onClick={this.addProject}>New project</button>
                 <div className="load-project-table">
                     {this.state.projects && this.state.projects.length > 0 && <ProjectList projects={this.state.projects}
                         deleteProject={this.deleteProject}

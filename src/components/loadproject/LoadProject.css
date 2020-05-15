@@ -12,3 +12,26 @@
     align-items:center;
     text-align: center;
 }
+
+.intro-section {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    max-width: 750px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.logo {
+    width: 40%;
+    max-width: 777px;
+}
+
+.privacy-notice {
+    padding: 10px;
+    background-color: papayawhip;
+}
+
+.play-button  {
+    background-color: #FF5252 !important;
+}

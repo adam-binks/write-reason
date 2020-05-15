@@ -4,6 +4,7 @@
   "private": true,
   "homepage": "https://adam-binks.github.io/write-reason",
   "dependencies": {
+    "@react-pdf/renderer": "^1.6.8",
     "color-string": "^1.5.3",
     "dexie": "^3.0.1",
     "emotion": "^10.0.27",
@@ -17,13 +18,15 @@
     "react-scripts": "3.2.0",
     "react-split-pane": "^0.1.91",
     "react-toastify": "^5.5.0",
+    "redux": "^4.0.5",
     "slate": "^0.47.9",
     "slate-html-serializer": "^0.8.13",
     "slate-react": "^0.22.10",
     "svg.connectable.js": "^2.0.1",
     "svg.draggy.js": "^1.1.1",
     "svg.js": "^2.7.1",
-    "svg.panzoom.js": "^1.2.3"
+    "svg.panzoom.js": "^1.2.3",
+    "video-react": "^0.14.1"
   },
   "scripts": {
     "predeploy": "npm run build",

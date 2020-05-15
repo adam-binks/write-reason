@@ -34,6 +34,7 @@ const blockSource = {
             
             addSection(draggedNode, props.editor, "Body only")
             props.editor.removeNodeByKey(props.node.key)
+            props.editor.blur()
         } else {
             const document = props.editor.value.document;
             const blockParent = document.getParent(props.node.key);

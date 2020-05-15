@@ -51,13 +51,14 @@ html, body {
 }
 
 footer {
-    position: fixed;
-    left: 0;
     bottom: 0;
     padding: 20px;
-    width: 100%;
     color: dimgray;
     font-size: 70%;
     text-align: center;
-    background-color: lightgrey;
-  }
+}
+
+.button-primary {
+    background-color: #FF5252;
+    color: white;
+}
