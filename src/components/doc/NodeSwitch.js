@@ -1,4 +1,4 @@
-import { Block } from 'slate';
+import { Block, Text } from 'slate';
 import OptionPopup from '../graph/OptionPopup.js'
 import { insertSectionBlock } from './GraphPlugin.js';
 
@@ -55,6 +55,10 @@ export function deleteNode(node, editor) {
     editor.getSharedState().removeDocNode(node.data.get("node_id"))
 
     editor.removeNodeByKey(node.key)
+
+    if (editor.value.document.nodes.size === 0) {
+        editor.insertNodeByKey(editor.value.document.key, 0, getEmptyParagraph())
+    }
 }
 
 function convertFromInline(node, editor, newStyle) {
@@ -66,15 +70,17 @@ function convertFromInline(node, editor, newStyle) {
     insertSectionBlock(editor, node.data.get("node_id"), node.text, "", newStyle)    
 }
 
+function getEmptyParagraph() {
+    return Block.create({
+        type: 'paragraph'
+    })
+}
+
 function convertToInline(node, editor) {
     const shortText = node.getBlocksByType("link").get(0).text;
     // need to get 0th child because previous of section is the body inside it
     const prev = editor.value.document.getPreviousBlock(node.nodes.get(0).key)
     const next = editor.value.document.getNextBlock(node.nodes.get(1).key)
-
-    const getEmptyParagraph = () => Block.create({
-        type: 'paragraph'
-    })
 
     // if doc only contains this section, add an empty paragraph at the start to prevent emptying the doc
     if (!prev && !next) {
