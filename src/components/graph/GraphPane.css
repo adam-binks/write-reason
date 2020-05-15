@@ -43,12 +43,14 @@
     
     font-family: 'Varela Round', sans-serif;
     font-size: 1em;
+    cursor: pointer;
 }
 
 .arrow-hitbox {
     transition-property: opacity;
     transition: 0.3s;
     opacity: 0;
+    cursor: pointer;
 }
 
 .arrow-hitbox:hover {
@@ -84,10 +86,11 @@
     transition: 0.2s;
     transition-property: fill;
     fill: #4fabca !important;
+    cursor: pointer
 }
 
 .node.hovered {
-    fill: #4bbce2 !important;
+    fill: #4fc5ec !important;
 }
 
 .node.node-on-graph {
@@ -95,7 +98,7 @@
 }
 
 .node.hovered.node-on-graph {
-    fill: yellow !important;
+    fill: #FFE23F !important;
 }
 
 .hovered.node-on-graph ~ .node-text {
@@ -127,17 +130,24 @@ table { border-collapse:collapse }
 }
 
 .option-row-selected {
-    background-color: rgb(236, 236, 236);
+    background-color: papayawhip;
+}
+
+.option-row {
+    transition: 0.2s;
+    transition-property: background-color;
+    cursor: pointer
 }
 
 .option-row:hover {
-    background-color: rgb(242, 242, 242);
+    background-color: #FFE23F;
 }
 
 /* is only for completed lines, not potential ones */
 .connector-line {
     transition: 0.1s;
     transition-property: opacity;
+    cursor: pointer
 }
 
 .connector-line:hover {

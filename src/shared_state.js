@@ -4,6 +4,9 @@ import Html from 'slate-html-serializer'
 import Logger from './logging'
 import db from './db.js'
 import { toast } from 'react-toastify';
+import { pdf, Document, Page, Text as PdfText, StyleSheet, Font } from '@react-pdf/renderer';
+import CrimsonText from './assets/CrimsonText-Regular.ttf'
+import CrimsonTextBold from './assets/CrimsonText-Bold.ttf'
 
 export default class SharedState {
     constructor(db_id, params) {      
@@ -29,7 +32,8 @@ export default class SharedState {
         
         this.downloadExperimentData = this.downloadExperimentData.bind(this);
         this.editorHasLoaded = this.editorHasLoaded.bind(this);
-        this.save = this.save.bind(this)        
+        this.save = this.save.bind(this)
+        this.exportPDF = this.exportPDF.bind(this)
 
         // when the tab is closed, if the document has been edited, warn before closing
         window.onbeforeunload = (e) => {
@@ -48,6 +52,8 @@ export default class SharedState {
                 this.node_id_counter = project.node_id_counter ? project.node_id_counter : 0
                 this.map = project.map ? this.mapFromJSON(project.map) : {}
                 this.getEditor().mapHasLoaded()
+                this.projectName = project.name
+                document.title = this.projectName + " - Write Reason"
             })
         
         this.lastSavedDocumentState = this.getEditor().getValue().document // editor is definitely not dirty right now
@@ -70,6 +76,7 @@ export default class SharedState {
                 } else {
                     toast.info('Changes saved!')
                     this.lastSavedDocumentState = this.getEditor().getValue().document
+                    this.logger.logSaveState(changes)
                 }
             }).catch(err => {
                 toast.error('Save error: ' + err.toString())
@@ -172,7 +179,7 @@ export default class SharedState {
         })
     }
 
-    getArgumentMarkdown() {
+    getArgumentHTML() {
         const parentStyleIs = (node, styleToCheck) => {
             const parent = this.getEditor().value.document.getParent(node.key)
             return parent && parent.data.get("nodeStyle") === styleToCheck
@@ -212,15 +219,78 @@ export default class SharedState {
                                 }
 
                             default:
-                                return undefined;
+                                return undefined
                         }
+                    } else if(node.object === 'string') {
+                        return node.text
                     }
                 } 
             }
         ]
 
         const serializer = new Html({rules: RULES})
-        var output = serializer.serialize(this.getEditor().value)
+        return serializer.serialize(this.getEditor().value)
+    }
+
+    exportPDF() {
+        this.logger.getLog(log => {
+            const element = document.createElement("a");
+            this.getReactPdfDocument().then(file => {            
+                element.href = URL.createObjectURL(file);
+                element.download = this.projectName + ".pdf";
+                document.body.appendChild(element); // Required for this to work in FireFox
+                element.click();
+            })
+        })
+    }
+
+    getReactPdfDocument() {
+        const markdown = this.getArgumentMarkdown()
+
+        Font.register({family: 'Crimson Text', fonts: [
+            {src: CrimsonText},
+            {src: CrimsonTextBold, fontWeight: 800}
+        ]})
+
+        const styles = StyleSheet.create({
+            page: {
+                padding: 80
+            },
+            text: {
+                fontFamily: "Crimson Text",
+                width: "100%",
+                fontSize: "12pt",
+                paddingBottom: 8,
+            },
+            heading: {
+                fontFamily: "Crimson Text",
+                textDecoration: "underline",
+                fontWeight: 800,
+                width: "100%",
+                fontSize: "12pt"
+            }
+        })
+
+        const document = (
+            <Document>
+                <Page style={styles.page}>
+                    {markdown.split('\n').map(line => {                        
+                        if (line.startsWith('##')) { // markdown heading
+                            line = line.substring('##'.length)
+                            return <PdfText style={styles.heading}>{line}</PdfText>
+                        }
+
+                        return <PdfText style={styles.text}>{line}</PdfText>
+                        }
+                    )}
+                </Page>
+            </Document>
+        )
+        return pdf(document).toBlob()
+    }
+
+    getArgumentMarkdown() {
+        var output = this.getArgumentHTML()
         
         var tagReplacements = [
             {regex: /<p>\s*<\/p>/g},  // special rule for removing empty paragraphs without inserting a newline
@@ -237,6 +307,12 @@ export default class SharedState {
         tagReplacements.forEach((replacement) => {
             output = output.replace(replacement.regex, replacement.replace ? replacement.replace : "")
         })
+
+        // unescape HTML entities, eg replace '&amp' with '&'
+        var element = document.createElement("span")
+        element.innerHTML = output
+        output = element.innerText
+
         return output
     }
 

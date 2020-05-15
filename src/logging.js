@@ -47,6 +47,27 @@ export default class Logger {
         })
     }
 
+    // keep a history of the save states so that we can look back at how the project developed
+    logSaveState(save) {
+        this.getLog(log => {
+            if (log.saves === undefined) {
+                log.saves = []
+            }
+
+            // don't store this save if we have stored a save <3 minutes ago
+            // to prevent multiple clicks of the save button taking up lots of space
+            const timestamp = new Date()
+            const THREE_MINUTES = 3 * 60 * 1000; // ms
+            if (!log.saves.find(save => (timestamp - save.timestamp < THREE_MINUTES))) {
+                log.saves.push({
+                    timestamp: timestamp,
+                    ...save,
+                })
+                this.setLog(log)
+            }
+        })
+    }
+
     getLog(callback) {
         db.table('projects')
             .get(this.db_id)

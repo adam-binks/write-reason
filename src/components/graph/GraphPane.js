@@ -46,7 +46,16 @@ class GraphPane extends React.Component {
                     return;
                 }
 
-                this.addNodeAtScreenLocation(svg, nodes, mouse_follower, "", e.clientX, e.clientY, true);
+                var x = e.clientX
+                if (x + 200 > window.innerWidth) {
+                    x = window.innerWidth - 200
+                }
+                var y = e.clientY
+                if (y + 60 > window.innerHeight) {
+                    y = window.innerHeight - 60
+                }
+
+                this.addNodeAtScreenLocation(svg, nodes, mouse_follower, "", x, y, true);
             });
 
             this.setupTextDropping(svg, nodes, mouse_follower);
@@ -63,6 +72,12 @@ class GraphPane extends React.Component {
             });
 
             this.props.sharedState.addGraphNode = (text, x, y, doNotDeleteIfEmptyText) => {
+                if (x + 200 > window.innerWidth) {
+                    x = window.innerWidth - 200
+                }
+                if (y + 60 > window.innerHeight) {
+                    y = window.innerHeight - 60
+                }
                 return this.addNodeAtScreenLocation(svg, nodes, mouse_follower, text, x, y, true, doNotDeleteIfEmptyText)
             }
             if (json && json.nodes) {
@@ -123,7 +138,15 @@ class GraphPane extends React.Component {
                 return
             }
 
-            var node = this.addNodeAtScreenLocation(svg, nodes, mouse_follower, data, e.clientX, e.clientY, false);
+            var x = e.clientX
+            if (x + 200 > window.innerWidth) {
+                x = window.innerWidth - 200
+            }
+            var y = e.clientY
+            if (y + 60 > window.innerHeight) {
+                y = window.innerHeight - 60
+            }
+            var node = this.addNodeAtScreenLocation(svg, nodes, mouse_follower, data, x, y, false);
             this.props.sharedState.addLinkAtSelection(node.id, node);
             this.props.sharedState.logger.logEvent({'type': 'node_create_from_doc', 'node_id': node.id, 'text': data});
             document.activeElement.blur();

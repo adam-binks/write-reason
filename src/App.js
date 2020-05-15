@@ -11,6 +11,7 @@ import Backend from 'react-dnd-html5-backend'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import SaveButton from './components/experiment/SaveButton';
+import IntroSection from './components/loadproject/IntroSection';
 
 
 export default class App extends Component {
@@ -58,7 +59,8 @@ export default class App extends Component {
             case "loadproject":
                 return (
                     <>
-                        <LoadProject transitionToEditor={this.transitionToEditor} autoload={39} />
+                        <IntroSection />
+                        <LoadProject transitionToEditor={this.transitionToEditor} autoload={false} />
                         {this.state.storageUsed && <footer>Storage used: {this.state.storageUsed}%</footer>}
                     </>
                 )

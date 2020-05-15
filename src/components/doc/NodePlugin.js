@@ -164,7 +164,7 @@ export default function LinkPlugin(options) {
 
             // if a whole section (block or inline) is deleted, tell the graph node
             if ((e.key === 'Backspace' || e.key === 'Delete') && selection.isExpanded) {
-                document.getNodesAtRange(selection).forEach(node => {
+                document.getDescendantsAtRange(selection).forEach(node => {
                     if (node.type === 'section' || node.type === 'link') {
                         // it's not certain whether the section will be deleted, as it may only be partially selected
                         // so check in 0 seconds, once the deletion happens, whether that's the case

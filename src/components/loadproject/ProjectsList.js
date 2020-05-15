@@ -7,28 +7,29 @@ export default class ProjectsList extends Component {
                 <table className='pure-table'>
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th></th>
-                            <th></th>
-                            <th></th>
+                            {/* {(process.env.NODE_ENV === 'development') && <th>ID</th>} */}
+                            <th>Project</th>
                             <th></th>
                         </tr>
                     </thead>
                     <tbody>
                         {
                             this.props.projects.map(project => <tr key={project.id.toString()}>
-                                <td>{project.id}</td>
+                                {/* {(process.env.NODE_ENV === 'development') && <td>{project.id}</td>} */}
                                 <td>{project.name}</td>
-                                <td><button className="pure-button" onClick={() => this.props.loadProject(project.id)}>Open</button></td>
-                                <td><button className="pure-button" onClick={() => this.props.renameProject(project.id)}>Rename</button></td>
-                                <td><button className="pure-button" onClick={() => this.props.duplicateProject(project.id)}>Duplicate</button></td>
-                                <td><button className="pure-button" onClick={() => this.props.deleteProject(project.id)}>Delete</button></td>
+                                <td>
+                                    <div className="pure-button-group" role="group" aria-label="...">
+                                        <button className="pure-button" onClick={() => this.props.loadProject(project.id)}>Open</button>
+                                        <button className="pure-button" onClick={() => this.props.renameProject(project.id)}>Rename</button>
+                                        <button className="pure-button" onClick={() => this.props.duplicateProject(project.id)}>Duplicate</button>
+                                        <button className="pure-button" onClick={() => this.props.deleteProject(project.id)}>Delete</button>
+                                    </div>
+                                </td>
                             </tr>)
                         }
                     </tbody>
                 </table>
             </div>
-        );
+        )
       }
 }
