@@ -59,9 +59,12 @@ export default function GraphPlugin(options) {
                             if ((child_index === 0 && nodeStyle === "Body only") || (child_index === 1 && nodeStyle === "Heading only")) {
                                 editor.removeNodeByKey(child.key)
                             } else {
-                                editor.moveNodeByKey(child.key, editor.value.document.key, section_index + child_index + 1)
+                                // offset varies because the link node has already been removed if body only
+                                const destOffset = (child_index === 1 && nodeStyle === "Body only") ? 1 : child_index + 1
+                                editor.moveNodeByKey(child.key, editor.value.document.key, section_index + destOffset)
                             }
-                            child_index ++
+
+                            child_index++
                         });
                     }
                     editor.removeNodeByKey(node.key)
@@ -87,6 +90,9 @@ export function addSection(draggedNode, editor, initialNodeStyle="Heading and bo
 }
 
 export function insertSectionBlock(editor, id, text, longText, initialNodeStyle) {
+    // if its an empty document, prevent a blank node being shown above the section added
+    const removeFirstNode = editor.value.document.nodes.size === 1 && editor.value.document.text === ""
+    
     var link = Block.create({
         type: 'link',
         data: {node_id: id},
@@ -103,10 +109,14 @@ export function insertSectionBlock(editor, id, text, longText, initialNodeStyle)
         type: 'section',
         data: {node_id: id, nodeStyle: initialNodeStyle},
         nodes: [link, body]
-    })    
-    
+    })
+
     editor.insertBlock(section);
     editor.moveToEndOfNode(section)
+
+    if (removeFirstNode) {
+        editor.removeNodeByKey(editor.value.document.nodes.get(0).key)
+    }
 
     return section
 }

@@ -184,10 +184,9 @@ export default function LinkPlugin(options) {
                         if (startBlock.text === "") {
                             editor.removeNodeByKey(startBlock.key)
                         }
+                        return
                     }
                 }
-
-                
             }
 
             // prevent backspace from merging body and link blocks with previous
