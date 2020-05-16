@@ -1,4 +1,4 @@
-import { Block, Text } from 'slate';
+import { Block } from 'slate';
 import OptionPopup from '../graph/OptionPopup.js'
 import { insertSectionBlock } from './GraphPlugin.js';
 

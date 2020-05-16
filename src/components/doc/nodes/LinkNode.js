@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
-import { showNodeSwitchMenu } from '../NodeSwitch';
+import React, { Component } from 'react'
+import StyleButton from '../StyleButton'
 
-class LinkNode extends Component {
+export default class LinkNode extends Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -48,13 +48,11 @@ class LinkNode extends Component {
             return (
                 <p className={classes} {...this.props.attributes}
                         onMouseEnter={() => this.setHover(true)} 
-                        onMouseLeave={() => this.setHover(false)}
-                        onContextMenu={(e) => showNodeSwitchMenu(e, this.props.node, this.props.editor)}>
+                        onMouseLeave={() => this.setHover(false)}>
                     {this.props.children}
+                    <StyleButton node={this.props.node} editor={this.props.editor} nodeStyle='inline' show={this.state.hover} />
                 </p>
             );
         }
     }
 }
-
-export default LinkNode;
