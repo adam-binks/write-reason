@@ -23,8 +23,8 @@
 }
 
 .logo {
-    width: 40%;
-    max-width: 777px;
+    width: 320px;
+    min-height: 110px; 
 }
 
 .privacy-notice {

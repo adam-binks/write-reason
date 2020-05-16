@@ -94,6 +94,31 @@
     animation: pulse 2s infinite;
 }
 
+.style-button {
+    padding: 3px;
+}
+
+.not-visible {
+    display: none;
+    transition: 2s;
+}
+
+.style-button-section {
+    float: right;
+}
+
+.style-button-inline {
+    padding: 0;
+    position: relative;
+    bottom: 5px;
+}
+
+.eye-icon {
+    content: url('https://api.iconify.design/heroicons:md-eye.svg?height=20');
+    vertical-align: -5em; /*-0.125em;*/
+    margin: 0;
+}
+
 @keyframes pulse {
     0% {
         background-color: yellowgreen;

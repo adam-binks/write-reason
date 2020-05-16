@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import DragifyBlock from '../DragifyBlock';
 import DropifyBlock from '../DropifyBlock';
 import { handleMouseUp } from '../GraphPlugin';
-import { showNodeSwitchMenu, getNodeStyleClass } from '../NodeSwitch';
+import { getNodeStyleClass } from '../NodeSwitch';
+import StyleButton from '../StyleButton';
 
 class SectionNode extends Component {
     constructor(props) {
@@ -36,7 +37,6 @@ class SectionNode extends Component {
         var hoverClass = (this.state.externalHover || cursorInside) ? " hovered" : "";
         var classes = "section plain-block " + hoverClass  + (isDragging ? " display-none" : "");
         classes += getNodeStyleClass(this.props.node.data.get("nodeStyle"))
-        
 
         return connectDropTarget(
             <div className='block-outer-div'>
@@ -44,8 +44,8 @@ class SectionNode extends Component {
                 <div className={classes} {...this.props.attributes} 
                         onMouseEnter={() => this.setHover(true)} onMouseOver={() => this.setHover(true)} onMouseLeave={() => this.setHover(false)} 
                         onMouseUp={() => {handleMouseUp(this.props.editor, this.props.node) && this.setState({hover: false})}}
-                        onContextMenu={(e) => showNodeSwitchMenu(e, this.props.node, this.props.editor)}
                         ref={connectDragSource}>
+                    {this.state.hover && <StyleButton node={this.props.node} editor={this.props.editor} nodeStyle='section' show={this.state.hover} />}
                     {this.props.children}
                 </div>
                 {(isOverCurrent && this.state.overHalf && <div className="drop-indicator" />)}
