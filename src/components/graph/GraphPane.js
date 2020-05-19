@@ -18,16 +18,38 @@ class GraphPane extends React.Component {
 
             this.$el = document.querySelector("#graph")
 
-            var svg = new SVG(this.$el).size("100%", "100%").panZoom({ zoomMin: 1, zoomMax: 1 }); // just pan, no zoom
+            var svg = new SVG(this.$el).size("100%", "100%").panZoom({ zoomMin: 0.2, zoomMax: 1, zoomFactor: 0.1 }); // just pan, no zoom
+            this.zoomCanvasTo = (level, pos, cb) => {
+                if (Math.abs(svg.zoom() - level) < 0.01) { // it doesn't zoom to the exact number
+                    if (cb) { cb() }
+                } else {
+                    const runner = svg.animate({duration: 100, ease: '>'})
+                        .zoom(level, pos)
+                    
+                    if (cb) { runner.after(cb) }
+                }
+            }
+
+            // do a cool zoom in effect on load
+            svg.zoom(0.8)
+            this.zoomCanvasTo(1)
 
             SVG.extend(SVG.Element, {
-                getScreenCoords: function () {
-                    var root_point = this.doc().node.getBoundingClientRect();
-                    var point = this.point(0, 0);
-                    return {
-                        x: -point.x - root_point.left,
-                        y: -point.y - root_point.top
-                    };
+                getScreenCoords: function (zone) {
+                    var root_point = this.doc().node.getBoundingClientRect()
+                    var point = this.node.getBoundingClientRect()
+
+                    if (zone === 'centre') {
+                        return {
+                            x: (point.left + point.right) / 2 - root_point.left,
+                            y: (point.top + point.bottom) / 2 - root_point.top
+                        }
+                    } else {
+                        return {
+                            x: point.x - root_point.left,
+                            y: point.y - root_point.top
+                        }
+                    }
                 }
             })
 
@@ -60,9 +82,11 @@ class GraphPane extends React.Component {
 
             this.setupTextDropping(svg, nodes, mouse_follower);
 
-            svg.on('panStart', (e) => {
+            const blurActiveElement = (e) => {
                 document.activeElement.blur();
-            });
+            }
+            svg.on('panStart', blurActiveElement)
+            svg.on('zoom', blurActiveElement)
 
             var textarea = document.querySelector('#nodeedit');
             textarea.setAttribute('style', 'height:' + (textarea.scrollHeight) + 'px;overflow-y:hidden;');
@@ -105,7 +129,7 @@ class GraphPane extends React.Component {
     }
 
     loadNodesFromJSON(json, mouse_follower, nodes) {
-        this.nodesList = json.map(nodeJSON => GraphNode.fromJSON(nodeJSON, nodes, mouse_follower, this.props.sharedState, () => this.nodesList))
+        this.nodesList = json.map(nodeJSON => GraphNode.fromJSON(nodeJSON, nodes, mouse_follower, this.props.sharedState, () => this.nodesList, this.zoomCanvasTo))
     }
 
     addNoNodesIndicator(svg, nodes, mouse_follower) {
@@ -166,7 +190,7 @@ class GraphPane extends React.Component {
             id: undefined, // set automatically
             doNotDeleteIfEmptyText: doNotDeleteIfEmptyText
         }
-        var node = new GraphNode(params, nodes, mouse_follower, this.props.sharedState, focus_text_area, () => this.nodesList);
+        var node = new GraphNode(params, nodes, mouse_follower, this.props.sharedState, focus_text_area, () => this.nodesList, this.zoomCanvasTo);
         this.nodesList.push(node);
 
         if (this.noNodesIndicator) {
