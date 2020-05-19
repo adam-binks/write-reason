@@ -201,9 +201,9 @@ export default class MouseFollower {
 
         var connector = this.draw_arrow(this.drawing_arrow_from, end_node, COMPLETED_ARROW_COLOUR)
 
-        var c1 = this.drawing_arrow_from.group.getScreenCoords();
-        var c2 = end_node.group.getScreenCoords();
-        var midpoint = [(c1.x + c2.x) / 2, (c1.y + c2.y) / 2]
+        var c1 = this.drawing_arrow_from.group.getScreenCoords('centre')
+        var c2 = end_node.group.getScreenCoords('centre')
+        var midpoint = {x: (c1.x + c2.x) / 2, y: (c1.y + c2.y) / 2}
 
         // only add the arrow to the list of completed arrows once a colour is selected
         // to prevent weird states being saved and loaded
@@ -221,7 +221,7 @@ export default class MouseFollower {
             this.add_context_menu_to_arrow(connector, arrowObject)
         }
 
-        this.edit_connector_type(connector, midpoint[0], midpoint[1], false, colourWasSelected);
+        this.edit_connector_type(connector, midpoint.x, midpoint.y, false, colourWasSelected);
 
         this.shared_state.logger.logEvent({'type': 'arrow_create', 'id': connector.id, 'source': this.drawing_arrow_from.id, 'target': end_node.id});
         this.stop_drawing_arrow();

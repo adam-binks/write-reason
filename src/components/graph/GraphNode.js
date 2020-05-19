@@ -3,11 +3,12 @@ import OptionPopup from "./OptionPopup";
 var ARROW_HITBOX_MARGIN = 20;
 
 class GraphNode {
-    constructor(params, nodes, mouse_follower, shared_state, focus_text_area, getNodesList) {
+    constructor(params, nodes, mouse_follower, shared_state, focus_text_area, getNodesList, zoomCanvasTo) {
         var { shortText, x, y, width, height, id, isOnGraph, longText } = params
         this.id = id ? id : shared_state.getNodeId();
 
-        this.getNodesList = getNodesList;
+        this.getNodesList = getNodesList
+        this.zoomCanvasTo = zoomCanvasTo
         
         this.group = nodes.group().translate(x, y);
 
@@ -47,14 +48,14 @@ class GraphNode {
         }
     }
 
-    static fromJSON(json, nodes, mouse_follower, shared_state, getNodesList) {
+    static fromJSON(json, nodes, mouse_follower, shared_state, getNodesList, zoomCanvasTo) {
         var params = json
         params.x = json.screenCoords.x
         params.y = json.screenCoords.y
         params.width = 200
         params.height = 42
         params.isFromJSON = true
-        return new GraphNode(params, nodes, mouse_follower, shared_state, false, getNodesList)
+        return new GraphNode(params, nodes, mouse_follower, shared_state, false, getNodesList, zoomCanvasTo)
     }
 
     toJSON() {
@@ -300,55 +301,57 @@ class GraphNode {
     editText(shared_state, delete_if_empty_text = false) {
         document.activeElement.blur(); // remove focus from everything
 
-        var textarea = document.querySelector('#nodeedit');
-        textarea.value = this.getShortText();
+        this.zoomCanvasTo(1, {x: this.group.cx(), y: this.group.cy()}, () => {
+            var textarea = document.querySelector('#nodeedit');
+            textarea.value = this.getShortText();
 
-        const preEditText = this.getShortText()
+            const preEditText = this.getShortText()
 
-        var screen_coords = this.group.getScreenCoords();
-        textarea.style.left = screen_coords.x + "px";
-        textarea.style.top = screen_coords.y + "px";
-        textarea.style.display = "inline-block";
-        textarea.focus();
+            var screen_coords = this.rect.getScreenCoords();
+            textarea.style.left = screen_coords.x + "px";
+            textarea.style.top = screen_coords.y + "px";
+            textarea.style.display = "inline-block";
+            textarea.focus();
 
-        textarea.style.width = "180px";
-        textarea.style.height = 'auto';
-        textarea.style.height = (textarea.scrollHeight) + 'px';
+            textarea.style.width = "180px";
+            textarea.style.height = 'auto';
+            textarea.style.height = (textarea.scrollHeight) + 'px';
 
-        this.text.hide();
+            this.text.hide();
 
-        this.editRect.addClass('visible')
-        this.setHoverer('editNodeDirectly', true)
+            this.editRect.addClass('visible')
+            this.setHoverer('editNodeDirectly', true)
 
-        var save_changes = () => {
-            this.updateShortText(textarea.value);
-            shared_state.updateDocShortText(this.id, this.getShortText());
-        };
-        var save_and_hide = () => {
-            save_changes();
-            textarea.style.display = "none";
-            if (delete_if_empty_text && (!this.text.text() || this.text.text() === "")) {
-                this.delete(shared_state);
-            }
-            this.text.show();
-            this.updateShortText(this.shortText);
-
-            if (this.getShortText() !== preEditText) {
-                shared_state.logger.logEvent({'type': 'node_edit_short_text', 'id': this.id, 'text': this.shortText});
-            }
-
-            this.editRect.removeClass('visible')
-            this.setHoverer('editNodeDirectly', false)
-        };
-        textarea.onblur = save_and_hide;
-        textarea.onkeyup = (e) => {
-            if (e.key === "Escape" || e.key === "Esc" || e.key === "Enter") {
-                e.preventDefault();
-                document.activeElement.blur();
-            } else {
+            var save_changes = () => {
+                this.updateShortText(textarea.value);
+                shared_state.updateDocShortText(this.id, this.getShortText());
+            };
+            var save_and_hide = () => {
                 save_changes();
-            }
-        };
+                textarea.style.display = "none";
+                if (delete_if_empty_text && (!this.text.text() || this.text.text() === "")) {
+                    this.delete(shared_state);
+                }
+                this.text.show();
+                this.updateShortText(this.shortText);
+
+                if (this.getShortText() !== preEditText) {
+                    shared_state.logger.logEvent({'type': 'node_edit_short_text', 'id': this.id, 'text': this.shortText});
+                }
+
+                this.editRect.removeClass('visible')
+                this.setHoverer('editNodeDirectly', false)
+            };
+            textarea.onblur = save_and_hide;
+            textarea.onkeyup = (e) => {
+                if (e.key === "Escape" || e.key === "Esc" || e.key === "Enter") {
+                    e.preventDefault();
+                    document.activeElement.blur();
+                } else {
+                    save_changes();
+                }
+            };
+        })
     }
 
     delete(shared_state) {

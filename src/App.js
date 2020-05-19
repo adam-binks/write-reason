@@ -64,7 +64,7 @@ export default class App extends Component {
                 return (
                     <>
                         <IntroSection />
-                        <LoadProject transitionToEditor={this.transitionToEditor} autoload={false} />
+                        <LoadProject transitionToEditor={this.transitionToEditor} autoload={39} />
                         {this.state.storageUsed && <footer>Storage used: {this.state.storageUsed}%</footer>}
                     </>
                 )

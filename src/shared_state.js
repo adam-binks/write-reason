@@ -8,8 +8,6 @@ import { pdf, Document, Page, Text as PdfText, StyleSheet, Font } from '@react-p
 import CrimsonText from './assets/CrimsonText-Regular.ttf'
 import CrimsonTextBold from './assets/CrimsonText-Bold.ttf'
 
-const MARKDOWN_BOLD = "__**__"
-const MARKDOWN_ITALICS = "__*__"
 
 export default class SharedState {
     constructor(db_id, params) {      
@@ -191,7 +189,7 @@ export default class SharedState {
         const RULES = [
             {
                 serialize: (node, children) => {
-                    if (["block", "inline", "mark"].includes(node.object)) {
+                    if (["block", "inline"].includes(node.object)) {
                         switch(node.type) {
                             case 'paragraph':
                             case '':
@@ -220,12 +218,6 @@ export default class SharedState {
                                         return <h2>{children}</h2>
                                     }
                                 }
-                            
-                            case 'bold':
-                                return <b>{children}</b>
-                            
-                            case 'italics':
-                                return <i>{children}</i>
 
                             default:
                                 return undefined
