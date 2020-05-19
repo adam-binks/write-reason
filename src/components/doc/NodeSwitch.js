@@ -67,7 +67,11 @@ function convertFromInline(node, editor, newStyle) {
     if (parent && parent.text === node.text) {
         editor.moveToRangeOfNode(parent)
     }
-    insertSectionBlock(editor, node.data.get("node_id"), node.text, "", newStyle)    
+
+    const graphNode = editor.getSharedState().getGraphNode(node.data.get('node_id'))
+    const longText = graphNode && graphNode.longText ? graphNode.longText : ""
+
+    insertSectionBlock(editor, node.data.get("node_id"), node.text, longText, newStyle)    
 }
 
 function getEmptyParagraph() {
@@ -102,6 +106,9 @@ function convertToInline(node, editor) {
             data: {node_id: node.data.get("node_id"), nodeStyle: "Inline"},
         })
         .insertText(shortText)
+    
+    // prevent rare bug where style is changed inline > section > inline, and doc-graph link is severed
+    setTimeout(() => {editor.focus(); editor.moveForward(); editor.moveBackward()}, 0)
 }
 
 export const getNodeStyleClass = (verbose) => {

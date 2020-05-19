@@ -50,7 +50,7 @@ export default class LinkNode extends Component {
                         onMouseEnter={() => this.setHover(true)} 
                         onMouseLeave={() => this.setHover(false)}>
                     {this.props.children}
-                    <StyleButton node={this.props.node} editor={this.props.editor} nodeStyle='inline' show={this.state.hover} />
+                    {this.state.hover && <StyleButton node={this.props.node} editor={this.props.editor} nodeStyle='inline' />}
                 </p>
             );
         }

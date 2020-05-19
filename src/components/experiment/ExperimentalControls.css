@@ -4,6 +4,10 @@
     right: 30px;
 }
 
+.experiment-controls button {
+    margin-left: 5px;
+}
+
 .countdown {
     color: grey;
     margin-right: 20px;

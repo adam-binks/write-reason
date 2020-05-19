@@ -8,6 +8,9 @@ import { pdf, Document, Page, Text as PdfText, StyleSheet, Font } from '@react-p
 import CrimsonText from './assets/CrimsonText-Regular.ttf'
 import CrimsonTextBold from './assets/CrimsonText-Bold.ttf'
 
+const MARKDOWN_BOLD = "__**__"
+const MARKDOWN_ITALICS = "__*__"
+
 export default class SharedState {
     constructor(db_id, params) {      
         this.logger = new Logger(db_id, params)
@@ -26,7 +29,6 @@ export default class SharedState {
 
         // log entire document content every 30 seconds
         this.intervalLogger = window.setInterval(() => {
-            this.logger.logEvent({'type': 'document_content_detailed', 'content': this.getEditor().getValue()});
             this.logger.logEvent({'type': 'document_content_markdown', 'content': this.getArgumentMarkdown()});
         }, 30000);
         
@@ -59,7 +61,7 @@ export default class SharedState {
         this.lastSavedDocumentState = this.getEditor().getValue().document // editor is definitely not dirty right now
     }
 
-    save() {
+    save(cb=undefined, forceLog=false) {
         const changes = {
             map: this.mapToJSON(),
             node_id_counter: this.node_id_counter,
@@ -76,13 +78,17 @@ export default class SharedState {
                 } else {
                     toast.info('Changes saved!')
                     this.lastSavedDocumentState = this.getEditor().getValue().document
-                    this.logger.logSaveState(changes)
+                    this.logger.logSaveState(changes, forceLog)
                 }
             }).catch(err => {
                 toast.error('Save error: ' + err.toString())
             })
             
         this.logger.logEvent({'type': 'save'})
+
+        if (cb) {
+            cb()
+        }
     }
 
     getStateIsDirty() {
@@ -163,20 +169,17 @@ export default class SharedState {
     }
 
     downloadExperimentData() {
-        this.logger.getLog(log => {
-            const element = document.createElement("a");
-            const data = {
-                params: this.params,
-                argument: this.getArgumentMarkdown(),
-                logs: log
-            }
-            const file = new Blob([JSON.stringify(data, null, 2)], {type: 'text/plain'});
-    
-            element.href = URL.createObjectURL(file);
-            element.download = this.logger.getExperimentId() + ".json";
-            document.body.appendChild(element); // Required for this to work in FireFox
-            element.click();
-        })
+        // save first to log the latest document version
+        this.save(() => {
+            this.logger.getLog(log => {
+                const data = {
+                    timestamp: new Date(),
+                    essay: this.getArgumentMarkdown(),
+                    logs: log
+                }
+                this.downloadJSON(data, this.projectName + '_logs.json')
+            })
+        }, true)
     }
 
     getArgumentHTML() {
@@ -188,7 +191,7 @@ export default class SharedState {
         const RULES = [
             {
                 serialize: (node, children) => {
-                    if (["block", "inline"].includes(node.object)) {
+                    if (["block", "inline", "mark"].includes(node.object)) {
                         switch(node.type) {
                             case 'paragraph':
                             case '':
@@ -217,6 +220,12 @@ export default class SharedState {
                                         return <h2>{children}</h2>
                                     }
                                 }
+                            
+                            case 'bold':
+                                return <b>{children}</b>
+                            
+                            case 'italics':
+                                return <i>{children}</i>
 
                             default:
                                 return undefined
@@ -232,14 +241,23 @@ export default class SharedState {
         return serializer.serialize(this.getEditor().value)
     }
 
+    downloadJSON(json, filename) {
+        const file = new Blob([JSON.stringify(json, null, 2)], {type: 'text/plain'})
+        this.downloadBlob(file, filename)
+    }
+
+    downloadBlob(blob, filename) {
+        const element = document.createElement("a");
+        element.href = URL.createObjectURL(blob);
+        element.download = filename;
+        document.body.appendChild(element); // Required for this to work in FireFox
+        element.click();
+    }
+
     exportPDF() {
         this.logger.getLog(log => {
-            const element = document.createElement("a");
-            this.getReactPdfDocument().then(file => {            
-                element.href = URL.createObjectURL(file);
-                element.download = this.projectName + ".pdf";
-                document.body.appendChild(element); // Required for this to work in FireFox
-                element.click();
+            this.getReactPdfDocument().then(file => {      
+                this.downloadBlob(file, this.projectName + ".pdf")
             })
         })
     }

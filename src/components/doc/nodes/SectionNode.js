@@ -45,7 +45,7 @@ class SectionNode extends Component {
                         onMouseEnter={() => this.setHover(true)} onMouseOver={() => this.setHover(true)} onMouseLeave={() => this.setHover(false)} 
                         onMouseUp={() => {handleMouseUp(this.props.editor, this.props.node) && this.setState({hover: false})}}
                         ref={connectDragSource}>
-                    {this.state.hover && <StyleButton node={this.props.node} editor={this.props.editor} nodeStyle='section' show={this.state.hover} />}
+                    {this.state.hover && <StyleButton node={this.props.node} editor={this.props.editor} nodeStyle='section' />}
                     {this.props.children}
                 </div>
                 {(isOverCurrent && this.state.overHalf && <div className="drop-indicator" />)}
