@@ -2,39 +2,41 @@ import ReactDOM from 'react-dom';
 import { DropTarget } from "react-dnd";
 import { ItemTypes } from "../../dragtypes";
 
+export function isOverHalf(component, event) {
+    // calculate based on height of firstChild because if this is the last node in the doc, its outer div expands to fill the remaining vertical space
+    const outerDiv = ReactDOM.findDOMNode(component)        
+    const outerRect = outerDiv.getBoundingClientRect()
+    
+    var innerDiv;
+    for (let item of outerDiv.children) {
+        if (item.classList.contains('plain-block') || item.classList.contains('section')) {
+            innerDiv = item;
+            break;
+        }
+    }
+
+    if (!innerDiv) {
+        console.log('error: couldn\'t find the inner div!');
+        return
+    }
+    const innerRect = innerDiv.getBoundingClientRect()       
+
+    // subtract offset of the innerRect from the outerRect, to prevent the insertion of the drag indicator from affecting things
+    const offset = (innerRect.y - outerRect.y)
+    var newState = false
+    if (event.clientY + offset > (innerRect.y + innerRect.height / 2)) {
+        newState = true
+    }
+    
+    if (component.state.overHalf !== newState) {
+        component.setState({overHalf: newState});
+    }
+}
+
 const blockTarget = {
     hover(props, monitor, component) {
-        const mouse = monitor.getClientOffset();
-
-        // calculate based on height of firstChild because if this is the last node in the doc, its outer div expands to fill the remaining vertical space
-        const outerDiv = ReactDOM.findDOMNode(component)        
-        const outerRect = outerDiv.getBoundingClientRect()
-        
-        var innerDiv;
-        for (let item of outerDiv.children) {
-            if (item.classList.contains('plain-block') || item.classList.contains('section')) {
-                innerDiv = item;
-                break;
-            }
-        }
-
-        if (!innerDiv) {
-            console.log('error: couldn\'t find the inner div!');
-            return
-        }
-        const innerRect = innerDiv.getBoundingClientRect()       
-    
-        // subtract offset of the innerRect from the outerRect, to prevent the insertion of the drag indicator from affecting things
-        const offset = (innerRect.y - outerRect.y)
-        var newState = false
-        if (mouse.y + offset > (innerRect.y + innerRect.height / 2)) {
-            newState = true
-        }
-        if (component.state.overHalf !== newState) {
-            component.setState({overHalf: newState});
-        }
+        isOverHalf(component, { clientY: monitor.getClientOffset().y })
     },
-
     drop(props, monitor, component) {
         const document = props.editor.value.document;
         const blockParent = document.getParent(props.node.key);

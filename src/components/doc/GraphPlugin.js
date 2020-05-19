@@ -121,7 +121,7 @@ export function insertSectionBlock(editor, id, text, longText, initialNodeStyle)
     return section
 }
 
-export function handleMouseUp(editor, clickedNode) {
+export function handleMouseUp(editor, clickedNode, isOverHalf) {
     var draggedNode = editor.getSharedState().draggedNode;
 
     if (draggedNode) {
@@ -140,7 +140,12 @@ export function handleMouseUp(editor, clickedNode) {
                 clickedNode = document.getParent(clickedNode);
             }
 
-            editor.moveToEndOfNode(clickedNode);
+            if (isOverHalf) {
+                editor.moveToEndOfNode(clickedNode);
+            } else {
+                editor.moveToStartOfNode(clickedNode)
+                editor.moveBackward()
+            }
 
             addSection(draggedNode, editor);
 

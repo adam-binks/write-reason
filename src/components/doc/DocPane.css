@@ -116,31 +116,12 @@
 
 @keyframes pulse {
     0% {
-        background-color: yellowgreen;
+        background-color: rgb(255, 217, 0);
     }
     50% {
-        background-color: green;
+        background-color: rgba(255, 217, 0, 0.774);
     }
     100% {
-        background-color: yellowgreen;
+        background-color: rgb(255, 217, 0);
     }
-  }
-
-@media print {
-    /* .doc.pane {
-        margin: 20px;
-    } */
-
-    .section {
-        background-color: white !important;
-    }
-
-    /* @page  
-    {
-        margin: 20mm 20mm 20mm 20mm;  
-    }  */
-/* 
-    body { 
-    margin: 10mm 10mm 10mm 10mm;
-    } */
 }

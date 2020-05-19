@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import DragifyBlock from '../DragifyBlock';
-import DropifyBlock from '../DropifyBlock';
+import DropifyBlock, { isOverHalf } from '../DropifyBlock';
 import { handleMouseUp } from '../GraphPlugin';
 
 class PlainBlockNode extends Component {
@@ -22,17 +22,22 @@ class PlainBlockNode extends Component {
 
         const classes = "plain-block " + (isDragging ? " display-none" : "")
 
+        const dragOverCurrent = isOverCurrent || (this.state.hover && this.props.editor.getSharedState().draggedNode)
+
         return connectDropTarget(
-            <div className='block-outer-div'>
-                {(isOverCurrent && !this.state.overHalf && <div className="drop-indicator" />)}
-                <div className={classes} {...this.props.attributes} 
-                        onMouseUp={() => {handleMouseUp(this.props.editor, this.props.node) && this.setState({hover: false})}} 
-                        onMouseEnter={() => this.setHover(true)} onMouseOver={() => this.setHover(true)} onMouseLeave={() => this.setHover(false)}
-                        ref={connectDragSource}>
+            <div className='block-outer-div'
+                onMouseUp={() => {handleMouseUp(this.props.editor, this.props.node, this.state.overHalf) && this.setState({hover: false})}} 
+                onMouseEnter={() => this.setHover(true)}
+                onMouseOver={() => this.setHover(true)}
+                onMouseLeave={() => this.setHover(false)}
+                onMouseMove={(e) => isOverHalf(this, e)}>
+
+                {(dragOverCurrent && !this.state.overHalf && <div className="drop-indicator" />)}
+                <div className={classes} {...this.props.attributes} ref={connectDragSource}>
                     {this.props.children}
                 </div>
-                {(isOverCurrent && this.state.overHalf && <div className="drop-indicator" />)}
-                {(this.state.hover && this.props.editor.getSharedState().draggedNode) && <div className="drop-indicator" />}
+                {(dragOverCurrent && this.state.overHalf && <div className="drop-indicator" />)}
+
             </div>
         );
     }
