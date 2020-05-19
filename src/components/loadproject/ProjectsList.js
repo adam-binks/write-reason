@@ -18,7 +18,7 @@ export default class ProjectsList extends Component {
                                 {/* {(process.env.NODE_ENV === 'development') && <td>{project.id}</td>} */}
                                 <td>{project.name}</td>
                                 <td>
-                                    <div className="pure-button-group" role="group" aria-label="...">
+                                    <div className="pure-button-group" role="group" aria-label="Project controls">
                                         <button className="pure-button" onClick={() => this.props.loadProject(project.id)}>Open</button>
                                         <button className="pure-button" onClick={() => this.props.renameProject(project.id)}>Rename</button>
                                         <button className="pure-button" onClick={() => this.props.duplicateProject(project.id)}>Duplicate</button>

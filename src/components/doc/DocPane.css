@@ -98,11 +98,6 @@
     padding: 3px;
 }
 
-.not-visible {
-    display: none;
-    transition: 2s;
-}
-
 .style-button-section {
     float: right;
 }

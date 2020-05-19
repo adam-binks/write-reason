@@ -5,9 +5,10 @@ export default class ExperimentControls extends Component {
     render() {
         return (
             <div className="experiment-controls">
-                <button onClick={this.props.backToMenu}>Back</button>
-                <button onClick={this.props.sharedState.exportPDF}>Export PDF</button>
-                <button onClick={this.props.sharedState.save}>Save</button>
+                <button className='pure-button' onClick={this.props.backToMenu}>Back</button>
+                <button className='pure-button' onClick={this.props.sharedState.exportPDF}>Export PDF</button>
+                <button className='pure-button' onClick={this.props.sharedState.downloadExperimentData}>Export Logs</button>
+                <button className='pure-button button-primary' onClick={this.props.sharedState.save}>Save</button>
             </div>
         );
     }

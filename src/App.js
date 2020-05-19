@@ -40,6 +40,10 @@ export default class App extends Component {
 
     transitionToMenu() {
         if (this.state.sharedState) {
+            if (this.state.sharedState.getStateIsDirty() && !window.confirm('Are you sure you want to go back to the menu? You will lose your unsaved changes.')) {
+                return // user wants to stay on this page
+            }
+
             this.state.sharedState.finishCondition()
         }
         this.setState({
@@ -60,7 +64,7 @@ export default class App extends Component {
                 return (
                     <>
                         <IntroSection />
-                        <LoadProject transitionToEditor={this.transitionToEditor} autoload={39} />
+                        <LoadProject transitionToEditor={this.transitionToEditor} autoload={false} />
                         {this.state.storageUsed && <footer>Storage used: {this.state.storageUsed}%</footer>}
                     </>
                 )
