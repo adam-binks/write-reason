@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import DragifyBlock from '../DragifyBlock';
-import DropifyBlock from '../DropifyBlock';
+import DropifyBlock, { isOverHalf } from '../DropifyBlock';
 import { handleMouseUp } from '../GraphPlugin';
 import { getNodeStyleClass } from '../NodeSwitch';
 import StyleButton from '../StyleButton';
@@ -11,6 +11,7 @@ class SectionNode extends Component {
         this.state = {
             hover: false,
             externalHover: false,
+            overHalf: false,
         }
         this.setHover = this.setHover.bind(this);
     }
@@ -38,18 +39,23 @@ class SectionNode extends Component {
         var classes = "section plain-block " + hoverClass  + (isDragging ? " display-none" : "");
         classes += getNodeStyleClass(this.props.node.data.get("nodeStyle"))
 
+        const dragOverCurrent = isOverCurrent || (this.state.hover && this.props.editor.getSharedState().draggedNode)
+
         return connectDropTarget(
-            <div className='block-outer-div'>
-                {(isOverCurrent && !this.state.overHalf && <div className="drop-indicator" />)}
-                <div className={classes} {...this.props.attributes} 
-                        onMouseEnter={() => this.setHover(true)} onMouseOver={() => this.setHover(true)} onMouseLeave={() => this.setHover(false)} 
-                        onMouseUp={() => {handleMouseUp(this.props.editor, this.props.node) && this.setState({hover: false})}}
-                        ref={connectDragSource}>
+            <div className='block-outer-div'
+                onMouseEnter={() => this.setHover(true)}
+                onMouseOver={() => this.setHover(true)}
+                onMouseLeave={() => this.setHover(false)} 
+                onMouseUp={() => {handleMouseUp(this.props.editor, this.props.node, this.state.overHalf) && this.setState({hover: false})}}
+                onMouseMove={(e) => isOverHalf(this, e)}>
+
+                {(dragOverCurrent && !this.state.overHalf && <div className="drop-indicator" />)}
+                <div className={classes} {...this.props.attributes} ref={connectDragSource}>
                     {this.state.hover && <StyleButton node={this.props.node} editor={this.props.editor} nodeStyle='section' />}
                     {this.props.children}
                 </div>
-                {(isOverCurrent && this.state.overHalf && <div className="drop-indicator" />)}
-                {(this.state.hover && this.props.editor.getSharedState().draggedNode) && <div className="drop-indicator" />}
+                {(dragOverCurrent && this.state.overHalf && <div className="drop-indicator" />)}
+
             </div>
         );
     }
