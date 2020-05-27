@@ -11,8 +11,24 @@ import Backend from 'react-dnd-html5-backend'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import SaveButton from './components/experiment/SaveButton';
+import ExperimentInfo from './components/experiment/ExperimentInfo';
 import IntroSection from './components/loadproject/IntroSection';
+import Modal from 'react-modal'
 
+Modal.setAppElement('#root')
+const modalStyles = {
+    content : {
+      top                   : '50%',
+      left                  : '50%',
+      right                 : 'auto',
+      bottom                : 'auto',
+      marginRight           : '-50%',
+      transform             : 'translate(-50%, -50%)',
+      maxWidth              : '40%',
+      maxHeight             : '90%',
+      padding               : '50px'
+    }
+  }
 
 export default class App extends Component {
     constructor(props) {
@@ -71,13 +87,28 @@ export default class App extends Component {
             case "editor":
                 return (
                     <div className="App">
+                        <Modal
+                            isOpen={this.state.modalIsOpen}
+                            style={modalStyles}
+                            contentLabel="Experiment information"
+                            onRequestClose={() => this.setState({ modalIsOpen: false })}
+                        >
+                            <ExperimentInfo />
+                            <button className="pure-button" onClick={() => this.setState({ modalIsOpen: false })}>Close</button>
+                        </Modal>
+
                         <DndProvider backend={Backend}>
                             <SplitPane split="vertical" defaultSize="50%">
                                 <DocPane sharedState={this.state.sharedState} />
                                 <GraphPane sharedState={this.state.sharedState} />
                             </SplitPane>
-                            <SaveButton sharedState={this.state.sharedState} backToMenu={this.transitionToMenu} />
+                            <SaveButton 
+                                sharedState={this.state.sharedState}
+                                backToMenu={this.transitionToMenu} 
+                                showExperimentInfo={() => this.setState({ modalIsOpen: true })}
+                            />
                         </DndProvider>
+
                         <ToastContainer
                             position="bottom-center"
                             autoClose={5000}

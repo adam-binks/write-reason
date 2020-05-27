@@ -2,7 +2,7 @@
   "name": "write-reason",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://adam-binks.github.io/write-reason",
+  "homepage": ".",
   "dependencies": {
     "@react-pdf/renderer": "^1.6.8",
     "color-string": "^1.5.3",
@@ -15,6 +15,7 @@
     "react-dnd": "^10.0.2",
     "react-dnd-html5-backend": "^10.0.2",
     "react-dom": "^16.13.1",
+    "react-modal": "^3.11.2",
     "react-scripts": "3.2.0",
     "react-split-pane": "^0.1.91",
     "react-toastify": "^5.5.0",

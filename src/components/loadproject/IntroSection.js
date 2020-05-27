@@ -19,7 +19,7 @@ export default class IntroSection extends Component {
                 <Player src={Video} poster={Thumbnail}>
                     <BigPlayButton className='play-button' position='center' />
                 </Player>
-        <p><i>Not sure how something works? Get in touch at <a href={'mailto:' + emailAddress + '?subject=Write Reason question'}>{emailAddress}</a>.</i></p>
+                <p><i>Not sure how something works? Get in touch at <a href={'mailto:' + emailAddress + '?subject=Write Reason question'}>{emailAddress}</a>.</i></p>
             </div>
         );
       }
