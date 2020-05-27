@@ -25,10 +25,10 @@ export default class SharedState {
         this.editor_ref = undefined;
         this.graphPane = undefined;
 
-        // log entire document content every 30 seconds
+        // log entire document content every 60 seconds
         this.intervalLogger = window.setInterval(() => {
             this.logger.logEvent({'type': 'document_content_markdown', 'content': this.getArgumentMarkdown()});
-        }, 30000);
+        }, 60000);
         
         this.downloadExperimentData = this.downloadExperimentData.bind(this);
         this.editorHasLoaded = this.editorHasLoaded.bind(this);

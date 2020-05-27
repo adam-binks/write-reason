@@ -9,7 +9,7 @@ export default class ExperimentControls extends Component {
                 <button className='pure-button' onClick={this.props.showExperimentInfo}>Study participant info</button>
                 <button className='pure-button' onClick={this.props.sharedState.exportPDF}>Export PDF</button>
                 <button className='pure-button' onClick={this.props.sharedState.downloadExperimentData}>Export logs</button>
-                <button className='pure-button button-primary' onClick={this.props.sharedState.save}>Save</button>
+                <button className='pure-button button-primary' onClick={() => {this.props.sharedState.save()}}>Save</button>
             </div>
         );
     }
