@@ -169,13 +169,16 @@ export default class SharedState {
     downloadExperimentData() {
         // save first to log the latest document version
         this.save(() => {
-            this.logger.getLog(log => {
+            db.table('projects')
+            .toArray(projects => {
                 const data = {
                     timestamp: new Date(),
-                    essay: this.getArgumentMarkdown(),
-                    logs: log
+                    projects: projects
                 }
-                this.downloadJSON(data, this.projectName + '_logs.json')
+                this.downloadJSON(data, 'Write Reason logs.json')
+                
+            }).catch(err => {
+                toast.error("Error downloading logs: " + err)
             })
         }, true)
     }

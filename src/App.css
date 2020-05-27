@@ -28,7 +28,6 @@ html, body {
 .Resizer {
     background: #000;
     opacity: .2;
-    z-index: 1;
 }
 
 .Resizer.vertical {
