@@ -33,6 +33,7 @@ export default class SharedState {
         this.downloadExperimentData = this.downloadExperimentData.bind(this);
         this.editorHasLoaded = this.editorHasLoaded.bind(this);
         this.save = this.save.bind(this)
+        this.mapToJSON = this.mapToJSON.bind(this)
         this.exportPDF = this.exportPDF.bind(this)
 
         // when the tab is closed, if the document has been edited, warn before closing
@@ -118,9 +119,9 @@ export default class SharedState {
             let doc_nodes = {};
             ['section', 'long', 'short'].forEach(part => {
                 const docNodeObjects = this.getDocNodes(id)
-                if (docNodeObjects) {
-                    if (docNodeObjects[part]) {
-                        const path = document.getPath(docNodeObjects[part])
+                if (docNodeObjects && docNodeObjects[part]) {
+                    const path = document.getPath(docNodeObjects[part])
+                    if (path) {
                         doc_nodes[part] = path.toArray()
                     }
                 } 
