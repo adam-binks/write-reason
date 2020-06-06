@@ -70,7 +70,13 @@ export default class App extends Component {
 
     getStorageUsed() {
         navigator.storage.estimate().then(estimate => {
-            this.setState({ storageUsed: (estimate.usage / estimate.quota * 100).toPrecision(2) })
+            var storageUsed = estimate.usage / estimate.quota * 100
+            if (storageUsed < 0.00000005) {
+                storageUsed = 0 // prevent 10e-16 sort of thing
+            }
+            storageUsed = storageUsed.toPrecision(2)
+
+            this.setState({ storageUsed })
         });
     }
 
@@ -80,7 +86,7 @@ export default class App extends Component {
                 return (
                     <>
                         <IntroSection />
-                        <LoadProject transitionToEditor={this.transitionToEditor} autoload={false} />
+                        <LoadProject transitionToEditor={this.transitionToEditor} autoload={1} />
                         {this.state.storageUsed && <footer>Storage used: {this.state.storageUsed}%</footer>}
                     </>
                 )
