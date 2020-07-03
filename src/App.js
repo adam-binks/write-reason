@@ -14,6 +14,7 @@ import SaveButton from './components/experiment/SaveButton';
 import ExperimentInfo from './components/experiment/ExperimentInfo';
 import IntroSection from './components/loadproject/IntroSection';
 import Modal from 'react-modal'
+import { isMobile } from "react-device-detect";
 
 Modal.setAppElement('#root')
 const modalStyles = {
@@ -44,6 +45,18 @@ export default class App extends Component {
     }
 
     componentDidMount() {
+        if(window.location.search) {
+            const urlParams = new URLSearchParams(window.location.search)
+            const scenario = urlParams.get('scenario')
+
+            if (scenario !== 'biohacking' && scenario !== 'sharedSpace') {
+                console.error('Unrecognised scenario ' + scenario)
+            } else {
+                localStorage.setItem('scenario', scenario)
+                console.log(localStorage.getItem('scenario'))
+            }
+        }
+
         this.getStorageUsed()
     }
 
@@ -52,6 +65,12 @@ export default class App extends Component {
             sharedState: newSharedState,
             phase: "editor"
         })
+
+        // open the instructions modal on first load
+        if (!localStorage.getItem('hasLoadedBefore')) {
+            localStorage.setItem('hasLoadedBefore', true)
+            this.setState({ modalIsOpen: true })
+        }
     }
 
     transitionToMenu() {
@@ -81,12 +100,18 @@ export default class App extends Component {
     }
 
     render() {
+        if (isMobile) {
+            return (
+                <p>Write Reason is designed for non-mobile devices. Please access from a laptop or desktop computer.</p>
+            )
+        }
+
         switch(this.state.phase) {
             case "loadproject":
                 return (
                     <>
                         <IntroSection />
-                        <LoadProject transitionToEditor={this.transitionToEditor} autoload={1} />
+                        <LoadProject transitionToEditor={this.transitionToEditor} autoload={false} />
                         {this.state.storageUsed && <footer>Storage used: {this.state.storageUsed}%</footer>}
                     </>
                 )

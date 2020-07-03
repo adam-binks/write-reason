@@ -45,6 +45,17 @@ export default class SharedState {
         }
     }
 
+    viewFactSheet() {
+        const scenario = localStorage.getItem('scenario')
+        if (!scenario) {
+            toast.error('Fact sheet not found. Please re-open Write Reason using the link in the email we sent you.')
+            return
+        }
+
+        const factSheetURL = scenario + '_factsheet.pdf'
+        window.open(factSheetURL, '_blank')  // open in new tab
+    }
+
     // called by editor once the database saved value has been set as the document.value
     editorHasLoaded() {
         db.table('projects')
