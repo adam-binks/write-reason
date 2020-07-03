@@ -40,7 +40,7 @@ export default class ExperimentInfo extends Component {
 
                 <h3>How to work on the task</h3>
                 <ol>
-                    <li>First, click the "View fact sheet" button and read through the information</li>
+                    <li>First, <a href={this.props.sharedState.viewFactSheet}>click here to read the fact sheet</a></li>
                     <li>Spend around 1 hour 40 minutes on this task, over the next week</li>
                     <li>Aim for around 700 words as a very rough guide - though it's fine to exceed this!</li>
                     <li>Whenever you work on the task record it in the diary. <a href='/diary_template.csv' download>Download a blank diary here</a></li>
@@ -52,7 +52,7 @@ export default class ExperimentInfo extends Component {
                 <ol>
                     <li>Press the "Export logs" button in the bottom right of the screen, and keep the downloaded file somewhere safe</li>
                     <li>Make sure your diary is filled out</li>
-                    <li>Email us at <a href={'mailto:' + emailAddress + '?subject=Write Reason task complete'}>{emailAddress}</a> to arrange an interview about your experiences!
+                    <li>Email us at <a href={'mailto:' + emailAddress + '?subject=Write Reason task complete'}>{emailAddress}</a> to arrange a short interview about your experiences!
                         During the interview you will send us the logs and your diary</li>
                     <li>You will receive a £20 Amazon voucher to thank you for your time</li>
                 </ol>
