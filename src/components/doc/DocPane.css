@@ -114,6 +114,25 @@
     margin: 0;
 }
 
+.word-count {
+    position: absolute;
+    bottom: 25px;
+    left: 50px;
+    padding: 10px;
+    color: grey;
+    background-color: white;
+
+    transition: .5s all;
+    opacity: 1;
+    transition-delay: .2s;
+}
+
+.word-count:hover {
+    pointer-events: none;
+    opacity: 0.1;
+    transition-delay: 0s;
+}
+
 @keyframes pulse {
     0% {
         background-color: rgb(255, 217, 0);
