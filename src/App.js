@@ -12,6 +12,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import SaveButton from './components/experiment/SaveButton';
 import ExperimentInfo from './components/experiment/ExperimentInfo';
+import PreTaskSection from './components/loadproject/PreTaskSection';
 import IntroSection from './components/loadproject/IntroSection';
 import Modal from 'react-modal'
 import { isMobile } from "react-device-detect";
@@ -35,8 +36,15 @@ export default class App extends Component {
     constructor(props) {
         super(props);
 
+        var startPhase = 'loadproject'
+
+        // show the pre-task question if it hasn't been completed
+        if (!localStorage.getItem('preTaskSubmission')) {
+            startPhase = 'pretask'
+        }
+
         this.state = {
-            phase: "loadproject",
+            phase: startPhase,
             params: undefined
         }
 
@@ -67,8 +75,8 @@ export default class App extends Component {
         })
 
         // open the instructions modal on first load
-        if (!localStorage.getItem('hasLoadedBefore')) {
-            localStorage.setItem('hasLoadedBefore', true)
+        if (!localStorage.getItem('editorHasLoadedBefore')) {
+            localStorage.setItem('editorHasLoadedBefore', true)
             this.setState({ modalIsOpen: true })
         }
     }
@@ -107,12 +115,20 @@ export default class App extends Component {
         }
 
         switch(this.state.phase) {
+            case "pretask":
+                return (
+                    <PreTaskSection transitionToMenu={this.transitionToMenu} />
+                )
             case "loadproject":
                 return (
                     <>
                         <IntroSection />
                         <LoadProject transitionToEditor={this.transitionToEditor} autoload={false} />
-                        {this.state.storageUsed && <footer>Storage used: {this.state.storageUsed}%</footer>}
+                        <footer>
+                            {this.state.storageUsed && <p>Storage used: {this.state.storageUsed}%</p>}
+                            <p><b>Privacy notice</b>: This webpage simply downloads the Write Reason application to your browser. Once loaded, 
+                            everything runs locally in your browser. No data is sent back to the server.</p>
+                        </footer>
                     </>
                 )
             case "editor":
@@ -124,7 +140,7 @@ export default class App extends Component {
                             contentLabel="Experiment information"
                             onRequestClose={() => this.setState({ modalIsOpen: false })}
                         >
-                            <ExperimentInfo />
+                            <ExperimentInfo sharedState={this.state.sharedState}/>
                             <button className="pure-button" onClick={() => this.setState({ modalIsOpen: false })}>Close</button>
                         </Modal>
 
