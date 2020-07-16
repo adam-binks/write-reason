@@ -27,11 +27,24 @@
     min-height: 110px; 
 }
 
-.privacy-notice {
-    padding: 10px;
-    background-color: papayawhip;
-}
-
 .play-button  {
     background-color: #FF5252 !important;
+}
+
+ol.steps {
+  list-style: none;
+  counter-reset: my-awesome-counter;
+  margin: 0;
+  padding: 0;
+}
+ol.steps li {
+  counter-increment: my-awesome-counter;
+}
+ol.steps li::before {
+  content: "Step " counter(my-awesome-counter);
+  font-weight: bold;
+  font-size: 3rem;
+  margin-right: 0.5rem;
+  font-family: 'Crimson Text', serif;
+  line-height: 1;
 }

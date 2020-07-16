@@ -14,8 +14,10 @@ export default class IntroSection extends Component {
         return (
             <div className='intro-section'>
                 <img src={Logo} className='logo' alt="Write Reason"/>
-                <p className='privacy-notice'><b>Privacy notice</b>: This webpage simply downloads the Write Reason application to your browser. Once loaded, 
-                    everything runs locally in your browser. No data is sent back to the server.</p>
+
+                {!localStorage.getItem('editorHasLoadedBefore') && <h2>Thank you for your answer. Next, please watch the video 
+                            below about how to use Write Reason, then try it out!</h2> }
+
                 <Player src={Video} poster={Thumbnail}>
                     <BigPlayButton className='play-button' position='center' />
                 </Player>

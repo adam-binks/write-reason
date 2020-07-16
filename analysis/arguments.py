@@ -151,7 +151,16 @@ def generate_all_docs():
 
 
 if __name__ == '__main__':
-    import docx
-    from docx.shared import Inches
+    # import docx
+    # from docx.shared import Inches
     
-    generate_all_docs()
+    # generate_all_docs()
+
+
+    args = get_args()
+    for cond, arg in args.items():
+        for id, elements in arg.items():
+            with open(f'nvivo/{str(id)}_{elements["question"]}_{cond}.txt', 'w') as f:
+                f.write(elements["arg"])
+
+        

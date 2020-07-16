@@ -23,16 +23,11 @@ export default class ExperimentInfo extends Component {
                 <p>Thank you for participating in this study!</p>
 
                 <h3>Before you start</h3>
-                <ol>
-                    <li>Complete this <a href="https://standrews.eu.qualtrics.com/jfe/form/SV_9tYNKrCBK8uHOiV">short demographics questionnaire</a> if you haven't already. 
-                        It should take a couple of minutes</li>
-                    <li>Try out Write Reason (this website)! Watch the “How to use” video on the home page, and have a play around. If you’re unsure how anything works, or have 
-                    any other questions, email us at <a href={'mailto:' + emailAddress + '?subject=Write Reason question'}>{emailAddress}</a>.</li>
-                </ol>
+                <p>Watch the “How to use” video on the home page.</p>
 
                 <h3>The task</h3>
 
-                <p>Your task is to use Write Reason to decide where you stand on the question below, and use Write Reason to write a document justifying your view:</p>
+                <p>Your task is to decide where you stand on the question below, and write a document justifying your view. Use Write Reason for all parts of the task.</p>
 
                 {question}
 
@@ -40,11 +35,11 @@ export default class ExperimentInfo extends Component {
 
                 <h3>How to work on the task</h3>
                 <ol>
-                    <li>First, <a href={this.props.sharedState.viewFactSheet}>click here to read the fact sheet</a></li>
+                    <li>First, <a href="#factsheet" onClick={(e) => {e.preventDefault(); this.props.sharedState.viewFactSheet()}}>click here to read the fact sheet</a></li>
                     <li>Spend around 1 hour 40 minutes on this task, over the next week</li>
                     <li>Aim for around 700 words as a very rough guide - though it's fine to exceed this!</li>
                     <li>Whenever you work on the task record it in the diary. <a href='/diary_template.csv' download>Download a blank diary here</a></li>
-                    <li>Please do not enter any personal information when using Write Reason</li>
+                    <li>Please <b>do not enter any personal information</b> when using Write Reason</li>
                     <li>Your work will be saved in your browser on this computer when you press "Save"</li>
                 </ol>
 

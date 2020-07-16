@@ -185,7 +185,8 @@ export default class SharedState {
             .toArray(projects => {
                 const data = {
                     timestamp: new Date(),
-                    projects: projects
+                    preTaskSubmission: localStorage.getItem('preTaskSubmission'),
+                    projects: projects,
                 }
                 this.downloadJSON(data, 'Write Reason logs.json')
                 
