@@ -27,7 +27,7 @@ export default class ExperimentInfo extends Component {
 
                 <h3>The task</h3>
 
-                <p>Your task is to decide where you stand on the question below, and write a document justifying your view. Use Write Reason for all parts of the task.</p>
+                <p>Your task is to decide where you stand on the question below, and write an essay justifying your view. Use Write Reason for all parts of the task.</p>
 
                 {question}
 
