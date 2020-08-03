@@ -10,8 +10,12 @@ import CrimsonTextBold from './assets/CrimsonText-Bold.ttf'
 
 
 export default class SharedState {
-    constructor(db_id, params) {      
-        this.logger = new Logger(db_id, params)
+    constructor(db_id, params) {
+        if (!params.logExplore) {
+            this.logger = new Logger(db_id, params)
+        } else {
+            this.logger = {logEvent: (x, y) => {} }
+        }
         this.condition = params.condition;
         this.params = params;
         
@@ -26,15 +30,20 @@ export default class SharedState {
         this.graphPane = undefined;
 
         // log entire document content every 60 seconds
-        this.intervalLogger = window.setInterval(() => {
-            this.logger.logEvent({'type': 'document_content_markdown', 'content': this.getArgumentMarkdown()});
-        }, 60000);
+        if (!this.params.logExplore) {
+            this.intervalLogger = window.setInterval(() => {
+                this.logger.logEvent({'type': 'document_content_markdown', 'content': this.getArgumentMarkdown()});
+            }, 60000);
+        }
         
         this.downloadExperimentData = this.downloadExperimentData.bind(this);
         this.editorHasLoaded = this.editorHasLoaded.bind(this);
         this.save = this.save.bind(this)
         this.mapToJSON = this.mapToJSON.bind(this)
         this.exportPDF = this.exportPDF.bind(this)
+        this.exploreNext = this.exploreNext.bind(this)
+        this.explorePrev = this.explorePrev.bind(this)
+        this.exploreLog = this.exploreLog.bind(this)
 
         // when the tab is closed, if the document has been edited, warn before closing
         window.onbeforeunload = (e) => {
@@ -58,15 +67,13 @@ export default class SharedState {
 
     // called by editor once the database saved value has been set as the document.value
     editorHasLoaded() {
-        db.table('projects')
-            .get(this.db_id)
-            .then(project => {
-                this.node_id_counter = project.node_id_counter ? project.node_id_counter : 0
-                this.map = project.map ? this.mapFromJSON(project.map) : {}
-                this.getEditor().mapHasLoaded()
-                this.projectName = project.name
-                document.title = this.projectName + " - Write Reason"
-            })
+        this.getProjectThen(project => {
+            this.node_id_counter = project.node_id_counter ? project.node_id_counter : 0
+            this.map = project.map ? this.mapFromJSON(project.map) : {}
+            this.getEditor().mapHasLoaded()
+            this.projectName = project.name
+            document.title = this.projectName + " - Write Reason"
+        })
         
         this.lastSavedDocumentState = this.getEditor().getValue().document // editor is definitely not dirty right now
     }
@@ -107,20 +114,51 @@ export default class SharedState {
         ) 
     }
 
+    explorePrev() {
+        if (this.params.logExplore.saveIndex === 0) {
+            return
+        }
+        
+        this.exploreLog(this.params.logExplore.project, this.params.logExplore.saveIndex - 1)
+    }
+
+    exploreNext() {
+        if (this.params.logExplore.saveIndex === this.params.logExplore.project.log.saves.length - 1) {
+            return
+        }
+
+        this.exploreLog(this.params.logExplore.project, this.params.logExplore.saveIndex + 1)
+    }
+
+    exploreLog(project, saveIndex) {
+        const params = { condition: 'graph', logExplore: {project: project, saveIndex: saveIndex}, transitionToEditor: this.params.transitionToEditor }
+        const sharedState = new SharedState(-1, params)
+        this.params.transitionToEditor(sharedState, true)
+    }
+
+    getProjectThen(cb) {
+        if (this.params.logExplore) {
+            const logExplore = this.params.logExplore
+            cb(logExplore.project.log.saves[logExplore.saveIndex])
+        } else {
+            db.table('projects')
+                .get(this.db_id)
+                .then(project => {
+                    cb(project)
+                })
+        }
+    }
+
     getSavedDocValue = async function(onDataLoad) {
-        db.table('projects')
-            .get(this.db_id)
-            .then(project => {
-                onDataLoad(project.doc_value)
-            })
+        this.getProjectThen(project => {
+            onDataLoad(project.doc_value)
+        })
     }
 
     getSavedGraph = async function(onDataLoad) {
-        db.table('projects')
-            .get(this.db_id)
-            .then(project => {
-                onDataLoad(project.graph_value)
-            })
+        this.getProjectThen(project => {
+            onDataLoad(project.graph_value)
+        })
     }
 
     mapToJSON() {

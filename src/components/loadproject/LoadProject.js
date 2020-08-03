@@ -2,8 +2,10 @@ import React, { Component } from 'react';
 import './LoadProject.css'
 import db from '../../db.js'
 import ProjectList from './ProjectsList.js'
+import LogsExploreTable from './LogsExploreTable.js'
 import SharedState from '../../shared_state.js';
 import { toast } from 'react-toastify';
+import DropZone from 'react-dropzone';
 
 export default class LoadProject extends Component {
     constructor(props) {
@@ -17,6 +19,8 @@ export default class LoadProject extends Component {
         this.renameProject = this.renameProject.bind(this)
         this.duplicateProject = this.duplicateProject.bind(this)
         this.updateProjectsFromDb = this.updateProjectsFromDb.bind(this)
+        this.onDropLogFiles = this.onDropLogFiles.bind(this)
+        this.exploreLog = this.exploreLog.bind(this)
         
         document.title = "Write Reason"
 
@@ -97,11 +101,54 @@ export default class LoadProject extends Component {
                 })
         }
     }
+
+    onDropLogFiles(files) {
+        files.forEach((file) => {
+            const reader = new FileReader()
+      
+            reader.onabort = () => console.log('file reading was aborted')
+            reader.onerror = () => console.log('file reading has failed')
+            reader.onload = () => {
+                const stored = localStorage.getItem('logsToExplore') || JSON.stringify({logs: []})
+                const allLogs = JSON.parse(stored).logs
+
+                var newLog = JSON.parse(reader.result)
+                newLog.filename = file.name
+                newLog.projects.forEach(project => project.filename = file.name)
+                allLogs.push(newLog)
+                localStorage.setItem('logsToExplore', JSON.stringify({logs: allLogs}))
+            }
+            reader.readAsText(file)
+        })
+    }
+
+    exploreLog(project, saveIndex) {
+        const params = { condition: 'graph', logExplore: {project: project, saveIndex: saveIndex}, transitionToEditor: this.props.transitionToEditor }
+        const sharedState = new SharedState(-1, params)
+        this.props.transitionToEditor(sharedState)
+    }
     
     render() {
         return (
             <div className="load-project">
                 <button className="pure-button button-primary" onClick={this.addProject}>New project</button>
+                {process.env.NODE_ENV === 'development' && <><DropZone onDrop={this.onDropLogFiles}>
+                        {({getRootProps, getInputProps}) => (
+                            <section>
+                            <div {...getRootProps()}>
+                                <input {...getInputProps()} />
+                                <p>Drop/select log files</p>
+                            </div>
+                            </section>
+                        )}
+                    </DropZone>
+                    
+                    <div className="load-project-table">
+                        <LogsExploreTable logs={localStorage.getItem('logsToExplore') && JSON.parse(localStorage.getItem('logsToExplore')).logs} 
+                            exploreLog={this.exploreLog} />
+                    </div>
+                    </>
+                    }
                 <div className="load-project-table">
                     {this.state.projects && this.state.projects.length > 0 && <ProjectList projects={this.state.projects}
                         deleteProject={this.deleteProject}

@@ -30,9 +30,7 @@ class GraphPane extends React.Component {
                 }
             }
 
-            // do a cool zoom in effect on load
-            svg.zoom(0.8)
-            this.zoomCanvasTo(1)
+            svg.zoom(1)
 
             SVG.extend(SVG.Element, {
                 getScreenCoords: function (zone) {
