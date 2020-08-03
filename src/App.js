@@ -68,11 +68,21 @@ export default class App extends Component {
         this.getStorageUsed()
     }
 
-    transitionToEditor(newSharedState) {
-        this.setState({ 
-            sharedState: newSharedState,
-            phase: "editor"
-        })
+    transitionToEditor(newSharedState, resetFirst) {
+        if (resetFirst) {
+            this.setState({phase: "reset", sharedState: undefined})
+            window.setTimeout(() => {
+                this.setState({ 
+                    sharedState: newSharedState,
+                    phase: "editor"
+                })
+            }, 0)
+        } else {
+            this.setState({ 
+                sharedState: newSharedState,
+                phase: "editor"
+            })
+        }
 
         // open the instructions modal on first load
         if (!localStorage.getItem('editorHasLoadedBefore')) {
@@ -172,7 +182,6 @@ export default class App extends Component {
             
             case "reset":
                 // hacky way to destroy and recreate all components
-                window.setTimeout(() => this.setState({phase: "editor"}), 0.1)
                 return (
                     <p>...</p>
                 )
