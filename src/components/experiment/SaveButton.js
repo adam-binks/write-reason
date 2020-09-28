@@ -7,6 +7,9 @@ export default class ExperimentControls extends Component {
             return (
                 <div className="experiment-controls">
                     <button className='pure-button' onClick={this.props.backToMenu}>Back</button>
+                    <button className='pure-button' onClick={() => {this.props.sharedState.orderAnnotate = true}}>Order annotate</button>
+                    <button className='pure-button' onClick={this.props.sharedState.exportAnnotatedLog}>Export annotated log</button>
+                    <button className='pure-button' onClick={this.props.sharedState.makeNodeReport}>Make node report</button>
                     <button className='pure-button' onClick={this.props.sharedState.explorePrev}>←</button>
                     <button className='pure-button'>{this.props.sharedState.params.logExplore.project.filename + " " + this.props.sharedState.params.logExplore.saveIndex}</button>
                     <button className='pure-button' onClick={this.props.sharedState.exploreNext}>→</button>
