@@ -21,7 +21,9 @@ def plot_df(df, title=''):
         'arrow_delete',
         'add_arrow_type',
         'arrow_set_type',
+        'update_arrow_colour',
         'cut',
+        'copy',
         'delete_arrow_type',
         'doc_create_from_node',
         'node_create_from_doc',
@@ -72,9 +74,4 @@ for fname in os.listdir(DIR):
         df.set_index('timestamp')
 
         plot_df(df, fname)
-
-    # ONLY DO THE FIRST FIVE PARTICIPANTS
-    i += 1
-    if i > 5:
-        break
 # %%

@@ -4,7 +4,7 @@ var ARROW_HITBOX_MARGIN = 20;
 
 class GraphNode {
     constructor(params, nodes, mouse_follower, shared_state, focus_text_area, getNodesList, zoomCanvasTo) {
-        var { shortText, x, y, width, height, id, isOnGraph, longText } = params
+        var { shortText, x, y, width, height, id, isOnGraph, longText, annotatedOrder } = params
         this.id = id ? id : shared_state.getNodeId();
 
         this.getNodesList = getNodesList
@@ -42,6 +42,9 @@ class GraphNode {
         
         this.setIsOnGraph(isOnGraph);
 
+        this.annotatedOrder = annotatedOrder
+        this.showAnnotatedOrder()
+
         // don't log add node events if they are just loaded from a save
         if (!params.isFromJSON) {
             shared_state.logger.logEvent({'type': 'node_create', 'id': this.id});
@@ -65,6 +68,7 @@ class GraphNode {
             longText: this.longText,
             screenCoords: this.group.getScreenCoords(),
             isOnGraph: this.isOnGraph,
+            annotatedOrder: this.annotatedOrder,
         }
     }
 
@@ -298,8 +302,28 @@ class GraphNode {
         return this.longText;
     }
 
+    showAnnotatedOrder() {
+        if (this.annotatedOrder) {
+            this.annotatedOrderText = this.group.text(this.annotatedOrder.toString())
+        }
+    }
+
     editText(shared_state, delete_if_empty_text = false) {
         document.activeElement.blur(); // remove focus from everything
+
+        if (shared_state.orderAnnotate) {
+            if (this.annotatedOrder) {
+                shared_state.annotatedNumbers = shared_state.annotatedNumbers.filter(num => num !== this.annotatedOrder)
+                this.annotatedOrder = undefined
+                this.annotatedOrderText.remove()
+            } else {
+                const num = shared_state.getNextAnnotateNum()
+                this.annotatedOrder = num
+                shared_state.annotatedNumbers.push(num)
+                this.showAnnotatedOrder()
+            }
+            return
+        }
 
         this.zoomCanvasTo(1, {x: this.group.cx(), y: this.group.cy()}, () => {
             var textarea = document.querySelector('#nodeedit');

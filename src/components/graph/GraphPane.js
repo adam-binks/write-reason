@@ -128,6 +128,8 @@ class GraphPane extends React.Component {
 
     loadNodesFromJSON(json, mouse_follower, nodes) {
         this.nodesList = json.map(nodeJSON => GraphNode.fromJSON(nodeJSON, nodes, mouse_follower, this.props.sharedState, () => this.nodesList, this.zoomCanvasTo))
+        // temp
+        console.log("num nodes: " + this.nodesList.length)
     }
 
     addNoNodesIndicator(svg, nodes, mouse_follower) {

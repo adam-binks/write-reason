@@ -24,6 +24,8 @@ export default class SharedState {
         this.map = {};
         this.map_recycle_bin = {};
         this.db_id = db_id
+        this.orderAnnotate = false
+        this.annotatedNumbers = []
 
         // this.editor_ref and this.graphPane set in the editor and graphpane
         this.editor_ref = undefined;
@@ -44,6 +46,9 @@ export default class SharedState {
         this.exploreNext = this.exploreNext.bind(this)
         this.explorePrev = this.explorePrev.bind(this)
         this.exploreLog = this.exploreLog.bind(this)
+        this.makeNodeReport = this.makeNodeReport.bind(this)
+        this.getNextAnnotateNum = this.getNextAnnotateNum.bind(this)
+        this.exportAnnotatedLog = this.exportAnnotatedLog.bind(this)
 
         // when the tab is closed, if the document has been edited, warn before closing
         window.onbeforeunload = (e) => {
@@ -51,6 +56,35 @@ export default class SharedState {
                 e.preventDefault()
                 e.returnValue = '' // for Chrome
             }
+        }
+    }
+
+    exportAnnotatedLog() {
+        const save = {
+            map: this.mapToJSON(),
+            node_id_counter: this.node_id_counter,
+            doc_value: this.getEditor().getValue().toJSON(),
+            graph_value: this.graphPane.toJSON(),
+        }
+        this.downloadJSON(save, this.params.logExplore.project.filename + "__order_annotated.json")
+    }
+
+    getNextAnnotateNum() {
+        if (this.annotatedNumbers.length === 0) {
+            return 1
+        } else {
+            // check for a gap
+            this.annotatedNumbers.sort((a, b) => a - b)
+            var prev = 0
+            this.annotatedNumbers.forEach(annotatedNum => {
+                if (prev + 1 !== annotatedNum) {
+                    return prev + 1
+                }
+                prev = annotatedNum
+            })
+            
+            // if no gaps
+            return this.annotatedNumbers[this.annotatedNumbers.length - 1] + 1
         }
     }
 
@@ -134,6 +168,51 @@ export default class SharedState {
         const params = { condition: 'graph', logExplore: {project: project, saveIndex: saveIndex}, transitionToEditor: this.params.transitionToEditor }
         const sharedState = new SharedState(-1, params)
         this.params.transitionToEditor(sharedState, true)
+    }
+
+    makeNodeReport() {
+        const changes = {
+            map: this.mapToJSON(),
+            node_id_counter: this.node_id_counter,
+            doc_value: this.getEditor().getValue().toJSON(),
+            graph_value: this.graphPane.toJSON(),
+        }
+        this.downloadJSON(changes, this.params.logExplore.project.filename + "_ANNOTATED.json")
+
+        const nodeReport = {linkedTexts: [], unlinkedTexts: []}
+        const value = this.getEditor().getValue()
+        value.document.getBlocks().forEach(block => {
+            if (block.type === 'body' || block.type === 'link' || block.type === 'section') {
+                nodeReport.linkedTexts.push(block.text)
+            } else {
+                block.nodes.forEach(node => {
+                    if (!node.text) {
+                        return
+                    }
+                    if (node.type === 'link') {
+                        nodeReport.linkedTexts.push(node.text)
+                    } else {
+                        nodeReport.unlinkedTexts.push(node.text)
+                    }
+                })
+            }
+        })
+
+        nodeReport.linked = nodeReport.linkedTexts.join('\n')
+        nodeReport.unlinked = nodeReport.unlinkedTexts.join('\n')
+        
+        nodeReport.linkedCharsProportion = nodeReport.linked.length / (nodeReport.linked.length + nodeReport.unlinked.length)
+        
+        const countWords = (str) => str.trim().split(/\s+/).length
+        nodeReport.linkedWords = countWords(nodeReport.linked)
+        nodeReport.unlinkedWords = countWords(nodeReport.unlinked)
+        nodeReport.linkedWordProportion = nodeReport.linkedWords / (nodeReport.linkedWords + nodeReport.unlinkedWords)
+
+        nodeReport.rawValue = value
+
+        var nodeReports = localStorage.getItem('nodeReports') ? JSON.parse(localStorage.getItem('nodeReports')) : {}
+        nodeReports[this.params.logExplore.project.filename] = nodeReport
+        localStorage.setItem('nodeReports', JSON.stringify(nodeReports))
     }
 
     getProjectThen(cb) {
