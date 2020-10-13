@@ -136,3 +136,5 @@ pretasks/17.txt
 pretasks/18.txt
 pretask_sheet_final.txt
 marker_sheet_xt.txt
+analysis/__pycache__/graph_ordering.cpython-36.pyc
+analysis/__pycache__/timeseries.cpython-36.pyc

@@ -36,7 +36,7 @@ def get_unvisited(some_nodes, current_order, permit_current=False):
 
 def get_visited(some_nodes, current_order):
     # ignored nodes that have no annotatedOrder (are never mentioned in the essay)
-    return [n for n in some_nodes if 'annotatedOrder' in n.keys() and n['annotatedOrder'] < current_order]
+    return [n for n in some_nodes if 'annotatedOrder' in n.keys() and n['annotatedOrder'] <= current_order]
 
 def get_depth_first_next_nodes(node, current_order, nodes, arrows):
     out_all = get_connected_nodes(node, arrows, nodes, "outgoing")
@@ -168,14 +168,29 @@ def analyse_order(save, print_details=False):
 def summarise_results(all_results):
     for algo, results in all_results.items():
         successes = sum(results)  # add the number of Trues in the results
-        print(f'{algo}: {successes}/{len(results)}, {successes/len(results)}')
+        # print(f'{algo}: {successes}/{len(results)}, {successes/len(results)}')
 
 
-DIR = r"C:\Users\jelly\OneDrive - University of St Andrews\Summer study\order_logs"
+def get_proportion_success(results, algo):
+    if len(results[algo]) == 0:
+        return 0
+    return sum(results[algo]) / len(results[algo])
 
-for fname in ['logs 14.json__order_annotated.json']: # os.listdir(DIR):
-    print(f'\n{fname}')
-    with open(os.path.join(DIR, fname), 'r', encoding="utf8") as f:
-        save = json.load(f)
-        results = analyse_order(save, print_details=True)
-        summarise_results(results)
+def get_graph_orderings(participant_ids):
+    DIR = r"C:\Users\jelly\OneDrive - University of St Andrews\Summer study\order_logs"
+
+    depth_first = []
+    breadth_first = []
+    
+    for participant_id in participant_ids:
+        fname = f'logs {participant_id}.json__order_annotated.json'
+        with open(os.path.join(DIR, fname), 'r', encoding="utf8") as f:
+            save = json.load(f)
+        results = analyse_order(save, print_details=False)
+
+        depth_first.append(get_proportion_success(results, 'depth first'))
+        breadth_first.append(get_proportion_success(results, 'breadth first'))
+
+    return depth_first, breadth_first
+
+        
