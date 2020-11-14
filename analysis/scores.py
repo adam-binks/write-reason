@@ -2,6 +2,7 @@ import os
 import json
 import pandas as pd
 from scipy import stats
+import matplotlib
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
@@ -10,8 +11,35 @@ import timeseries
 import graph_ordering
 
 # %%
+sns.set_style("whitegrid")
+sns.despine()
 
-sns.set()
+# %%
+
+# setup matplotlib for latex export
+matplotlib.use("pgf")
+matplotlib.rcParams.update({
+    "pgf.texsystem": "pdflatex",
+    'text.usetex': True,
+    'pgf.rcfonts': False,
+    'text.latex.preamble': r'\usepackage{libertine}',
+    'font.size': 2,
+    'font.family': 'Linux Libertine',
+})
+
+SMALL_SIZE = 8
+MEDIUM_SIZE = 10
+BIGGER_SIZE = 12
+
+plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
+plt.rc('axes', titlesize=SMALL_SIZE)     # fontsize of the axes title
+plt.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
+plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
+plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
+
+# %%
 
 score_cols = [
     'Clarity',
@@ -21,42 +49,78 @@ score_cols = [
     'Overall'
 ]
 
+def save_fig(name):
+    plt.savefig(f'figs/{name}.pgf', bbox_inches='tight', dpi=1000)
+
 def run_ttest(df_a, df_b, col, should_print=True, decimal_places=3, ttest=stats.ttest_ind):
     a = df_a[col]
     b = df_b[col]
     ttest_result = ttest(a, b)
-    if should_print:
-        print(f't({int(len(a))-1})={round(ttest_result.statistic, decimal_places)}'
-              f', p={round(ttest_result.pvalue, decimal_places)}\n')
-    
-    return ttest_result
 
-def group_and_bar(col, val1=False, val2=True, numerical_cols=score_cols, stacked=False):
+    df = int(len(a))- (2 if ttest == stats.ttest_ind else 1)
+
+    report_string = f't({df})={round(ttest_result.statistic, decimal_places)}, '
+    report_string += f'p={round(ttest_result.pvalue, decimal_places)}'
+    if should_print:
+        print(report_string)
+    
+    return ttest_result, report_string
+
+def group_and_bar(col, val1=False, val2=True, numerical_cols=None, stacked=False, figsize=None, name=None, save=True):
+    if numerical_cols is None:
+        numerical_cols = score_cols
+    if figsize is None:
+        figsize=(3.5, 2.5)
+    if name is None:
+        name = col
+
     group = df.groupby(col)
-    ax = group.mean()[numerical_cols].plot(
+
+    if numerical_cols == score_cols:
+        ax = group.mean()[numerical_cols].plot(
             kind='bar',
             stacked=stacked,
             yerr=group.std()[numerical_cols],
             capsize=2,
-            rot=0
+            rot=0,
+            figsize=figsize,
+            ylim=(0, 10.5) # set the ylim for score_cols 0-10
         )
+    else:
+        ax = group.mean()[numerical_cols].plot(
+                kind='bar',
+                stacked=stacked,
+                yerr=group.std()[numerical_cols],
+                capsize=2,
+                rot=0,
+                figsize=figsize
+            )
 
     count = df[col].value_counts()
     ax.set_xticklabels([f'{v} ({count[v]})' for v in [val1, val2]])
     ax.legend(bbox_to_anchor=(1,1))
-    plt.show()
+    ax.grid(axis="x")
+    if save:
+        save_fig(name)
 
     if val1 != False or val2 != True:
         print(f'ttest {val1} vs {val2}')
     
     sig = []
     for score in numerical_cols:
-        result = run_ttest(df[df[col] == val1], df[df[col] == val2], score, should_print=False)
+        result, result_str = run_ttest(df[df[col] == val1], df[df[col] == val2], score, should_print=False)
         if result.pvalue < 0.05:
-            sig.append(f'{score} (p={result.pvalue})')
+            s = f'{score} '
+            for val in [val2, val1]:
+                s += f'{val}: '
+                score_vals = df[df[col] == val][score]
+                s += f'M={round(score_vals.mean(), 2)}, '
+                s += f'SD={round(score_vals.std(), 2)}. '
+
+            sig.append(s + f'    {result_str}')
     
     if sig:
-        print(f'↑ significant: ' + ', '.join(sig) + '\n')
+        print(f'↑ significant: ' + '\n'.join(sig) + '\n')
     else:
         print('↑ no significant' + '\n')
 
@@ -170,6 +234,19 @@ plt.show()
 
 # %%
 
+# group_and_bar('Essay structure graph', name='essay_struc_score', figsize=(3, 2))
+group_and_bar('Argumentation map', name='arg_map_score', figsize=(3, 2))
+
+# add significance bars
+for offset, height in [(.205, 9.4), (-.205, 10.2)]:
+    x1, x2 = 0 - offset, 1 - offset   # first and second clarity columns
+    y, h, col = height, .2, 'k'
+    plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=1.5, c=col)
+    plt.text((x1+x2)*.5, y+h-0.1, "*", ha='center', va='bottom', color=col)
+save_fig('arg_map_score')
+
+# %%
+
 for col in bool_cols:
     group_and_bar(col)
 
@@ -216,7 +293,19 @@ df.plot(x='Total nodes', y='Persuasiveness', kind='scatter')
 df.plot(x='Total interaction time', y='Overall', kind='scatter')
 df.plot(x='Graph time', y='Overall', kind='scatter')
 df.plot(x='Doc time', y='Overall', kind='scatter')
-df.plot(x='Graph time', y='Doc time', kind='scatter', figsize=(5,5), xlim=(0, 90), ylim=(0, 90))
+
+# %%
+
+fig, ax = plt.subplots()
+fig.set_size_inches(3, 3)
+df['Average score'] = df[score_cols].mean(axis=1)
+g = sns.scatterplot(data=df, ax=ax, x='Graph time', y='Doc time', hue='Average score',
+    palette='crest')
+g.set(xlim=(0, 90), ylim=(0, 90))
+
+plt.xlabel("Map interaction time (minutes)")
+plt.ylabel("Document interaction time (minutes)")
+save_fig('graph_vs_doc_time')
 
 # %%
 time_cols = ['Total interaction time', 'Graph time', 'Doc time', 'Mixed time', 'No interaction time']
@@ -235,11 +324,17 @@ plt.show()
 # %%
 depth = 'Depth first proportion'
 breadth = 'Breadth first proportion'
-df.hist(depth)
-df.hist(breadth)
-df.plot(x=depth, y=breadth, kind='scatter', figsize=(5,5))
-sns.scatterplot(data=df, x=depth, y=breadth, hue='Essay structure graph')
 
+
+df.hist(depth, figsize=(3.5, 2))
+save_fig('depth_first_hist')
+
+# df.hist(breadth)
+
+# df.plot(x=depth, y=breadth, kind='scatter', figsize=(5,5))
+# sns.scatterplot(data=df, x=depth, y=breadth, hue='Essay structure graph')
+# %%
+df.corr()
 # %%
 df.plot(x=depth, y='Obj-resp', kind='scatter')
 df.plot(x=breadth, y='Overall', kind='scatter')
