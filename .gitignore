@@ -138,3 +138,8 @@ pretask_sheet_final.txt
 marker_sheet_xt.txt
 analysis/__pycache__/graph_ordering.cpython-36.pyc
 analysis/__pycache__/timeseries.cpython-36.pyc
+analysis/figs/depth_first_hist.pgf
+analysis/figs/depth_first_hist.pgf
+analysis/figs/graph_vs_doc_time.pgf
+analysis/figs/depth_first_hist.pgf
+analysis/figs/graph_vs_doc_time.pgf

@@ -22,9 +22,9 @@ matplotlib.rcParams.update({
     "pgf.texsystem": "pdflatex",
     'text.usetex': True,
     'pgf.rcfonts': False,
-    'text.latex.preamble': r'\usepackage{libertine}',
+    # 'text.latex.preamble': r'\usepackage{libertine}',
     'font.size': 2,
-    'font.family': 'Linux Libertine',
+    # 'font.family': 'Linux Libertine',
 })
 
 SMALL_SIZE = 8
@@ -218,6 +218,8 @@ depth_first, breadth_first = graph_ordering.get_graph_orderings(df['Participant'
 df['Depth first proportion'] = depth_first
 df['Breadth first proportion'] = breadth_first
 
+df['Average score'] = df[score_cols].mean(axis=1)
+
 # %%
 
 for col in ['Essay', 'Pre-task']:
@@ -298,10 +300,14 @@ df.plot(x='Doc time', y='Overall', kind='scatter')
 
 fig, ax = plt.subplots()
 fig.set_size_inches(3, 3)
+
+ax.plot([0, 90], [0, 90], color='#a2cb90', lw=.2)
+
 df['Average score'] = df[score_cols].mean(axis=1)
 g = sns.scatterplot(data=df, ax=ax, x='Graph time', y='Doc time', hue='Average score',
     palette='crest')
 g.set(xlim=(0, 90), ylim=(0, 90))
+
 
 plt.xlabel("Map interaction time (minutes)")
 plt.ylabel("Document interaction time (minutes)")
@@ -325,14 +331,33 @@ plt.show()
 depth = 'Depth first proportion'
 breadth = 'Breadth first proportion'
 
+bucketed_by_avg_score = []
+legend= []
+for i in range(5, 11): # starting at 4 is ok because no avg scores below that
+    bucketed_by_avg_score.append(list(df[(df['Average score'] >= i - 1) & 
+                                 (df['Average score'] < i)][depth]))
+    legend.append(f'{i}')
 
-df.hist(depth, figsize=(3.5, 2))
-save_fig('depth_first_hist')
+colors = sns.color_palette('crest').as_hex()
 
-# df.hist(breadth)
+fig = plt.figure(figsize=(3.5, 2))
+plt.hist(bucketed_by_avg_score, stacked=True, 
+    color=colors,
+    label=legend)
 
-# df.plot(x=depth, y=breadth, kind='scatter', figsize=(5,5))
-# sns.scatterplot(data=df, x=depth, y=breadth, hue='Essay structure graph')
+plt.xlabel("Depth-first proportion")
+plt.ylabel("Frequency")
+
+from matplotlib.lines import Line2D
+handles = [Line2D([0], [0], marker='o', color='w', label=legend[i],
+    markerfacecolor=colors[i], markersize=8) for i in range(len(legend))]
+
+lgd = fig.legend(prop={'size': 10}, title="Average score", handles=handles, 
+    bbox_to_anchor=(.95, 1), loc='upper left')
+
+plt.tight_layout()
+
+plt.savefig(f'figs/depth_first_hist.pgf', bbox_extra_artists=[lgd], bbox_inches='tight', dpi=1000)
 # %%
 df.corr()
 # %%
