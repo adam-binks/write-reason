@@ -86,6 +86,21 @@ export default class LogExploreTimeline extends Component {
                 node = graphPane.getNodeById(event.id)
                 if (node) {
                     updateSvgElement(node.rect)
+                } else if (!hasNotBeenExplored) {
+                    node = graphPane.addTempNode(event.id)
+                    if (node) {
+                        updateSvgElement(node.rect)
+                    }
+                }
+                break
+            
+            case 'node_delete':
+                if (!hasNotBeenExplored) {
+                    node = graphPane.getNodeById(event.id)
+                    if (node) {
+                        node.delete(this.props.sharedState)
+                        graphPane.numTempNodes--
+                    }
                 }
                 break
             
