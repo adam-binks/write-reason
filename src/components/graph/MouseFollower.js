@@ -33,6 +33,9 @@ export default class MouseFollower {
         this.markers = markers;
         this.links = links;
 
+        this.connector_objs = {}
+        this.temp_arrows = {}
+
         this.arrow_id_counter = 0
 
         this.completed_arrows = []
@@ -96,6 +99,7 @@ export default class MouseFollower {
                 arrow.colour
             )
             this.add_context_menu_to_arrow(connector, arrow)
+            this.connector_objs[arrow.origin + "->" + arrow.destination] = connector
             
             // update the arrow start and end points
             originNode.group.node.dispatchEvent(new CustomEvent("dragmove"))
@@ -229,6 +233,21 @@ export default class MouseFollower {
 
     getArrowByID(id) {
         return this.completed_arrows.find(arrow => arrow.id === id)
+    }
+
+    getConnectorObjectConnecting(source, dest) {
+        // if there are multiple, this will just return the first
+        return this.connector_objs[source + "->" + dest]
+    }
+
+    addTempArrow(source, dest, colour, temp_id) {
+        const source_node = this.shared_state.graphPane.getNodeById(source)
+        const dest_node = this.shared_state.graphPane.getNodeById(dest)
+        if (!source_node || !dest_node) {
+            return
+        }
+        this.connector_objs[source + '->' + dest] = this.draw_arrow(source_node, dest_node, colour)
+        this.temp_arrows[temp_id] = source + '->' + dest
     }
 
     getNewId() {
@@ -456,7 +475,9 @@ export default class MouseFollower {
     }
 
     remove_arrow(connector, arrowObject) {
-        connector.line.node.instance.delete_connectable(connector);
+        if (connector && connector.line) {
+            connector.line.node.instance.delete_connectable(connector);
+        }
 
         if (arrowObject) {
             this.completed_arrows = this.completed_arrows.filter(arrow => arrow !== arrowObject)        

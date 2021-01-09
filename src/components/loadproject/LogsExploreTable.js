@@ -21,6 +21,10 @@ export default class LogsExploreTable extends Component {
                                                 <button className="pure-button" onClick={(e) => this.props.exploreLog(log.projects[0], index)}>{index}</button>
                                             )
                                         }
+                                        {
+                                            // TEMP - just open the first log
+                                            // (log.filename === 'logs 2.json') && setTimeout(() => this.props.exploreLog(log.projects[0], 0), 0)
+                                        }
                                     </div>
                                 </td>
                             </tr>)

@@ -11,6 +11,7 @@ import Backend from 'react-dnd-html5-backend'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import SaveButton from './components/experiment/SaveButton';
+import LogExploreTimeline from './components/experiment/LogExploreTimeline';
 import ExperimentInfo from './components/experiment/ExperimentInfo';
 import PreTaskSection from './components/loadproject/PreTaskSection';
 import IntroSection from './components/loadproject/IntroSection';
@@ -159,6 +160,9 @@ export default class App extends Component {
                                 <DocPane sharedState={this.state.sharedState} />
                                 <GraphPane sharedState={this.state.sharedState} />
                             </SplitPane>
+                            {
+                                this.state.sharedState.params.logExplore && <LogExploreTimeline sharedState={this.state.sharedState}/>
+                            }
                             <SaveButton 
                                 sharedState={this.state.sharedState}
                                 backToMenu={this.transitionToMenu} 
