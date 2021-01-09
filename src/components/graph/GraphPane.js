@@ -132,6 +132,17 @@ class GraphPane extends React.Component {
         console.log("num nodes: " + this.nodesList.length)
     }
 
+    explodeNodes() {
+        const factor = 0.1
+        this.nodesList.forEach((node) => {
+            node.group.move(
+                node.group.x() + node.group.x() * factor, 
+                node.group.y() + node.group.y() * factor
+            )
+            node.group.node.dispatchEvent(new CustomEvent("dragmove")) // update arrows
+        })
+    }
+
     addNoNodesIndicator(svg, nodes, mouse_follower) {
         this.noNodesIndicator = svg.text("Double click to add a node").addClass("indicator-text").attr({x: "40%", y: "45%"});
         this.noNodesIndicator.on('dblclick', (e) => {

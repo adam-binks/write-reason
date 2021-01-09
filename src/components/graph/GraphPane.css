@@ -89,6 +89,14 @@
     cursor: pointer
 }
 
+#graph.timeline-explore-mode .node:not(.has-been-explored) {
+    fill-opacity: 0.2;
+}
+
+#graph.timeline-explore-mode .connector-line:not(.has-been-explored) {
+    stroke-width: .2 !important;
+}
+
 .node.hovered {
     fill: #4fc5ec !important;
 }

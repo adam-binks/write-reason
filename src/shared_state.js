@@ -49,6 +49,7 @@ export default class SharedState {
         this.makeNodeReport = this.makeNodeReport.bind(this)
         this.getNextAnnotateNum = this.getNextAnnotateNum.bind(this)
         this.exportAnnotatedLog = this.exportAnnotatedLog.bind(this)
+        this.explodeNodes = this.explodeNodes.bind(this)
 
         // when the tab is closed, if the document has been edited, warn before closing
         window.onbeforeunload = (e) => {
@@ -650,5 +651,9 @@ export default class SharedState {
         if (graphNode) {
             graphNode.updateLongText(newText);            
         }
+    }
+
+    explodeNodes() {
+        this.graphPane.explodeNodes()
     }
 }
