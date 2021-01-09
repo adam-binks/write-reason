@@ -19,6 +19,7 @@ class GraphPane extends React.Component {
             this.$el = document.querySelector("#graph")
 
             var svg = new SVG(this.$el).size("100%", "100%").panZoom({ zoomMin: 0.2, zoomMax: 1, zoomFactor: 0.1 }); // just pan, no zoom
+            this.svg = svg
             this.zoomCanvasTo = (level, pos, cb) => {
                 if (Math.abs(svg.zoom() - level) < 0.01) { // it doesn't zoom to the exact number
                     if (cb) { cb() }
@@ -54,6 +55,9 @@ class GraphPane extends React.Component {
             var links = svg.group();
             var markers = svg.group();
             var nodes = svg.group();
+            this.nodesSvgGroup = nodes
+
+            this.numTempNodes = 0
 
             const json_connections = json ? json.connections : undefined
             var mouse_follower = MouseFollower.fromJSON(json_connections, this.props.sharedState, svg, links, markers, links);
@@ -143,6 +147,14 @@ class GraphPane extends React.Component {
         })
     }
 
+    addTempNode(id) {
+        // this is to visualise nodes that were created then deleted, and are now being viewed in the log explore timeline
+        var node = this.addNodeAtScreenLocation(this.svg, this.nodesSvgGroup, this.mouse_follower, "?", 0, this.numTempNodes * 150, false, true, id, true)
+        this.numTempNodes++
+
+        return node
+    }
+
     addNoNodesIndicator(svg, nodes, mouse_follower) {
         this.noNodesIndicator = svg.text("Double click to add a node").addClass("indicator-text").attr({x: "40%", y: "45%"});
         this.noNodesIndicator.on('dblclick', (e) => {
@@ -188,8 +200,11 @@ class GraphPane extends React.Component {
         });
     }
 
-    addNodeAtScreenLocation(svg, nodes, mouse_follower, text, x, y, focus_text_area, doNotDeleteIfEmptyText=false) {
+    addNodeAtScreenLocation(svg, nodes, mouse_follower, text, x, y, focus_text_area, doNotDeleteIfEmptyText=false, id=undefined, isSvgCoords=false) {
         var point = svg.point(x, y);
+        if (isSvgCoords) { // don't convert screen > svg coords
+            point = {x: x, y: y}
+        }
         const params = {
             shortText: text,
             longText: "", 
@@ -198,7 +213,7 @@ class GraphPane extends React.Component {
             width: 200,
             height: 42,
             isOnGraph: false,
-            id: undefined, // set automatically
+            id: id, // set automatically
             doNotDeleteIfEmptyText: doNotDeleteIfEmptyText
         }
         var node = new GraphNode(params, nodes, mouse_follower, this.props.sharedState, focus_text_area, () => this.nodesList, this.zoomCanvasTo);
