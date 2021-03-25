@@ -27,6 +27,10 @@
     top: 0px;
 }
 
+.timeline p {
+    text-align: center;
+}
+
 .timeline button {
     text-align: left;
     width: 100%

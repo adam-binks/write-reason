@@ -177,25 +177,27 @@ new_cols = {a: [] for a in [
 ]}
 
 DIR_LOGS = r"C:\Users\jelly\OneDrive - University of St Andrews\Summer study\logs"
-for participant_id in df['Participant']:
-    fname = f'logs {participant_id}.json'
-    print(f'loading {fname}')
-    with open(os.path.join(DIR_LOGS, fname), 'r', encoding="utf8") as f:
-        data = json.load(f)
-        ts_df = timeseries.load_timeseries_data(data)
-        activity = timeseries.calculate_df_time_totals(ts_df)
-        counts = activity.value_counts()
-        
-        num_minutes_per_activity_tick = 0.5  # 30 seconds
 
-        new_cols['Graph time'].append(counts['Graph'] * num_minutes_per_activity_tick)
-        new_cols['Doc time'].append(counts['Doc'] * num_minutes_per_activity_tick)
-        new_cols['Mixed time'].append(counts['Mixed'] * num_minutes_per_activity_tick)
-        new_cols['No interaction time'].append(counts['None'] * num_minutes_per_activity_tick)
-        new_cols['Total interaction time'].append((counts['Graph'] + counts['Doc'] + counts['Mixed']) * num_minutes_per_activity_tick)
+# temp - skip timeseries for speed
+# for participant_id in df['Participant']:
+#     fname = f'logs {participant_id}.json'
+#     print(f'loading {fname}')
+#     with open(os.path.join(DIR_LOGS, fname), 'r', encoding="utf8") as f:
+#         data = json.load(f)
+#         ts_df = timeseries.load_timeseries_data(data)
+#         activity = timeseries.calculate_df_time_totals(ts_df)
+#         counts = activity.value_counts()
+        
+#         num_minutes_per_activity_tick = 0.5  # 30 seconds
+
+#         new_cols['Graph time'].append(counts['Graph'] * num_minutes_per_activity_tick)
+#         new_cols['Doc time'].append(counts['Doc'] * num_minutes_per_activity_tick)
+#         new_cols['Mixed time'].append(counts['Mixed'] * num_minutes_per_activity_tick)
+#         new_cols['No interaction time'].append(counts['None'] * num_minutes_per_activity_tick)
+#         new_cols['Total interaction time'].append((counts['Graph'] + counts['Doc'] + counts['Mixed']) * num_minutes_per_activity_tick)
     
-for col, contents in new_cols.items():
-    df[col] = contents
+# for col, contents in new_cols.items():
+#     df[col] = contents
 
 
 # load node reports from additional analysis
@@ -236,6 +238,20 @@ plt.show()
 
 # %%
 
+# new stats:
+
+arg_series = df['Argumentation map']
+struc_series = df['Essay structure graph']
+
+arg = df[arg_series == 1 & struc_series == 0]
+struc = df[arg_series == 0 & struc_series == 1]
+both = df[arg_series == 1 & struc_series == 1]
+
+stats.bartlett()
+
+
+# %%
+
 # group_and_bar('Essay structure graph', name='essay_struc_score', figsize=(3, 2))
 group_and_bar('Argumentation map', name='arg_map_score', figsize=(3, 2))
 
@@ -270,6 +286,10 @@ plt.show()
 for col in cat_cols:
     sns.swarmplot(data=df, x=col, y='linkedWordsProportion')
     plt.show()
+
+# %%
+
+df['Nodes in text proportion'] == 1
 
 # %%
 
