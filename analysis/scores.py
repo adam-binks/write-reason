@@ -1,4 +1,5 @@
 import os
+import itertools
 import json
 import pandas as pd
 from scipy import stats
@@ -16,28 +17,32 @@ sns.despine()
 
 # %%
 
-# setup matplotlib for latex export
-matplotlib.use("pgf")
-matplotlib.rcParams.update({
-    "pgf.texsystem": "pdflatex",
-    'text.usetex': True,
-    'pgf.rcfonts': False,
-    # 'text.latex.preamble': r'\usepackage{libertine}',
-    'font.size': 2,
-    # 'font.family': 'Linux Libertine',
-})
+LATEX_MODE = False
 
-SMALL_SIZE = 8
-MEDIUM_SIZE = 10
-BIGGER_SIZE = 12
 
-plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
-plt.rc('axes', titlesize=SMALL_SIZE)     # fontsize of the axes title
-plt.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
-plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
-plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
-plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
-plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
+if LATEX_MODE:
+    # setup matplotlib for latex export
+    matplotlib.use("pgf")
+    matplotlib.rcParams.update({
+        "pgf.texsystem": "pdflatex",
+        'text.usetex': True,
+        'pgf.rcfonts': False,
+        # 'text.latex.preamble': r'\usepackage{libertine}',
+        'font.size': 2,
+        # 'font.family': 'Linux Libertine',
+    })
+
+    SMALL_SIZE = 8
+    MEDIUM_SIZE = 10
+    BIGGER_SIZE = 12
+
+    plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
+    plt.rc('axes', titlesize=SMALL_SIZE)     # fontsize of the axes title
+    plt.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
+    plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+    plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+    plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
+    plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 # %%
 
@@ -130,9 +135,72 @@ DIR = r'C:\Users\jelly\OneDrive - University of St Andrews\Summer study'
 
 df = pd.read_csv(os.path.join(DIR, 'graph_analysis.csv'))
 
-bool_cols = [
-    'Used graph',
+map_features = [
+    'Fact sheet content (quoted)',
+    'Fact sheet content (paraphrased)',
+    'Fact sheet content',
+    'Original ideas',
+    'Issue node (topic statement)',
+    'Issue node (question)',
+    'Issue node (stance)',
+    'Issue node',
+    'Arg relations: arrow colour (local)',
+    'Arg relations: arrow colour (global)',
+    'Arg relations: arrow colour (unclear)',
+    'Arg relations: arrow colour',
+    'Arg relations: pro/con connected',
+    'Arg relations: clustering',
+    'Arg relations',
+    'Provenance',
+    'Other relations',
+    'Planning essay order',
+    'Representing task requirements',
+]
+
+text_kinds = [
+    'Essay struc list',
+    'Fact sheet repro',
+    'Essay',
+]
+
+essaywriting_frequency = [
+    'Most days',
+    '1-2x weekly',
+    '1-2x monthly',
+    'Rarely',
+    'Never',
+]
+
+# these are not boolean, they are a count of number of transformations with this property
+# so could equal 2 if the participant did 2 transformations with that property
+transformation_properties = [
+    'Num transformations',
+    'Interleaving',
+    'Batching',
+    'Paper',
+    'More explicit',
+    'Same explicit',
+    'Less explicit',
+    'One-to-many',
+    'One-to-one',
+]
+
+# out of date columns, from earlier iterations of our grounded theory
+defunct_cols = [
+    'Copied fact sheet',
     'Shallow graph',
+    'approach (from interview)',
+    'Stance: not consistently repr',
+    'Relations: stance',
+    'Relations: sources',
+    'Relations: unused',
+    'Node: structure markers',
+    'Node: repr process',
+    'Int: index fact sheet',
+    'Int: order essay',
+    'Int: jot key facts',
+    'Int: map arg relations',
+    'Int: map global stance',
     'Essay structure graph',
     'Argumentation map',
     'Cites sources',
@@ -143,9 +211,16 @@ bool_cols = [
     'Used arrows',
     'Arrow types semantic value',
     'Tree structure',
-    'Copied fact sheet',
-    'Sections'
+    'Sections',
+    'start',
+    'middle',
+    'end',
+    'Unnamed: 76',
+    'Unnamed: 77',
+    'Unnamed: 78',
 ]
+
+bool_cols = list(itertools.chain(map_features, text_kinds, essaywriting_frequency))
 
 for col in bool_cols:
     # NB - does not preserve NaN
@@ -162,14 +237,6 @@ for col in cat_cols:
 
 df['Nodes in text proportion'] = df['Nodes in text'] / df['Total nodes']
 df['Nodes in text proportion'] = df['Nodes in text proportion'].fillna(0)
-
-df['Both graphs'] = df['Essay structure graph'] & df['Argumentation map']
-
-df['Structure graph only'] = df['Essay structure graph'] & (~ df['Argumentation map'])
-
-df['Argumentation map only'] = (~ df['Essay structure graph']) & df['Argumentation map']
-
-bool_cols.extend(['Both graphs', 'Structure graph only', 'Argumentation map only'])
 
 # load data about time spent
 new_cols = {a: [] for a in [
@@ -221,6 +288,21 @@ df['Depth first proportion'] = depth_first
 df['Breadth first proportion'] = breadth_first
 
 df['Average score'] = df[score_cols].mean(axis=1)
+
+df = df.drop(columns=defunct_cols)
+
+# %%
+
+corr = df.corr()[score_cols]
+
+f, ax = plt.subplots(figsize=(14, 12))
+mask = np.triu(np.ones_like(corr, dtype=bool))
+sns.heatmap(round(corr, 2), cmap="coolwarm", square=True, ax=ax, cbar_kws={"shrink": .5}, 
+            mask=mask, vmin=-1, vmax=1, linewidths=.5,)
+
+
+
+
 
 # %%
 

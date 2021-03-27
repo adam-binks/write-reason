@@ -1,5 +1,3 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
 /node_modules
 /.pnp
@@ -143,3 +141,10 @@ analysis/figs/depth_first_hist.pgf
 analysis/figs/graph_vs_doc_time.pgf
 analysis/figs/depth_first_hist.pgf
 analysis/figs/graph_vs_doc_time.pgf
+pretask_sheet_adds.txt
+pretasks/21.txt
+pretasks/22.txt
+pretasks/23.txt
+pretasks/25.txt
+pretasks/26.txt
+*.pyc
