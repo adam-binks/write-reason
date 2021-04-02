@@ -7,6 +7,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
+import statsmodels.stats.multitest as multitest
 
 import timeseries
 import graph_ordering
@@ -293,18 +294,106 @@ df = df.drop(columns=defunct_cols)
 
 # %%
 
-corr = df.corr()[score_cols]
+# find pearson correlation
+corr = df.corr()[score_cols].drop(score_cols).drop(['Average score', 'Essay.1']) \
+                .drop(essaywriting_frequency).drop('Nodes in text')
 
-f, ax = plt.subplots(figsize=(14, 12))
 mask = np.triu(np.ones_like(corr, dtype=bool))
-sns.heatmap(round(corr, 2), cmap="coolwarm", square=True, ax=ax, cbar_kws={"shrink": .5}, 
-            mask=mask, vmin=-1, vmax=1, linewidths=.5,)
+pvalues = np.zeros_like(mask, dtype=float)
+
+# determine which correlations are significant
+for score_i, score in enumerate(score_cols):
+    for col_i, col in enumerate(corr[score].keys()):
+        correlation, pvalue = stats.pearsonr(df[score], df[col])
+        pvalues[col_i][score_i] = pvalue
+        if pvalue >= 0.05:
+            mask[col_i][score_i] = True
+
+def draw_heatmap(mask):
+    f, ax = plt.subplots(figsize=(20, 20))
+    sns.heatmap(round(corr, 2), cmap="coolwarm", square=True, ax=ax, cbar_kws={"shrink": .5}, 
+            vmin=-1, vmax=1, linewidths=.5, annot=pvalues, fmt='.2f', mask=mask)
+    plt.show()
+
+# plot the correlations as a heatmap, labelled with p values
+draw_heatmap(None)
+
+# same heatmap but with only p < 0.05 shown
+draw_heatmap(mask)
+
+# %%
+
+# generate latex tables with the heatmap data
+
+# todo - rotate, add heatmap colouring, denote p-values better, generate multiple tables, split reasonably
+
+all_properties = list(corr[score_cols[0]].keys())
+
+properties = all_properties[:5] # temp
+
+output = r"\begin{tabular}{" + 'r' + 'c' * len(properties) + '}\n' + r'\toprule' + '\n'
+
+output += ' & '.join(properties) + '\\\\ \n' + r'\midrule' + '\n'
+
+for score in score_cols:
+    prop_strings = [score]
+    for prop in properties:
+        correlation, pvalue = stats.pearsonr(df[score], df[prop])
+        prop_strings.append(f'{round(correlation, 2)}, {round(pvalue, 2)}')
+
+    output += " & ".join(prop_strings) + " \\\\ \n"
+
+output += r'\bottomrule' + '\n'
+output += r'\end{tabular}'
+
+print(output)
+
+# %%
+
+# because we are doing repeated measures, the chance of Type I errors is high
+# correct for this using Bonferonni correction
+flattened_pvalues = list(pd.core.common.flatten(pvalues))
+num_hypothesis_tests = len(flattened_pvalues)
+alpha = 0.05
+
+bonferonni_corrected_alpha = alpha / num_hypothesis_tests
+
+print(f'Bonferonni corrected alpha: {bonferonni_corrected_alpha}' + 
+        f' because we run {num_hypothesis_tests} tests')
+print(f'Lowest pvalue: {min(flattened_pvalues)}')
+
+# %%
+
+# Bonferonni correction has problems so we apply
+# Benjamini/Hochberg's False Discovery Rate control https://www.jstor.org/stable/2346101
+
+null_hypothesis_rejected, pvalue_corrected_fdr = multitest.fdrcorrection(flattened_pvalues)
+if not any(null_hypothesis_rejected):
+    print(f"No significant results, lowest p value:\n{min(pvalue_corrected_fdr)}")
+
+# %%
+
+print(r'\begin{tabular}{l l l l}')
+print(r'\toprule')
+print(r'Marking criterion & Mean & Median & SD')
+print(r'\midrule')
+for col in score_cols:
+    series = df[col]
+    summaries = [series.mean(), series.median(), series.std()]
+    print(f'{col if col != "Obj-resp" else "Objection responsiveness"} & ' + 
+            ' & '.join([str(round(s, 2)) for s in summaries]) + r'\\')
+print(r'\bottomrule')
+
+
+
 
 
 
 
 
 # %%
+
+# older explatory analysis:
 
 for col in ['Essay', 'Pre-task']:
     group_and_bar(col, val1="Multi-structural", val2="Relational")
