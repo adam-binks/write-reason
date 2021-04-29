@@ -295,8 +295,12 @@ df = df.drop(columns=defunct_cols)
 # %%
 
 # find pearson correlation
-corr = df.corr()[score_cols].drop(score_cols).drop(['Average score', 'Essay.1']) \
-                .drop(essaywriting_frequency).drop('Nodes in text')
+omit_cols = ['Average score', 'Nodes in text', 'Essay.1', 'Issue node (topic statement)',
+'Issue node (question)', 'Issue node (stance)', 'Arg relations: arrow colour (local)',
+ 'Arg relations: arrow colour (global)', 'Arg relations: arrow colour (unclear)', 'Total nodes',
+ 'linkedCharsProportion']
+corr = df.corr()[score_cols].drop(score_cols).drop(essaywriting_frequency).drop(omit_cols)
+
 
 mask = np.triu(np.ones_like(corr, dtype=bool))
 pvalues = np.zeros_like(mask, dtype=float)
@@ -312,7 +316,7 @@ for score_i, score in enumerate(score_cols):
 def draw_heatmap(mask):
     f, ax = plt.subplots(figsize=(20, 20))
     sns.heatmap(round(corr, 2), cmap="coolwarm", square=True, ax=ax, cbar_kws={"shrink": .5}, 
-            vmin=-1, vmax=1, linewidths=.5, annot=pvalues, fmt='.2f', mask=mask)
+            vmin=-1, vmax=1, linewidths=.5, annot=True, fmt='.2f', mask=mask)
     plt.show()
 
 # plot the correlations as a heatmap, labelled with p values
@@ -327,26 +331,135 @@ draw_heatmap(mask)
 
 # todo - rotate, add heatmap colouring, denote p-values better, generate multiple tables, split reasonably
 
+def get_tidy_col_name(col):    
+    replacements = {
+        "Obj-resp": 'Objection resp.',
+        "Nodes in text proportion": 'Proportion of map nodes in text',
+        "linkedWordsProportion": 'Proportion of text words in map',
+        'Paper': 'Used paper',
+        'Essay struc list': 'Essay structure list',
+        'Fact sheet repro': 'Fact sheet reproduction',
+        'Num transformations': 'Number of transformations',
+        'Arg relations': 'Argumentative relations'
+    }
+    if col in replacements.keys():
+        return replacements[col]
+    return col
+
+section_ends = ['Issue node', 'Other relations', 'Fact sheet repro', 'Batching', 'Paper', 'One-to-one']
+
+def gen_table(properties):
+    output = r"\begin{tabular}{" + 'r' + 'S' * len(score_cols) + '}\n' + r'\toprule' + '\n'
+
+    output += 'Property & ' + \
+            ' & '.join([r'\rot{' + get_tidy_col_name(s) + '}' for s in score_cols]) \
+            + '\\\\ \n' + r'\midrule' + '\n'
+
+    for prop in properties:
+        prop_strings = [get_tidy_col_name(prop)]
+        for score in score_cols:
+            correlation, pvalue = stats.pearsonr(df[score], df[prop])
+
+            val = str(round(correlation, 2))
+            prop_strings.append('\\cca' + ('bold' if pvalue < 0.05 else '') + '{' + val + '}' + ('*' if pvalue < 0.05 else ''))
+
+        output += " & ".join(prop_strings) + " \\\\ \n"
+
+        if prop in section_ends or get_tidy_col_name(prop) in section_ends:
+            output += '\\addlinespace \n'
+
+    output += r'\bottomrule' + '\n'
+    output += r'\end{tabular}'
+    
+    return output
+
 all_properties = list(corr[score_cols[0]].keys())
 
-properties = all_properties[:5] # temp
+print(gen_table([
+    'Used graph',
+    'Paper',
+    'Fact sheet content (quoted)',
+    'Fact sheet content (paraphrased)',
+    'Fact sheet content',
+    'Original ideas',
+    'Issue node',
+    'Arg relations',
+    'Arg relations: arrow colour',
+    'Arg relations: pro/con connected',
+    'Arg relations: clustering',
+    'Provenance',
+    'Other relations',
+    'Planning essay order',
+    'Representing task requirements',
+]))
 
-output = r"\begin{tabular}{" + 'r' + 'c' * len(properties) + '}\n' + r'\toprule' + '\n'
+print ('\n\n\n')
 
-output += ' & '.join(properties) + '\\\\ \n' + r'\midrule' + '\n'
+print(gen_table([
+    'Essay struc list',
+    'Fact sheet repro',
+    'Num transformations',
+    'Interleaving',
+    'Batching',
+    'More explicit',
+    'Same explicit',
+    'Less explicit',
+    'One-to-many',
+    'One-to-one',
+    'Nodes in text proportion',
+    'linkedWordsProportion',
+    'Depth first proportion',
+    'Breadth first proportion'
+ ]))
+
+# %%
+
+# old version - horizontal layout
+# output = r"\begin{tabular}{" + 'r' + 'S' * len(properties) + '}\n' + r'\toprule' + '\n'
+
+# output += 'Marking criterion & ' + \
+#         ' & '.join([r'\rot{' + get_tidy_col_name(p) + '}' for p in properties]) \
+#         + '\\\\ \n' + r'\midrule' + '\n'
+
+# for score in score_cols:
+#     prop_strings = [get_tidy_col_name(score)]
+#     for prop in properties:
+#         correlation, pvalue = stats.pearsonr(df[score], df[prop])
+
+#         prop_strings.append(f'{round(correlation, 2)}' + ('\\textbf{*}' if pvalue < 0.05 else ''))
+
+#     output += " & ".join(prop_strings) + " \\\\ \n"
+
+# output += r'\bottomrule' + '\n'
+# output += r'\end{tabular}'
+
+# print(output)
+
+# %%
+
+# generate a csv table with heatmap data
+
+all_properties = list(corr[score_cols[0]].keys())
+
+properties = all_properties[14:] # temp
+
+output = ''
+
+output += 'Marking criterion,' + \
+        ','.join([("Repr. task requirements" if 'requirements' in p else p) for p in properties]) \
+         + '\n'
 
 for score in score_cols:
-    prop_strings = [score]
+    prop_strings = [score if score != "Obj-resp" else "Objection resp."]
     for prop in properties:
         correlation, pvalue = stats.pearsonr(df[score], df[prop])
-        prop_strings.append(f'{round(correlation, 2)}, {round(pvalue, 2)}')
 
-    output += " & ".join(prop_strings) + " \\\\ \n"
+        prop_strings.append(f'{round(correlation, 3)}' + ('*' if pvalue < 0.05 else ''))
 
-output += r'\bottomrule' + '\n'
-output += r'\end{tabular}'
+    output += ",".join(prop_strings) + " \n"
 
-print(output)
+with open('corr.csv', 'w') as f:
+    f.write(output)
 
 # %%
 
@@ -359,7 +472,7 @@ alpha = 0.05
 bonferonni_corrected_alpha = alpha / num_hypothesis_tests
 
 print(f'Bonferonni corrected alpha: {bonferonni_corrected_alpha}' + 
-        f' because we run {num_hypothesis_tests} tests')
+        f' because we run {num_hypothesis_tests} tests - {len(score_cols)} * {len(all_properties)}')
 print(f'Lowest pvalue: {min(flattened_pvalues)}')
 
 # %%

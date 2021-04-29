@@ -2,6 +2,8 @@
 import os
 import json
 import random
+import datetime
+
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -106,6 +108,45 @@ def load_timeseries_data(data):
     
     return df
 
+def calculate_total_time_in_write_reason(data, log=False):
+    df = load_timeseries_data(data)
+    df = df[df['event_type'] != 'document_content_markdown']
+
+    events_unsorted = df.to_dict('records')
+    # order by timestamp
+    events = sorted(events_unsorted, key=lambda k: k['timestamp'].to_pydatetime()) 
+
+    def print_if_logging(s):
+        if log:
+            print(s)
+
+    start_time = events[0]['timestamp']
+    print_if_logging(f'start {start_time} at {events[0]["event_type"]}')
+    total_time = datetime.timedelta(0)
+    prev_event = None
+    
+    def interval_too_big(event, prev_event):
+        MAX_INTERVAL = datetime.timedelta(minutes=15)
+        return (event['timestamp'].to_pydatetime() - prev_event['timestamp'].to_pydatetime()) > MAX_INTERVAL
+
+    for event in events:
+        if prev_event and (event['event_type'] == 'session_start' or event == events[-1] or interval_too_big(event, prev_event)):
+            end_event = event if event == events[-1] else prev_event
+
+            if end_event['event_type'] != 'session_start':
+                end_time = end_event['timestamp'].to_pydatetime()
+                interval = end_time - start_time
+                total_time += interval
+                print_if_logging(f'end   {end_time} at {end_event["event_type"]}, interval {interval}')
+            else:
+                print_if_logging('end   skipped - session_start')
+
+            start_time = event['timestamp'].to_pydatetime()
+            print_if_logging(f'start {start_time} at {event["event_type"]}')
+        
+        prev_event = event
+    
+    return total_time
 
 if __name__ == "__main__":
     DIR = r"C:\Users\jelly\OneDrive - University of St Andrews\Summer study\logs"
@@ -113,11 +154,18 @@ if __name__ == "__main__":
     i = 0
 
     dfs = {}
-    for fname in ['logs 17.json']: # os.listdir(DIR):
+    total_time = datetime.timedelta(0)
+    for fname in os.listdir(DIR):
         print(f'loading {fname}')
         with open(os.path.join(DIR, fname), 'r', encoding="utf8") as f:
             data = json.load(f)
-            df = load_timeseries_data(data)
+            time = calculate_total_time_in_write_reason(data, log=False)
+            total_time += time
+            print(f'time spent - {fname}: {time}')
 
-            dfs[fname] = df
-            calculate_df_time_totals(df)
+            # df = load_timeseries_data(data)
+
+            # dfs[fname] = df
+            # calculate_df_time_totals(df)
+        
+        print(f'grand total time spent: {total_time}')
