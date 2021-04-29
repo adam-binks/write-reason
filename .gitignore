@@ -148,3 +148,4 @@ pretasks/23.txt
 pretasks/25.txt
 pretasks/26.txt
 *.pyc
+analysis/corr.csv
