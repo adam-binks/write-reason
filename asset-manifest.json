@@ -1,28 +1,28 @@
 {
   "files": {
-    "main.css": "/write-reason/static/css/main.30ecede3.chunk.css",
-    "main.js": "/write-reason/static/js/main.08c816a8.chunk.js",
-    "main.js.map": "/write-reason/static/js/main.08c816a8.chunk.js.map",
-    "runtime-main.js": "/write-reason/static/js/runtime-main.b9c216d1.js",
-    "runtime-main.js.map": "/write-reason/static/js/runtime-main.b9c216d1.js.map",
-    "static/css/2.afd3daa1.chunk.css": "/write-reason/static/css/2.afd3daa1.chunk.css",
-    "static/js/2.3c1f3ab6.chunk.js": "/write-reason/static/js/2.3c1f3ab6.chunk.js",
-    "static/js/2.3c1f3ab6.chunk.js.map": "/write-reason/static/js/2.3c1f3ab6.chunk.js.map",
-    "index.html": "/write-reason/index.html",
-    "precache-manifest.fdac0dc315034e3a946633aa5f3530c4.js": "/write-reason/precache-manifest.fdac0dc315034e3a946633aa5f3530c4.js",
-    "service-worker.js": "/write-reason/service-worker.js",
-    "static/css/2.afd3daa1.chunk.css.map": "/write-reason/static/css/2.afd3daa1.chunk.css.map",
-    "static/css/main.30ecede3.chunk.css.map": "/write-reason/static/css/main.30ecede3.chunk.css.map",
-    "static/media/CrimsonText-Bold.ttf": "/write-reason/static/media/CrimsonText-Bold.89b16aa6.ttf",
-    "static/media/CrimsonText-Regular.ttf": "/write-reason/static/media/CrimsonText-Regular.62f10d46.ttf",
-    "static/media/instructions.mp4": "/write-reason/static/media/instructions.e7449ed9.mp4",
-    "static/media/logo.png": "/write-reason/static/media/logo.09afe702.png"
+    "main.css": "/write-reason/editor/static/css/main.e144c8b8.chunk.css",
+    "main.js": "/write-reason/editor/static/js/main.b6dff67e.chunk.js",
+    "main.js.map": "/write-reason/editor/static/js/main.b6dff67e.chunk.js.map",
+    "runtime-main.js": "/write-reason/editor/static/js/runtime-main.39390368.js",
+    "runtime-main.js.map": "/write-reason/editor/static/js/runtime-main.39390368.js.map",
+    "static/css/2.b8073c2c.chunk.css": "/write-reason/editor/static/css/2.b8073c2c.chunk.css",
+    "static/js/2.c7a054fa.chunk.js": "/write-reason/editor/static/js/2.c7a054fa.chunk.js",
+    "static/js/2.c7a054fa.chunk.js.map": "/write-reason/editor/static/js/2.c7a054fa.chunk.js.map",
+    "index.html": "/write-reason/editor/index.html",
+    "precache-manifest.c2a5d372889a93701e4241854793e6bf.js": "/write-reason/editor/precache-manifest.c2a5d372889a93701e4241854793e6bf.js",
+    "service-worker.js": "/write-reason/editor/service-worker.js",
+    "static/css/2.b8073c2c.chunk.css.map": "/write-reason/editor/static/css/2.b8073c2c.chunk.css.map",
+    "static/css/main.e144c8b8.chunk.css.map": "/write-reason/editor/static/css/main.e144c8b8.chunk.css.map",
+    "static/media/CrimsonText-Bold.ttf": "/write-reason/editor/static/media/CrimsonText-Bold.89b16aa6.ttf",
+    "static/media/CrimsonText-Regular.ttf": "/write-reason/editor/static/media/CrimsonText-Regular.62f10d46.ttf",
+    "static/media/instructions.mp4": "/write-reason/editor/static/media/instructions.f31121e4.mp4",
+    "static/media/logo.png": "/write-reason/editor/static/media/logo.510deb2b.png"
   },
   "entrypoints": [
-    "static/js/runtime-main.b9c216d1.js",
-    "static/css/2.afd3daa1.chunk.css",
-    "static/js/2.3c1f3ab6.chunk.js",
-    "static/css/main.30ecede3.chunk.css",
-    "static/js/main.08c816a8.chunk.js"
+    "static/js/runtime-main.39390368.js",
+    "static/css/2.b8073c2c.chunk.css",
+    "static/js/2.c7a054fa.chunk.js",
+    "static/css/main.e144c8b8.chunk.css",
+    "static/js/main.b6dff67e.chunk.js"
   ]
 }
