@@ -15,15 +15,12 @@ export default class IntroSection extends Component {
             <div className='intro-section'>
                 <img src={Logo} className='logo' alt="Write Reason"/>
 
-                {!localStorage.getItem('editorHasLoadedBefore') && <h2>Thank you for your answer. Next, please watch the video 
-                            below about how to use Write Reason, then try it out!</h2> }
-
-                {process.env.NODE_ENV !== 'development' && <>
+                <>
                     <Player src={Video} poster={Thumbnail}>
                         <BigPlayButton className='play-button' position='center' />
                     </Player>
-                    <p><i>Not sure how something works? Get in touch at <a href={'mailto:' + emailAddress + '?subject=Write Reason question'}>{emailAddress}</a>.</i></p>
-                </>}
+                    {/* <p><i>Not sure how something works? Get in touch at <a href={'mailto:' + emailAddress + '?subject=Write Reason question'}>{emailAddress}</a>.</i></p> */}
+                </>
             </div>
         );
       }

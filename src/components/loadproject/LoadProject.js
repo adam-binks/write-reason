@@ -132,7 +132,7 @@ export default class LoadProject extends Component {
         return (
             <div className="load-project">
                 <button className="pure-button button-primary" onClick={this.addProject}>New project</button>
-                {process.env.NODE_ENV === 'development' && <><DropZone onDrop={this.onDropLogFiles}>
+                {/* {process.env.NODE_ENV === 'development' && <><DropZone onDrop={this.onDropLogFiles}>
                         {({getRootProps, getInputProps}) => (
                             <section>
                             <div {...getRootProps()}>
@@ -148,7 +148,7 @@ export default class LoadProject extends Component {
                             exploreLog={this.exploreLog} />
                     </div>
                     </>
-                    }
+                    } */}
                 <div className="load-project-table">
                     {this.state.projects && this.state.projects.length > 0 && <ProjectList projects={this.state.projects}
                         deleteProject={this.deleteProject}

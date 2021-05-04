@@ -39,11 +39,6 @@ export default class App extends Component {
 
         var startPhase = 'loadproject'
 
-        // show the pre-task question if it hasn't been completed
-        if (!localStorage.getItem('preTaskSubmission')) {
-            startPhase = 'pretask'
-        }
-
         this.state = {
             phase: startPhase,
             params: undefined
@@ -85,11 +80,11 @@ export default class App extends Component {
             })
         }
 
-        // open the instructions modal on first load
-        if (!localStorage.getItem('editorHasLoadedBefore')) {
-            localStorage.setItem('editorHasLoadedBefore', true)
-            this.setState({ modalIsOpen: true })
-        }
+        // // open the instructions modal on first load
+        // if (!localStorage.getItem('editorHasLoadedBefore')) {
+        //     localStorage.setItem('editorHasLoadedBefore', true)
+        //     this.setState({ modalIsOpen: true })
+        // }
     }
 
     transitionToMenu() {
