@@ -80,12 +80,6 @@ export default class App extends Component {
                 phase: "editor"
             })
         }
-
-        // open the instructions modal on first load
-        if (!localStorage.getItem('editorHasLoadedBefore')) {
-            localStorage.setItem('editorHasLoadedBefore', true)
-            this.setState({ modalIsOpen: true })
-        }
     }
 
     transitionToMenu() {

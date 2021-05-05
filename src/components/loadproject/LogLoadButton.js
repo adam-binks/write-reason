@@ -1,9 +1,8 @@
-import React, { Component } from 'react';
-import Logo from '../../assets/logo.png'
+import React, { Component } from 'react'
 
 export default class LogLoadButton extends Component {
     render() {
-        const src = true ? '/thumbnails/' + this.props.participant_id + '.png' : Logo
+        const src = process.env.PUBLIC_URL + '/thumbnails/' + this.props.participant_id + '.png'
         return (
             <div className='log-load-button' onClick={() => {this.props.loadLog(this.props.participant_id)}}>
                 <img src={src} className='log-load-img' alt={"P" + this.props.participant_id + " map thumbnail"}/>
