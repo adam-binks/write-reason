@@ -17,14 +17,34 @@
     color: red;
 }
 
-.timeline {
+.slide-out-pane {
     background-color: lightgrey;
     height: 100vh;
     overflow-y: auto;
-    width: 250px;
+    width: 200px;
     position: absolute;
     right: 0px;
     top: 0px;
+    font-size: small;
+}
+
+.slide-out-pane.closed {
+    display: none;
+}
+
+.timeline-toggle-button  {
+    position: absolute;
+    right: 200px;
+    top: 50px;
+    transform: translate(0, -50%);
+}
+
+.timeline-toggle-button.closed  {
+    right: 0px;
+}
+
+.timeline {
+    background-color: lightgrey;
 }
 
 .timeline p {
@@ -53,7 +73,13 @@
 }
 
 .timeline button.explore-head {
-    outline-width: 2px !important;
-    outline-style: solid;
     text-decoration: underline !important;
+}
+
+.timeline-description {
+    margin-left: 10px;
+    margin-right: 10px;
+    padding: 10px;
+    font-style: italic;
+    background-color: papayawhip;
 }

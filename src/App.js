@@ -12,6 +12,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import SaveButton from './components/experiment/SaveButton';
 import LogExploreTimeline from './components/experiment/LogExploreTimeline';
+import SlideOutPane from './components/experiment/SlideOutPane';
 import ExperimentInfo from './components/experiment/ExperimentInfo';
 import PreTaskSection from './components/loadproject/PreTaskSection';
 import IntroSection from './components/loadproject/IntroSection';
@@ -38,11 +39,6 @@ export default class App extends Component {
         super(props);
 
         var startPhase = 'loadproject'
-
-        // show the pre-task question if it hasn't been completed
-        if (!localStorage.getItem('preTaskSubmission')) {
-            startPhase = 'pretask'
-        }
 
         this.state = {
             phase: startPhase,
@@ -94,10 +90,6 @@ export default class App extends Component {
 
     transitionToMenu() {
         if (this.state.sharedState) {
-            if (this.state.sharedState.getStateIsDirty() && !window.confirm('Are you sure you want to go back to the menu? You will lose your unsaved changes.')) {
-                return // user wants to stay on this page
-            }
-
             this.state.sharedState.finishCondition()
         }
         this.setState({
@@ -161,7 +153,7 @@ export default class App extends Component {
                                 <GraphPane sharedState={this.state.sharedState} />
                             </SplitPane>
                             {
-                                this.state.sharedState.params.logExplore && <LogExploreTimeline sharedState={this.state.sharedState}/>
+                                this.state.sharedState.params.logExplore && <SlideOutPane><LogExploreTimeline sharedState={this.state.sharedState}/></SlideOutPane>
                             }
                             <SaveButton 
                                 sharedState={this.state.sharedState}

@@ -107,10 +107,26 @@ export default class SharedState {
             this.map = project.map ? this.mapFromJSON(project.map) : {}
             this.getEditor().mapHasLoaded()
             this.projectName = project.name
-            document.title = this.projectName + " - Write Reason"
         })
         
         this.lastSavedDocumentState = this.getEditor().getValue().document // editor is definitely not dirty right now
+    }
+
+    downloadThisLog() {
+        const save = {
+            map: this.mapToJSON(),
+            node_id_counter: this.node_id_counter,
+            doc_value: this.getEditor().getValue().toJSON(),
+            graph_value: this.graphPane.toJSON(),
+        }
+        this.params.logExplore.project.log.saves.push(save)
+        this.downloadJSON({projects: [{
+            map: this.mapToJSON(),
+            node_id_counter: this.node_id_counter,
+            doc_value: this.getEditor().getValue().toJSON(),
+            graph_value: this.graphPane.toJSON(),
+            log: this.params.logExplore.project.log,
+        }]}, "x.json")
     }
 
     save(cb=undefined, forceLog=false) {

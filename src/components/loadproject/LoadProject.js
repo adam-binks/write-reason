@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
 import './LoadProject.css'
 import db from '../../db.js'
-import ProjectList from './ProjectsList.js'
-import LogsExploreTable from './LogsExploreTable.js'
 import SharedState from '../../shared_state.js';
+import LogLoadButton from './LogLoadButton.js';
 import { toast } from 'react-toastify';
-import DropZone from 'react-dropzone';
 
 export default class LoadProject extends Component {
     constructor(props) {
@@ -13,11 +11,7 @@ export default class LoadProject extends Component {
         this.state = {
             projects: []
         };
-        this.addProject = this.addProject.bind(this)
-        this.deleteProject = this.deleteProject.bind(this)
         this.loadProject = this.loadProject.bind(this)
-        this.renameProject = this.renameProject.bind(this)
-        this.duplicateProject = this.duplicateProject.bind(this)
         this.updateProjectsFromDb = this.updateProjectsFromDb.bind(this)
         this.onDropLogFiles = this.onDropLogFiles.bind(this)
         this.exploreLog = this.exploreLog.bind(this)
@@ -50,46 +44,6 @@ export default class LoadProject extends Component {
         const params = { condition: 'graph' }
         const sharedState = new SharedState(id, params)
         this.props.transitionToEditor(sharedState)
-    }
-
-    addProject() {
-        const project = {name: window.prompt('Name your project', 'New project')}
-        if (project.name) {
-            db.table('projects')
-                .add(project)
-                .then(() => {
-                    this.updateProjectsFromDb()
-                });
-        }
-    }
-
-    renameProject(id) {
-        db.table('projects')
-            .get(id)
-            .then((project) => {
-                const newName = window.prompt('Set a new project name', project.name)
-                if (newName) {
-                    db.table('projects')
-                        .update(id, { name: newName })
-                        .then(() => {
-                            this.updateProjectsFromDb()
-                        })
-                }
-            });
-    }
-
-    duplicateProject(id) {
-        db.table('projects')
-            .get(id)
-            .then((project) => {
-                project.name += ' (copy)'
-                delete project.id // set a new one automatically
-                db.table('projects')
-                    .add(project)
-                    .then(() => {
-                        this.updateProjectsFromDb()
-                    });
-            })
     }
 
     deleteProject(id) {
@@ -129,33 +83,24 @@ export default class LoadProject extends Component {
     }
     
     render() {
+        const participant_ids = [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 14, 15, 17, 18, 21, 22, 23, 25, 26]
+
+        const loadLog = (id) => {
+            import('../../assets/logs/' + id + '.json')
+            .then((log) => {
+                console.log(log)
+                this.exploreLog(log.projects[0], log.projects[0].log.saves.length - 1)
+            })
+            document.title = "P" + id + " - Write Reason"
+        }
+
         return (
             <div className="load-project">
-                <button className="pure-button button-primary" onClick={this.addProject}>New project</button>
-                {process.env.NODE_ENV === 'development' && <><DropZone onDrop={this.onDropLogFiles}>
-                        {({getRootProps, getInputProps}) => (
-                            <section>
-                            <div {...getRootProps()}>
-                                <input {...getInputProps()} />
-                                <p>Drop/select log files</p>
-                            </div>
-                            </section>
-                        )}
-                    </DropZone>
-                    
-                    <div className="load-project-table">
-                        <LogsExploreTable logs={localStorage.getItem('logsToExplore') && JSON.parse(localStorage.getItem('logsToExplore')).logs} 
-                            exploreLog={this.exploreLog} />
-                    </div>
-                    </>
+                <div className="logs-grid">
+                    {
+                        participant_ids.map(id => <LogLoadButton participant_id={id} loadLog={loadLog} key={id}/>)
                     }
-                <div className="load-project-table">
-                    {this.state.projects && this.state.projects.length > 0 && <ProjectList projects={this.state.projects}
-                        deleteProject={this.deleteProject}
-                        loadProject={this.loadProject}
-                        renameProject={this.renameProject}
-                        duplicateProject={this.duplicateProject}
-                    />}
+                    
                 </div>
             </div>
         );

@@ -20,7 +20,7 @@ export default class TimelineEntry extends Component {
         }
 
         if (this.props.isExploreHead) {
-            theClass += ' explore-head'
+            theClass += ' explore-head pure-button-active'
         }
 
         return (

@@ -181,6 +181,8 @@ export default class LogExploreTimeline extends Component {
 
         return (
             <div className="timeline" onKeyDown={this.handleKeyDown}>
+                <p className="timeline-description">This timeline shows in what order the participant built their map and text.
+                <br/>Click on an event to see which elements had been created at that time.</p>
                 <p>{project.filename}</p>
                 {logs.map((log, index) => {
                         const getDate = (timestamp) => timestamp.substring("2020-".length, "2020-07-21".length)

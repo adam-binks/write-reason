@@ -2,7 +2,7 @@
   "name": "write-reason",
   "version": "0.1.0",
   "private": true,
-  "homepage": ".",
+  "homepage": "https://adam-binks.github.io/write-reason/explore",
   "dependencies": {
     "@react-pdf/renderer": "^1.6.8",
     "color-string": "^1.5.3",
@@ -33,7 +33,7 @@
   },
   "scripts": {
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
+    "deploy": "gh-pages -d build -e explore",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
