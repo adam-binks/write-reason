@@ -8,18 +8,14 @@ import "video-react/dist/video-react.css"
 export default class IntroSection extends Component {
     
     render() {
-        // eslint-disable-next-line no-useless-concat
-        var emailAddress = 'ab' + '390' + '@st-andrews' + '.ac.uk' // concat to avoid having the raw email address in git
-
         return (
             <div className='intro-section'>
-                <img src={Logo} className='logo' alt="Write Reason"/>
+                <a href="https://adam-binks.github.io/write-reason/"><img src={Logo} className='logo' alt="Write Reason"/></a>
 
                 <>
                     <Player src={Video} poster={Thumbnail}>
                         <BigPlayButton className='play-button' position='center' />
                     </Player>
-                    {/* <p><i>Not sure how something works? Get in touch at <a href={'mailto:' + emailAddress + '?subject=Write Reason question'}>{emailAddress}</a>.</i></p> */}
                 </>
             </div>
         );
