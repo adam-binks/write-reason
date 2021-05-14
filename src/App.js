@@ -93,7 +93,11 @@ export default class App extends Component {
     }
 
     getStorageUsed() {
-        navigator.storage.estimate().then(estimate => {
+        navigator.storage && navigator.storage.estimate().then(estimate => {
+            if (!estimate) {
+                return
+            }
+
             var storageUsed = estimate.usage / estimate.quota * 100
             if (storageUsed < 0.00000005) {
                 storageUsed = 0 // prevent 10e-16 sort of thing
