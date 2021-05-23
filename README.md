@@ -10,6 +10,8 @@ Write Reason was built using [React](https://reactjs.org/), with [Slate.js](slat
 
 Write Reason was designed by researchers at the University of St Andrews and the University of Victoria: [Adam Binks](https://adambinks.me), [Alice Toniolo](https://at258.host.cs.st-andrews.ac.uk) and [Miguel Nacenta](http://nacenta.com/).
 
+[![DOI](https://zenodo.org/badge/219541861.svg)](https://zenodo.org/badge/latestdoi/219541861)
+
 ## How to run locally
 
 Clone the git repo, run `npm install`, then run `npm start`.
