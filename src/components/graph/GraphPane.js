@@ -156,7 +156,7 @@ class GraphPane extends React.Component {
     }
 
     addNoNodesIndicator(svg, nodes, mouse_follower) {
-        this.noNodesIndicator = svg.text("Double click to add a node").addClass("indicator-text").attr({x: "40%", y: "45%"});
+        this.noNodesIndicator = svg.text("No nodes created").addClass("indicator-text").attr({x: "40%", y: "45%"});
         this.noNodesIndicator.on('dblclick', (e) => {
             this.addNodeAtScreenLocation(svg, nodes, mouse_follower, "", e.clientX, e.clientY, true);
         });
