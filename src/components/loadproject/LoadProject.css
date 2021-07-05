@@ -6,6 +6,21 @@
     text-align: left;
 }
 
+.license {
+  color: grey;
+  background-color: papayawhip;
+  padding: 10px;
+}
+
+.license h4 {
+  margin: 0;
+  padding: 0;
+}
+
+.license p {
+  margin-top: 5px;
+}
+
 .load-project {
     display: flex;
     padding: 30px;

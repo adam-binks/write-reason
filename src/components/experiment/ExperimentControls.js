@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import Countdown, { zeroPad } from 'react-countdown-now';
 import './ExperimentalControls.css';
 
 const countdownRenderer = ({ hours, minutes, seconds, completed }) => {
@@ -15,10 +14,8 @@ const countdownRenderer = ({ hours, minutes, seconds, completed }) => {
 export default class ExperimentControls extends Component {
     render() {
         const buttonText = this.props.sharedState.params.sandboxMode ? "Exit sandbox mode" : "Submit argument";
-        const countdown = <Countdown date={Date.now() + (this.props.sharedState.params.sandboxMode ? 3 * 1000 * 60 : this.props.sharedState.params.duration)} renderer={countdownRenderer} />
         return (
             <div className="experiment-controls">
-                {countdown}
                 {/* <button onClick={() => console.log(this.props.sharedState.getArgumentMarkdown())}>Log argument</button>
                 <button onClick={this.props.sharedState.downloadExperimentData}>Download experiment data</button> */}
                 <button tabIndex="-1" onClick={() => {

@@ -126,7 +126,6 @@ export default class App extends Component {
                         <IntroSection />
                         <LoadProject transitionToEditor={this.transitionToEditor} autoload={false} />
                         <footer>
-                            {this.state.storageUsed && <p>Storage used: {this.state.storageUsed}%</p>}
                             <p><b>Privacy notice</b>: This webpage simply downloads the Write Reason application to your browser. Once loaded, 
                             everything runs locally in your browser. No data is sent back to the server.</p>
                         </footer>

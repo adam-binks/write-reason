@@ -95,14 +95,30 @@ export default class LoadProject extends Component {
         }
 
         return (
-            <div className="load-project">
-                <div className="logs-grid">
-                    {
-                        participant_ids.map(id => <LogLoadButton participant_id={id} loadLog={loadLog} key={id}/>)
-                    }
-                    
+            <>
+                <div className="load-project">
+                    <div className="logs-grid">
+                        {
+                            participant_ids.map(id => <LogLoadButton participant_id={id} loadLog={loadLog} key={id}/>)
+                        }
+                        
+                    </div>
                 </div>
-            </div>
+
+                <div className='intro-section'> <div className="license">
+                    <h4>Using this data</h4>
+
+                    <p>This data was collected by Adam Binks, Alice Toniolo and Miguel Nacenta, from consenting study participants, and is released  
+                        under <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>. The data is shared in an anonymised form
+                        as approved by University of St Andrews <a href="https://www.st-andrews.ac.uk/research/environment/committees/utrec/">UTREC</a>, approval code CS14896. 
+                        By accessing this data you agree not to use it to attempt to reidentify individual participants.</p>
+
+                    {/* <p>When giving attribution, use the following citation information:<br/>
+                    Adam Binks, Alice Toniolo and Miguel A. Nacenta. (2021) Representational transformations: Using maps to write essays ... [etc, rest of citation]</p> */}
+
+                    <a href="representational_transformations_data.zip"><button className="pure-button">Download the data</button></a>
+                </div> </div>
+            </>
         );
       }
 }
