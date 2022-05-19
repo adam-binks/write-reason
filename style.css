@@ -4,7 +4,19 @@ html {
     font-family: 'Varela Round';
 }
 
+.content {
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 img {
     width: 320px;
     min-height: 110px; 
+}
+
+.mostwidth {
+    width: 800px;
+    max-width: 80%;
+    margin-bottom: 30px;
 }
