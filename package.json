@@ -2,7 +2,7 @@
   "name": "write-reason",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://adam-binks.github.io/write-reason/explore",
+  "homepage": "https://writereason.app/explore",
   "dependencies": {
     "@react-pdf/renderer": "^1.6.8",
     "dexie": "^3.0.1",

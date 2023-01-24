@@ -7,9 +7,9 @@ export default class IntroSection extends Component {
     render() {
         return (
             <div className='intro-section'>
-                <a href="https://adambinks.me/write-reason/"><img src={Logo} className='logo' alt="Write Reason"/></a>
+                <a href="https://writereason.app"><img src={Logo} className='logo' alt="Write Reason"/></a>
 
-                <p>Explore the representations created by participants in our study,<br/> <em>Representational transformations: Using maps to write essays</em>.</p>
+                <p>Explore the representations created by participants in our study,<br/> <a href="https://doi.org/10.1016/j.ijhcs.2022.102851"><em>Representational transformations: Using maps to write essays</em></a>.</p>
             </div>
         );
       }
