@@ -1,28 +1,28 @@
 {
   "files": {
-    "main.css": "/write-reason/editor/static/css/main.7f7de45a.chunk.css",
-    "main.js": "/write-reason/editor/static/js/main.76937e25.chunk.js",
-    "main.js.map": "/write-reason/editor/static/js/main.76937e25.chunk.js.map",
-    "runtime-main.js": "/write-reason/editor/static/js/runtime-main.39390368.js",
-    "runtime-main.js.map": "/write-reason/editor/static/js/runtime-main.39390368.js.map",
-    "static/css/2.b8073c2c.chunk.css": "/write-reason/editor/static/css/2.b8073c2c.chunk.css",
-    "static/js/2.4ded798f.chunk.js": "/write-reason/editor/static/js/2.4ded798f.chunk.js",
-    "static/js/2.4ded798f.chunk.js.map": "/write-reason/editor/static/js/2.4ded798f.chunk.js.map",
-    "index.html": "/write-reason/editor/index.html",
-    "precache-manifest.f6a697f1d612e713ef49c6415eaec5af.js": "/write-reason/editor/precache-manifest.f6a697f1d612e713ef49c6415eaec5af.js",
-    "service-worker.js": "/write-reason/editor/service-worker.js",
-    "static/css/2.b8073c2c.chunk.css.map": "/write-reason/editor/static/css/2.b8073c2c.chunk.css.map",
-    "static/css/main.7f7de45a.chunk.css.map": "/write-reason/editor/static/css/main.7f7de45a.chunk.css.map",
-    "static/media/CrimsonText-Bold.ttf": "/write-reason/editor/static/media/CrimsonText-Bold.89b16aa6.ttf",
-    "static/media/CrimsonText-Regular.ttf": "/write-reason/editor/static/media/CrimsonText-Regular.62f10d46.ttf",
-    "static/media/instructions.mp4": "/write-reason/editor/static/media/instructions.f31121e4.mp4",
-    "static/media/logo.png": "/write-reason/editor/static/media/logo.510deb2b.png"
+    "main.css": "/editor/static/css/main.7f7de45a.chunk.css",
+    "main.js": "/editor/static/js/main.13f46c1e.chunk.js",
+    "main.js.map": "/editor/static/js/main.13f46c1e.chunk.js.map",
+    "runtime-main.js": "/editor/static/js/runtime-main.dea8d184.js",
+    "runtime-main.js.map": "/editor/static/js/runtime-main.dea8d184.js.map",
+    "static/css/2.b8073c2c.chunk.css": "/editor/static/css/2.b8073c2c.chunk.css",
+    "static/js/2.e3588474.chunk.js": "/editor/static/js/2.e3588474.chunk.js",
+    "static/js/2.e3588474.chunk.js.map": "/editor/static/js/2.e3588474.chunk.js.map",
+    "index.html": "/editor/index.html",
+    "precache-manifest.b73d0689881019206fd5c1bebfc35ce5.js": "/editor/precache-manifest.b73d0689881019206fd5c1bebfc35ce5.js",
+    "service-worker.js": "/editor/service-worker.js",
+    "static/css/2.b8073c2c.chunk.css.map": "/editor/static/css/2.b8073c2c.chunk.css.map",
+    "static/css/main.7f7de45a.chunk.css.map": "/editor/static/css/main.7f7de45a.chunk.css.map",
+    "static/media/CrimsonText-Bold.ttf": "/editor/static/media/CrimsonText-Bold.89b16aa6.ttf",
+    "static/media/CrimsonText-Regular.ttf": "/editor/static/media/CrimsonText-Regular.62f10d46.ttf",
+    "static/media/instructions.mp4": "/editor/static/media/instructions.f31121e4.mp4",
+    "static/media/logo.png": "/editor/static/media/logo.510deb2b.png"
   },
   "entrypoints": [
-    "static/js/runtime-main.39390368.js",
+    "static/js/runtime-main.dea8d184.js",
     "static/css/2.b8073c2c.chunk.css",
-    "static/js/2.4ded798f.chunk.js",
+    "static/js/2.e3588474.chunk.js",
     "static/css/main.7f7de45a.chunk.css",
-    "static/js/main.76937e25.chunk.js"
+    "static/js/main.13f46c1e.chunk.js"
   ]
 }
