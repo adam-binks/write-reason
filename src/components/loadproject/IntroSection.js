@@ -10,7 +10,7 @@ export default class IntroSection extends Component {
     render() {
         return (
             <div className='intro-section'>
-                <a href="https://adam-binks.github.io/write-reason/"><img src={Logo} className='logo' alt="Write Reason"/></a>
+                <a href="https://writereason.app"><img src={Logo} className='logo' alt="Write Reason"/></a>
 
                 <>
                     <Player src={Video} poster={Thumbnail}>
