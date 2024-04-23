@@ -8,7 +8,7 @@
     "color-string": "^1.5.5",
     "dexie": "^3.0.3",
     "emotion": "^10.0.27",
-    "gh-pages": "^2.2.0",
+    "gh-pages": "^5.0.0",
     "immutable": "^4.0.0-rc.12",
     "react": "^16.14.0",
     "react-countdown-now": "^2.1.2",
